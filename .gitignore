@@ -1,0 +1,8 @@
+Release/**
+Debug/**
+ipch/**
+CGProyect.sdf
+CGProyect/Release/**
+CGProyect/Debug/**
+CGProyect/out.txt
+CGProyect/ReadMe.txt
