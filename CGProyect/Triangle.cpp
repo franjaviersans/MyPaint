@@ -11,13 +11,12 @@ CTriangle::CTriangle()
 	m_p1.x = m_p1.y = 0;
 	m_p2.x = m_p2.y = 0;
 	m_id = IM_TRIANGLE;
+	m_bgcolor = 0;
+	m_linecolor = 0;
 }
 
 void CTriangle::OnDraw(CDC *pDC,POINT WindowsSize)
 {
-	COLORREF color;
-	color = 0;
-	
 
 	POINT p0, p1, p2;
 	p0.x = (int)(m_p0.x * WindowsSize.x);
@@ -28,9 +27,9 @@ void CTriangle::OnDraw(CDC *pDC,POINT WindowsSize)
 	p2.y = (int)(m_p2.y * WindowsSize.y);
 
 
-	CLine::DrawLine(p0, p1, pDC, color);
-	CLine::DrawLine(p1, p2, pDC, color);
-	CLine::DrawLine(p0, p2, pDC, color);
+	CLine::DrawLine(p0, p1, pDC, m_linecolor);
+	CLine::DrawLine(p1, p2, pDC, m_linecolor);
+	CLine::DrawLine(p0, p2, pDC, m_linecolor);
 }
 
 void CTriangle::Serialize(CArchive& ar)
@@ -147,4 +146,17 @@ void CTriangle::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 	// put back the old objects
 	pDC->SelectObject(pOldBrush);
+}
+
+
+bool CTriangle::Intersect(POINT p){
+	return true;
+}
+
+void CTriangle::ChangeFillColor(COLORREF c){
+	m_bgcolor = c;
+}
+
+void CTriangle::ChangeLineColor(COLORREF c){
+	m_linecolor = c;
 }

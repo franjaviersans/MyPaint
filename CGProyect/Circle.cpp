@@ -8,6 +8,8 @@ CCircle::CCircle()
 	m_center.x = m_center.y = 0;
 	m_tangente.x = m_tangente.y = 0;
 	m_id = IM_CIRCLE;
+	m_bgcolor = 0;
+	m_linecolor = 0;
 }
 
 void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
@@ -26,9 +28,6 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 
 	//pDC->Ellipse(center.x - r, center.y - r, center.x + r, center.y + r);
 
-	COLORREF color;
-	color = 0;
-
 	int x,y,d;
 	x = 0;
 	y = r;
@@ -38,7 +37,7 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 	delta		= 2;
 	incy		= -2 * r +5;
 
-	Draw8Points(x, y, center, color, pDC);
+	Draw8Points(x, y, center, m_linecolor, pDC);
 	while (y > x){
 		if (d < 0) {
 			d += incx;
@@ -49,7 +48,7 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 		}
 		++x;
 		incx += delta;
-		Draw8Points(x, y, center, color, pDC);
+		Draw8Points(x, y, center, m_linecolor, pDC);
 	}
 }
 
@@ -163,4 +162,16 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	// put back the old objects
 	pDC->SelectObject(pOldBrush);
 	
+}
+
+bool CCircle::Intersect(POINT p){
+	return true;
+}
+
+void CCircle::ChangeFillColor(COLORREF c){
+	m_bgcolor = c;
+}
+
+void CCircle::ChangeLineColor(COLORREF c){
+	m_linecolor = c;
 }

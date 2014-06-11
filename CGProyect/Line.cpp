@@ -7,6 +7,8 @@ CLine::CLine()
 	m_p1.x	= m_p1.y = 0;
 	m_p2.x	= m_p2.y = 0;
 	m_id	= 	IM_LINE;
+	m_bgcolor = 0;
+	m_linecolor = 0;
 }
 
 void CLine::DrawLine(POINT p0, POINT p1, CDC *pDC, COLORREF color){
@@ -67,16 +69,13 @@ void CLine::DrawLine(POINT p0, POINT p1, CDC *pDC, COLORREF color){
 void CLine::OnDraw(CDC *pDC, POINT WindowsSize)
 {
 	
-	COLORREF color;
-	color = 0;
-
 	POINT p0, p1;
 	p0.x = (int)(m_p1.x * WindowsSize.x);
 	p0.y = (int)(m_p1.y * WindowsSize.y);
 	p1.x = (int)(m_p2.x * WindowsSize.x);
 	p1.y = (int)(m_p2.y * WindowsSize.y);
 
-	CLine::DrawLine(p0, p1, pDC, color);
+	CLine::DrawLine(p0, p1, pDC, m_linecolor);
 }
 
 void CLine::Serialize(CArchive& ar)
@@ -117,3 +116,14 @@ void CLine::DrawSelected(CDC *pDC, POINT WindowsSize){
 	pDC->SelectObject(pOldBrush);
 }
 
+bool CLine::Intersect(POINT p){
+	return true;
+}
+
+void CLine::ChangeFillColor(COLORREF c){
+	m_bgcolor = c;
+}
+
+void CLine::ChangeLineColor(COLORREF c){
+	m_linecolor = c;
+}

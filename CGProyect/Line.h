@@ -13,6 +13,9 @@ public:
 	virtual void Serialize(CArchive &);
 	virtual void DrawSelected(CDC *, POINT);
 	static void DrawLine(POINT, POINT, CDC *, COLORREF);
+	virtual bool Intersect(POINT);
+	virtual void ChangeFillColor(COLORREF);
+	virtual void ChangeLineColor(COLORREF);
 };
 
 #endif

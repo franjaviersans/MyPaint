@@ -8,6 +8,8 @@ CBezier::CBezier()
 	m_center.x = m_center.y = 0;
 	m_tangente.x = m_tangente.y = 0;
 	m_id = IM_BEZIER;
+	m_bgcolor = 0;
+	m_linecolor = 0;
 }
 
 void CBezier::OnDraw(CDC *pDC)
@@ -72,4 +74,16 @@ void CBezier::Draw8Points(int x, int y, POINT center, COLORREF color, CDC *pDC){
 	pDC->SetPixel(center.x - y, center.y + x, color);
 	pDC->SetPixel(center.x - y, center.y - x, color);
 	pDC->SetPixel(center.x + y, center.y - x, color);
+}
+
+bool CBezier::Intersect(POINT p){
+	return true;
+}
+
+void CBezier::ChangeFillColor(COLORREF c){
+	m_bgcolor = c;
+}
+
+void CBezier::ChangeLineColor(COLORREF c){
+	m_linecolor = c;
 }
