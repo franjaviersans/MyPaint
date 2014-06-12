@@ -15,11 +15,6 @@ protected: // create from serialization only
 // Attributes
 public:
 	CCGProyectDoc* GetDocument() const;
-	int m_current, m_selected;
-	POINT m_WindosSize;
-	bool m_pressed, m_bezier;
-	int m_triangle;
-	COLORREF m_Color;
 
 // Operations
 public:
@@ -55,6 +50,20 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnChangeChangebordercolor();
+	afx_msg void OnChangeDeletefigure();
+	afx_msg void OnChangeDeselectfigure();
+	afx_msg void OnChangeFillfigure();
+	afx_msg void OnChangeMovetobackground();
+	afx_msg void OnChangeMovetoforeground();
+	afx_msg void OnChangeBackgroundcolor();
+	afx_msg void OnForegroundKey();
+	afx_msg void OnBackgroundKey();
+	afx_msg void OnDeselectKey();
+	afx_msg void OnDeleteKey();
+	afx_msg void OnChangeDeteleallfigures();
+	afx_msg void OnChangeUnselectfigure();
+	afx_msg void OnDeleteOneKey();
 };
 
 #ifndef _DEBUG  // debug version in CGProyectView.cpp

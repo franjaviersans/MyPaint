@@ -13,6 +13,10 @@ public:
 	CBezier();
 	virtual void OnDraw(CDC *pDC);
 	virtual void Serialize(CArchive& ar);
+	virtual bool Intersect(POINT);
+	virtual void ChangeFillColor(COLORREF);
+	virtual void ChangeLineColor(COLORREF);
+	virtual void ChangeFilled();
 
 private:
 	void Draw8Points(int x, int y, POINT center, COLORREF color, CDC *pDC);

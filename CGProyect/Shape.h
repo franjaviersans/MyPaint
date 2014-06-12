@@ -33,11 +33,20 @@ public:
 
 class CShape
 {
-public:
+protected:
 	int m_id;
+	COLORREF m_bgcolor;
+	COLORREF m_linecolor;
+	bool m_filled;
+
+public:
 	virtual void OnDraw(CDC *, POINT) = 0;
     virtual void Serialize(CArchive& ar) = 0;
 	virtual void DrawSelected(CDC *, POINT) = 0;
+	virtual bool Intersect(POINT) = 0;
+	virtual void ChangeFillColor(COLORREF) = 0;
+	virtual void ChangeLineColor(COLORREF) = 0;
+	virtual void ChangeFilled() = 0;
 };
 
 #endif

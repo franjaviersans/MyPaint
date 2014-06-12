@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include <list>
+#include <vector>
 #include <iostream>
-using namespace std;
 
 #include "Circle.h"
 #include "Ellipse.h"
@@ -26,9 +25,12 @@ public:
 
 // Operations
 public:
-	list<CShape *> m_figures;
+	std::vector<CShape *> m_figures;
 	int m_current;
-	bool m_pressed;
+	POINT m_WindosSize;
+	bool m_pressed, m_bezier;
+	std::vector<CShape *>::iterator position;
+	int m_triangle;
 
 // Overrides
 public:
