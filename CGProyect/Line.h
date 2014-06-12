@@ -16,6 +16,7 @@ public:
 	virtual bool Intersect(POINT);
 	virtual void ChangeFillColor(COLORREF);
 	virtual void ChangeLineColor(COLORREF);
+	virtual void ChangeFilled();
 };
 
 #endif

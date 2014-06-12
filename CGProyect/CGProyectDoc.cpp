@@ -70,6 +70,7 @@ void CCGProyectDoc::Serialize(CArchive& ar)
 	else
 	{
 		m_figures.clear();
+		position = m_figures.begin();
 		int n, id;
 		ar >> n;
 

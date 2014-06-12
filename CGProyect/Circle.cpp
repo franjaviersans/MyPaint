@@ -10,6 +10,7 @@ CCircle::CCircle()
 	m_id = IM_CIRCLE;
 	m_bgcolor = 0;
 	m_linecolor = 0;
+	m_filled = false;
 }
 
 void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
@@ -26,7 +27,16 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 	int incx, incy, delta;
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
 
-	//pDC->Ellipse(center.x - r, center.y - r, center.x + r, center.y + r);
+	//Draw filled figured
+	if(m_filled){
+		CBrush brushBlue(m_bgcolor);
+		CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
+
+		pDC->Ellipse(center.x - r, center.y - r, center.x + r, center.y + r);
+
+		pDC->SelectObject(pOldBrush);
+	}
+		
 
 	int x,y,d;
 	x = 0;
@@ -174,4 +184,8 @@ void CCircle::ChangeFillColor(COLORREF c){
 
 void CCircle::ChangeLineColor(COLORREF c){
 	m_linecolor = c;
+}
+
+void CCircle::ChangeFilled(){
+	m_filled = !m_filled;
 }

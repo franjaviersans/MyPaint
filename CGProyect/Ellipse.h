@@ -17,6 +17,7 @@ public:
 	virtual bool Intersect(POINT);
 	virtual void ChangeFillColor(COLORREF);
 	virtual void ChangeLineColor(COLORREF);
+	virtual void ChangeFilled();
 
 private:
 	void EllipsePoints(int x, int y, POINT center, COLORREF color, CDC *pDC);

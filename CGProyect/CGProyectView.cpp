@@ -36,11 +36,17 @@ BEGIN_MESSAGE_MAP(CCGProyectView, CView)
 ON_WM_RBUTTONDOWN()
 ON_COMMAND(ID_CHANGE_CHANGEBORDERCOLOR, &CCGProyectView::OnChangeChangebordercolor)
 ON_COMMAND(ID_CHANGE_DELETEFIGURE, &CCGProyectView::OnChangeDeletefigure)
-ON_COMMAND(ID_CHANGE_DESELECTFIGURE, &CCGProyectView::OnChangeDeselectfigure)
 ON_COMMAND(ID_CHANGE_FILLFIGURE, &CCGProyectView::OnChangeFillfigure)
 ON_COMMAND(ID_CHANGE_MOVETOBACKGROUND, &CCGProyectView::OnChangeMovetobackground)
 ON_COMMAND(ID_CHANGE_MOVETOFOREGROUND, &CCGProyectView::OnChangeMovetoforeground)
 ON_COMMAND(ID_CHANGE_BACKGROUNDCOLOR, &CCGProyectView::OnChangeBackgroundcolor)
+ON_COMMAND(ID_FOREGROUND_KEY, &CCGProyectView::OnForegroundKey)
+ON_COMMAND(ID_BACKGROUND_KEY, &CCGProyectView::OnBackgroundKey)
+ON_COMMAND(ID_DESELECT_KEY, &CCGProyectView::OnDeselectKey)
+ON_COMMAND(ID_DELETE_KEY, &CCGProyectView::OnDeleteKey)
+ON_COMMAND(ID_CHANGE_DETELEALLFIGURES, &CCGProyectView::OnChangeDeteleallfigures)
+ON_COMMAND(ID_CHANGE_UNSELECTFIGURE, &CCGProyectView::OnChangeUnselectfigure)
+ON_COMMAND(ID_DELETE_ONE_KEY, &CCGProyectView::OnDeleteOneKey)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -106,12 +112,10 @@ CCGProyectDoc* CCGProyectView::GetDocument() const // non-debug version is inlin
 #endif //_DEBUG
 
 
+
 // CCGProyectView message handlers
-
-
 void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
 	CCGProyectDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
@@ -169,8 +173,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
-		CCGProyectDoc* pDoc = GetDocument();
+	CCGProyectDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
@@ -211,8 +214,6 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
-	// TODO: Agregue aquí su código de controlador de mensajes o llame al valor predeterminado
 	CCGProyectDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
@@ -374,19 +375,11 @@ void CCGProyectView::OnChangeDeletefigure()
 }
 
 
-void CCGProyectView::OnChangeDeselectfigure()
-{
-	CCGProyectDoc* pDoc = GetDocument();
-	pDoc->position = pDoc->m_figures.end();
-	Invalidate(1);
-}
-
-
 void CCGProyectView::OnChangeFillfigure()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
-		
+		(*pDoc->position)->ChangeFilled();
 		Invalidate(1);
 	}
 }
@@ -397,9 +390,9 @@ void CCGProyectView::OnChangeMovetobackground()
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		std::vector<CShape *>::iterator it = pDoc->position;
-		if(++it != pDoc->m_figures.end()){
-						pDoc->position = it;
-			std::swap(pDoc->position, it);
+		if(it != pDoc->m_figures.begin()){
+			std::swap(*pDoc->position, *(--it));
+			pDoc->position = it;
 			Invalidate(1);
 		}
 	}
@@ -411,11 +404,87 @@ void CCGProyectView::OnChangeMovetoforeground()
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		std::vector<CShape *>::iterator it = pDoc->position;
-		if(it != pDoc->m_figures.begin()){
-						pDoc->position = it;
-			std::swap(pDoc->position, it);
+		if(++it != pDoc->m_figures.end()){
+			std::swap(*pDoc->position, *(it));
+			pDoc->position = it;
 			Invalidate(1);
 		}
 	}
 }
 
+
+//F Key
+void CCGProyectView::OnForegroundKey()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		std::vector<CShape *>::iterator it = pDoc->position;
+		if(++it != pDoc->m_figures.end()){
+			std::swap(*pDoc->position, *(it));
+			pDoc->position = it;
+			Invalidate(1);
+		}
+	}
+}
+
+//B Key
+void CCGProyectView::OnBackgroundKey()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		std::vector<CShape *>::iterator it = pDoc->position;
+		if(it != pDoc->m_figures.begin()){
+			std::swap(*pDoc->position, *(--it));
+			pDoc->position = it;
+			Invalidate(1);
+		}
+	}
+}
+
+//U Key
+void CCGProyectView::OnDeselectKey()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->position = pDoc->m_figures.end();
+	Invalidate(1);
+}
+
+//Control + delete
+void CCGProyectView::OnDeleteKey()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(!pDoc->m_figures.empty()){
+		pDoc->m_figures.clear();
+		pDoc->position = pDoc->m_figures.begin();
+		Invalidate(1);
+	}
+}
+
+
+void CCGProyectView::OnChangeDeteleallfigures()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(!pDoc->m_figures.empty()){
+		pDoc->m_figures.clear();
+		pDoc->position = pDoc->m_figures.begin();
+		Invalidate(1);
+	}
+}
+
+
+void CCGProyectView::OnChangeUnselectfigure()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->position = pDoc->m_figures.end();
+	Invalidate(1);
+}
+
+
+void CCGProyectView::OnDeleteOneKey()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		pDoc->position = pDoc->m_figures.erase(pDoc->position);
+		Invalidate(1);
+	}
+}

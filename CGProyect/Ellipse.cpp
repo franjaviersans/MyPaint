@@ -10,6 +10,7 @@ CEllipse::CEllipse()
 	m_id = IM_ELLIPSE;
 	m_bgcolor = 0;
 	m_linecolor = 0;
+	m_filled = false;
 }
 
 void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
@@ -30,6 +31,17 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 	bb			= b * b;
 	center.x	= (p1.x + p0.x) >> 1;
 	center.y	= (p1.y + p0.y) >> 1;
+
+	//Draw filled figured
+	if(m_filled){
+		CBrush brushBlue(m_bgcolor);
+		CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
+
+		pDC->Ellipse(center.x - a, center.y - b, center.x + a, center.y + b);
+
+		pDC->SelectObject(pOldBrush);
+	}
+
 
 	//Block 1
 	x = 0;
@@ -188,4 +200,8 @@ void CEllipse::ChangeFillColor(COLORREF c){
 
 void CEllipse::ChangeLineColor(COLORREF c){
 	m_linecolor = c;
+}
+
+void CEllipse::ChangeFilled(){
+	m_filled = !m_filled;
 }

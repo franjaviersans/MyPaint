@@ -10,6 +10,7 @@ CBezier::CBezier()
 	m_id = IM_BEZIER;
 	m_bgcolor = 0;
 	m_linecolor = 0;
+	m_filled = false;
 }
 
 void CBezier::OnDraw(CDC *pDC)
@@ -86,4 +87,8 @@ void CBezier::ChangeFillColor(COLORREF c){
 
 void CBezier::ChangeLineColor(COLORREF c){
 	m_linecolor = c;
+}
+
+void CBezier::ChangeFilled(){
+	m_filled = !m_filled;
 }

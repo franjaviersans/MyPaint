@@ -9,6 +9,7 @@ CLine::CLine()
 	m_id	= 	IM_LINE;
 	m_bgcolor = 0;
 	m_linecolor = 0;
+	m_filled = false;
 }
 
 void CLine::DrawLine(POINT p0, POINT p1, CDC *pDC, COLORREF color){
@@ -126,4 +127,8 @@ void CLine::ChangeFillColor(COLORREF c){
 
 void CLine::ChangeLineColor(COLORREF c){
 	m_linecolor = c;
+}
+
+void CLine::ChangeFilled(){
+	m_filled = !m_filled;
 }

@@ -13,6 +13,7 @@ CTriangle::CTriangle()
 	m_id = IM_TRIANGLE;
 	m_bgcolor = 0;
 	m_linecolor = 0;
+	m_filled = false;
 }
 
 void CTriangle::OnDraw(CDC *pDC,POINT WindowsSize)
@@ -82,6 +83,19 @@ void CTriangle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	pp1.x = max(p0.x, max(p1.x, p2.x));
 	pp1.y = max(p0.y, max(p1.y, p2.y));
 	
+
+
+
+	//Draw filled figured
+	if(m_filled){
+		//CBrush brushBlue(m_bgcolor);
+		//CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
+
+		//pDC->SelectObject(pOldBrush);
+	}
+
+
+
 	// create and select a thick, black pen
 	CPen penBlack;
 	penBlack.CreatePen(PS_DOT, 1, RGB(255, 0, 0));
@@ -159,4 +173,8 @@ void CTriangle::ChangeFillColor(COLORREF c){
 
 void CTriangle::ChangeLineColor(COLORREF c){
 	m_linecolor = c;
+}
+
+void CTriangle::ChangeFilled(){
+	m_filled = !m_filled;
 }

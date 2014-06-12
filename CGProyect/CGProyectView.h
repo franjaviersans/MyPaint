@@ -57,6 +57,13 @@ public:
 	afx_msg void OnChangeMovetobackground();
 	afx_msg void OnChangeMovetoforeground();
 	afx_msg void OnChangeBackgroundcolor();
+	afx_msg void OnForegroundKey();
+	afx_msg void OnBackgroundKey();
+	afx_msg void OnDeselectKey();
+	afx_msg void OnDeleteKey();
+	afx_msg void OnChangeDeteleallfigures();
+	afx_msg void OnChangeUnselectfigure();
+	afx_msg void OnDeleteOneKey();
 };
 
 #ifndef _DEBUG  // debug version in CGProyectView.cpp
