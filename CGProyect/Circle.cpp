@@ -115,7 +115,7 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 	POINT p0, p1;
 	p0.x = center.x - r;
-	p0.y	= center.y - r;
+	p0.y = center.y - r;
 	p1.x = center.x - r;
 	p1.y = center.y + r;
 
@@ -123,7 +123,7 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	pDC->LineTo(p1);
 
 	p0.x = center.x - r;
-	p0.y	= center.y - r;
+	p0.y = center.y - r;
 	p1.x = center.x + r;
 	p1.y = center.y - r;
 
@@ -131,7 +131,7 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	pDC->LineTo(p1);
 
 	p0.x = center.x - r;
-	p0.y	= center.y + r;
+	p0.y = center.y + r;
 	p1.x = center.x + r;
 	p1.y = center.y + r;
 
@@ -174,8 +174,25 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	
 }
 
-bool CCircle::Intersect(POINT p){
-	return true;
+bool CCircle::Intersect(CPOINT2F p){
+
+	double dx = m_center.x - m_tangente.x;
+	double dy = m_center.y - m_tangente.y;
+	double r = sqrt( (double)dx * dx + dy * dy);
+
+
+	if((m_center.x - r <= p.x && p.x <= m_center.x + r) && 
+		(m_center.y - r <= p.y && p.y <= m_center.y + r))
+		return true;
+	else 
+		return false;
+}
+
+void CCircle::Translate(CPOINT2F p){
+	m_center.x += p.x;
+	m_center.y += p.y;
+	m_tangente.x += p.x;
+	m_tangente.y += p.y;
 }
 
 void CCircle::ChangeFillColor(COLORREF c){

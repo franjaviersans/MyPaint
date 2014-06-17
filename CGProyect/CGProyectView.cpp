@@ -47,6 +47,11 @@ ON_COMMAND(ID_DELETE_KEY, &CCGProyectView::OnDeleteKey)
 ON_COMMAND(ID_CHANGE_DETELEALLFIGURES, &CCGProyectView::OnChangeDeteleallfigures)
 ON_COMMAND(ID_CHANGE_UNSELECTFIGURE, &CCGProyectView::OnChangeUnselectfigure)
 ON_COMMAND(ID_DELETE_ONE_KEY, &CCGProyectView::OnDeleteOneKey)
+ON_COMMAND(ID_CHANGE_NEWBEZIERCURVE, &CCGProyectView::OnChangeNewbeziercurve)
+ON_COMMAND(ID_CHANGE_ENTERINSERTMODE, &CCGProyectView::OnChangeEnterinsertmode)
+ON_COMMAND(ID_CHANGE_ENTEREDITMODE, &CCGProyectView::OnChangeEntereditmode)
+ON_COMMAND(ID_ACCELERATORKEYI, &CCGProyectView::OnAcceleratorkeyi)
+ON_COMMAND(ID_ACCELERATORKEYE, &CCGProyectView::OnAcceleratorkeye)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -121,51 +126,88 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 	if (!pDoc)
 		return;
 	pDoc->m_pressed =true;
-	switch (pDoc->m_current)
-	{
-		case IM_CIRCLE:	  {
-			CCircle *C = new CCircle;
-			C->m_center.x  = C->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
-			C->m_center.y  = C->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
-			pDoc->m_figures.push_back(C);
-			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
-			break;
-		}
-		case IM_LINE:	  {
-			CLine *L = new CLine;
-			L->m_p1.x = L->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-			L->m_p1.y = L->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-			pDoc->m_figures.push_back(L);
-			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
-			break;
-		}
-		case IM_ELLIPSE:  {
-			CEllipse *E = new CEllipse;
-			E->m_p1.x = E->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-			E->m_p1.y = E->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-			pDoc->m_figures.push_back(E);
-			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
-			break;
-		}
-		case IM_TRIANGLE:{
-			if(pDoc->m_triangle == 1){
-				std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
-				((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-				pDoc->m_triangle = 0;
-			}else{
-				CTriangle *T = new CTriangle;
-				T->m_p0.x = T->m_p1.x = T->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				T->m_p0.y = T->m_p1.y = T->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-				++pDoc->m_triangle;
-				pDoc->m_figures.push_back(T);
+
+	if(pDoc->m_insertmode){
+		switch (pDoc->m_current)
+		{
+			case IM_CIRCLE:	  {
+				CCircle *C = new CCircle;
+				C->m_center.x  = C->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
+				C->m_center.y  = C->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
+				pDoc->m_figures.push_back(C);
 				pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+				break;
 			}
-			break;
+			case IM_LINE:	  {
+				CLine *L = new CLine;
+				L->m_p1.x = L->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+				L->m_p1.y = L->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				pDoc->m_figures.push_back(L);
+				pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+				break;
+			}
+			case IM_ELLIPSE:  {
+				CEllipse *E = new CEllipse;
+				E->m_p1.x = E->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+				E->m_p1.y = E->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				pDoc->m_figures.push_back(E);
+				pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+				break;
+			}
+			case IM_TRIANGLE:{
+				if(pDoc->m_triangle == 1){
+					std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
+					((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+					((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					pDoc->m_triangle = 0;
+				}else{
+					CTriangle *T = new CTriangle;
+					T->m_p0.x = T->m_p1.x = T->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+					T->m_p0.y = T->m_p1.y = T->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					++pDoc->m_triangle;
+					pDoc->m_figures.push_back(T);
+					pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+				}
+				break;
+			}
+			case IM_BEZIER:  {
+				CBezier *B = new CBezier;
+				B->arr[0][0].x = B->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
+				B->arr[0][0].y = B->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+				pDoc->m_figures.push_back(B);
+				pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+				break;
+			}
+
+		}
+		Invalidate(1);
+	}else{
+		if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
+			 pDoc->m_initialPoint = point;
+		}else{
+			CPOINT2F p;
+			p.x = (float)point.x / pDoc->m_WindosSize.x;
+			p.y = (float)point.y / pDoc->m_WindosSize.y;
+
+			bool found = false;
+
+			if(pDoc->position != pDoc->m_figures.end()){
+				
+			}
+
+			if(!found){
+				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
+					if((*i)->Intersect(p)){
+						pDoc->position = i;
+					}
+				}
+			}
 		}
 
+		Invalidate(1);
+		/*if(pDoc->position != pDoc->m_figures.end())
+			(*pDoc->position)->DrawSelected(pDC,pDoc->m_WindosSize);*/
 	}
-	Invalidate(1);
 
 	CView::OnLButtonDown(nFlags, point);
 }
@@ -177,37 +219,62 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
-	if ((nFlags & MK_LBUTTON) && pDoc->m_pressed)
-	{
-		std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
-		switch (pDoc->m_current)
+
+	if(pDoc->m_insertmode){
+		if ((nFlags & MK_LBUTTON) && pDoc->m_pressed)
 		{
-			case IM_CIRCLE:	{
-				((CCircle*)(*i))->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CCircle*)(*i))->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
-				break;
-			}
-			case IM_LINE:	{
-				((CLine *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CLine *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-				break;
-			}
-			case IM_ELLIPSE:{
-				((CEllipse *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CEllipse *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-				break;
-			}
-			case IM_TRIANGLE:{
-				if(pDoc->m_triangle == 1){
-					((CTriangle *)(*i))->m_p1.x = ((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-					((CTriangle *)(*i))->m_p1.y = ((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+			std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
+			switch (pDoc->m_current)
+			{
+				case IM_CIRCLE:	{
+					((CCircle*)(*i))->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
+					((CCircle*)(*i))->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
+					break;
 				}
-				break;
+				case IM_LINE:	{
+					((CLine *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+					((CLine *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					break;
+				}
+				case IM_ELLIPSE:{
+					((CEllipse *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+					((CEllipse *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					break;
+				}
+				case IM_TRIANGLE:{
+					if(pDoc->m_triangle == 1){
+						((CTriangle *)(*i))->m_p1.x = ((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+						((CTriangle *)(*i))->m_p1.y = ((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					}
+					break;
+				}
+				case IM_BEZIER:  {
+					((CBezier *)(*i))->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
+					((CBezier *)(*i))->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+					break;
+				}
 			}
+			Invalidate(1);
 		}
-		Invalidate(1);
+		
+	}else{
+		if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
+			
+			CPOINT2F p;
+
+			 p.x = (float)(point.x - pDoc->m_initialPoint.x) / pDoc->m_WindosSize.x;
+			 p.y = (float)(point.y - pDoc->m_initialPoint.y) / pDoc->m_WindosSize.y;
+
+			 (*pDoc->position)->Translate(p);
+
+			 pDoc->m_initialPoint = point;
+			 Invalidate(1);
+		}
 	}
+
 	pDoc->m_pressed = false;
+
+	
 	CView::OnLButtonUp(nFlags, point);
 }
 
@@ -218,36 +285,60 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
-	if ((nFlags & MK_LBUTTON) && pDoc->m_pressed)
-	{
-		std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
-		switch (pDoc->m_current)
+	if(pDoc->m_insertmode){
+		if ((nFlags & MK_LBUTTON) && pDoc->m_pressed)
 		{
-			case IM_CIRCLE:	{
-				((CCircle*)(*i))->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CCircle*)(*i))->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
-				break;
-			}
-			case IM_LINE:	{
-				((CLine *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CLine *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-				break;
-			}
-			case IM_ELLIPSE:{
-				((CEllipse *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CEllipse *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-				break;
-			}
-			case IM_TRIANGLE:{
-				if(pDoc->m_triangle == 1){
-					((CTriangle *)(*i))->m_p1.x = ((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-					((CTriangle *)(*i))->m_p1.y = ((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+			std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
+			switch (pDoc->m_current)
+			{
+				case IM_CIRCLE:	{
+					((CCircle*)(*i))->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
+					((CCircle*)(*i))->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
+					break;
 				}
-				break;
+				case IM_LINE:	{
+					((CLine *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+					((CLine *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					break;
+				}
+				case IM_ELLIPSE:{
+					((CEllipse *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+					((CEllipse *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					break;
+				}
+				case IM_TRIANGLE:{
+					if(pDoc->m_triangle == 1){
+						((CTriangle *)(*i))->m_p1.x = ((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
+						((CTriangle *)(*i))->m_p1.y = ((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					}
+					break;
+				}
+				case IM_BEZIER:  {
+					((CBezier *)(*i))->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
+					((CBezier *)(*i))->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+					break;
+				}
 			}
+			Invalidate(1);
 		}
-		InvalidateRect(NULL, 1);
+	}else{
+		if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
+			
+			CPOINT2F p;
+
+			 p.x = (float)(point.x - pDoc->m_initialPoint.x) / pDoc->m_WindosSize.x;
+			 p.y = (float)(point.y - pDoc->m_initialPoint.y) / pDoc->m_WindosSize.y;
+
+			 (*pDoc->position)->Translate(p);
+
+			 pDoc->m_initialPoint = point;
+			 Invalidate(1);
+		}
+
 	}
+
+	
+
 	CView::OnMouseMove(nFlags, point);
 
 }
@@ -257,10 +348,6 @@ void CCGProyectView::OnButtonBezier()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_BEZIER;
-	if(pDoc->m_triangle == 1){
-		GetDocument()->m_figures.pop_back(); 
-		Invalidate(1);
-	}
 }
 
 
@@ -268,10 +355,6 @@ void CCGProyectView::OnButtonCircle()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_CIRCLE;
-	if(pDoc->m_triangle == 1){
-		GetDocument()->m_figures.pop_back(); 
-		Invalidate(1);
-	}
 }
 
 
@@ -279,10 +362,6 @@ void CCGProyectView::OnButtonEllipse()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_ELLIPSE;
-	if(pDoc->m_triangle == 1){
-		GetDocument()->m_figures.pop_back(); 
-		Invalidate(1);
-	}
 }
 
 
@@ -290,10 +369,6 @@ void CCGProyectView::OnButtonLine()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_LINE;
-	if(pDoc->m_triangle == 1){
-		GetDocument()->m_figures.pop_back(); 
-		Invalidate(1);
-	} 
 }
 
 
@@ -316,14 +391,22 @@ void CCGProyectView::OnSize(UINT nType, int cx, int cy)
 
 void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 {
-
+	CCGProyectDoc* pDoc = GetDocument();
+	
 	CMenu menu;
-	menu.LoadMenu(IDR_MENU1);
+	if(pDoc->m_insertmode){
+		menu.LoadMenu(IDR_MENU3);
+	}else{
+		if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_BEZIER)	menu.LoadMenu(IDR_MENU2);
+		else																					menu.LoadMenu(IDR_MENU1);
+	}
     CMenu *pSub = menu.GetSubMenu(0);
     // Modify menu items here if necessary (e.g. gray out items)
     int nCmd = pSub->TrackPopupMenuEx(
         TPM_LEFTALIGN | TPM_LEFTBUTTON,
         point.x, point.y, this, NULL);
+
+	//m_lastClick = point;
 
 }
 
@@ -333,7 +416,7 @@ void CCGProyectView::OnRButtonDown(UINT nFlags, CPoint point)
 	CView::OnRButtonDown(nFlags, point);
 }
 
-
+//Change the border color
 void CCGProyectView::OnChangeChangebordercolor()
 {
 
@@ -349,6 +432,7 @@ void CCGProyectView::OnChangeChangebordercolor()
 	}
 }
 
+//Change background color
 void CCGProyectView::OnChangeBackgroundcolor()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -363,8 +447,7 @@ void CCGProyectView::OnChangeBackgroundcolor()
 	}
 }
 
-
-
+//Delete only one figure
 void CCGProyectView::OnChangeDeletefigure()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -374,7 +457,7 @@ void CCGProyectView::OnChangeDeletefigure()
 	}
 }
 
-
+//Change if a figure is filled
 void CCGProyectView::OnChangeFillfigure()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -384,7 +467,7 @@ void CCGProyectView::OnChangeFillfigure()
 	}
 }
 
-
+//Move a figure to background
 void CCGProyectView::OnChangeMovetobackground()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -398,7 +481,7 @@ void CCGProyectView::OnChangeMovetobackground()
 	}
 }
 
-
+//Move a figure to foreground
 void CCGProyectView::OnChangeMovetoforeground()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -460,7 +543,7 @@ void CCGProyectView::OnDeleteKey()
 	}
 }
 
-
+//Delete all figures
 void CCGProyectView::OnChangeDeteleallfigures()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -471,7 +554,7 @@ void CCGProyectView::OnChangeDeteleallfigures()
 	}
 }
 
-
+//Unselect a figure
 void CCGProyectView::OnChangeUnselectfigure()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -479,7 +562,7 @@ void CCGProyectView::OnChangeUnselectfigure()
 	Invalidate(1);
 }
 
-
+//Delete only one figure
 void CCGProyectView::OnDeleteOneKey()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -487,4 +570,45 @@ void CCGProyectView::OnDeleteOneKey()
 		pDoc->position = pDoc->m_figures.erase(pDoc->position);
 		Invalidate(1);
 	}
+}
+
+
+//Elevate the degree of the bezier curve
+void CCGProyectView::OnChangeNewbeziercurve()
+{
+
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_BEZIER){
+			((CBezier*)(*pDoc->position))->addControlpoint(0,0);
+		}
+	}
+}
+
+
+void CCGProyectView::OnChangeEnterinsertmode()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->m_insertmode = true;
+}
+
+
+void CCGProyectView::OnChangeEntereditmode()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->m_insertmode = false;
+}
+
+//I Key
+void CCGProyectView::OnAcceleratorkeyi()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->m_insertmode = true;
+}
+
+//E Key
+void CCGProyectView::OnAcceleratorkeye()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->m_insertmode = false;
 }

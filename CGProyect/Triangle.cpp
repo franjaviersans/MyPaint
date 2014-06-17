@@ -87,6 +87,7 @@ void CTriangle::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 
 	//Draw filled figured
+	//TODO 
 	if(m_filled){
 		//CBrush brushBlue(m_bgcolor);
 		//CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
@@ -163,8 +164,28 @@ void CTriangle::DrawSelected(CDC *pDC, POINT WindowsSize){
 }
 
 
-bool CTriangle::Intersect(POINT p){
-	return true;
+bool CTriangle::Intersect(CPOINT2F p){
+
+	CPOINT2F p0, p1;
+	p0.x = min(m_p0.x, min(m_p1.x, m_p2.x));
+	p0.y = min(m_p0.y, min(m_p1.y, m_p2.y));
+	p1.x = max(m_p0.x, max(m_p1.x, m_p2.x));
+	p1.y = max(m_p0.y, max(m_p1.y, m_p2.y));
+
+	if((p0.x <= p.x && p.x <= p1.x) && 
+		(p0.y <= p.y && p.y <= p1.y))
+		return true;
+	else 
+		return false;
+}
+
+void CTriangle::Translate(CPOINT2F p){
+	m_p0.x += p.x;
+	m_p0.y += p.y;
+	m_p1.x += p.x;
+	m_p1.y += p.y;
+	m_p2.x += p.x;
+	m_p2.y += p.y;
 }
 
 void CTriangle::ChangeFillColor(COLORREF c){

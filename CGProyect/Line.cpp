@@ -41,15 +41,14 @@ void CLine::DrawLine(POINT p0, POINT p1, CDC *pDC, COLORREF color){
 		d		= dx - (dy << 1);
 		IncD1	= - (dy << 1);
 		IncD2	= (dx - dy) << 1;
-		x		= p0.x;
-		y		= p0.y;
 	}
 
 	d	= dx - (dy << 1);
 	x	= p0.x;
 	y	= p0.y;
 	
-	pDC->SetPixel(p0.x, p0.y, color);
+	if(!invert) pDC->SetPixel(x, y, color);
+	else		pDC->SetPixel(y, x, color);
 
 	while(x < p1.x){
 		if(d <= 0){
@@ -117,8 +116,21 @@ void CLine::DrawSelected(CDC *pDC, POINT WindowsSize){
 	pDC->SelectObject(pOldBrush);
 }
 
-bool CLine::Intersect(POINT p){
-	return true;
+bool CLine::Intersect(CPOINT2F p){
+	double epsilon = 0.02;
+	if(abs((p.x - m_p1.x) * (m_p2.y - m_p1.y)  - (p.y - m_p1.y) * (m_p2.x - m_p1.x)) <= epsilon 
+		&& ((m_p1.x <= p.x && p.x <= m_p2.x) || (m_p2.x <= p.x && p.x <= m_p1.x)) 
+		&& ((m_p1.y <= p.y && p.y <= m_p2.y) || (m_p2.y <= p.y && p.y <= m_p1.y)))
+		return true;
+	else
+		return false;
+}
+
+void CLine::Translate(CPOINT2F p){
+	m_p1.x += p.x;
+	m_p1.y += p.y;
+	m_p2.x += p.x;
+	m_p2.y += p.y;
 }
 
 void CLine::ChangeFillColor(COLORREF c){

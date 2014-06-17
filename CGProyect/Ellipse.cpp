@@ -190,8 +190,19 @@ void CEllipse::DrawSelected(CDC *pDC, POINT WindowsSize){
 	pDC->SelectObject(pOldBrush);
 }
 
-bool CEllipse::Intersect(POINT p){
-	return true;
+bool CEllipse::Intersect(CPOINT2F p){
+	if(((m_p1.x <= p.x && p.x <= m_p2.x) || (m_p2.x <= p.x && p.x <= m_p1.x)) && 
+		((m_p1.y <= p.y && p.y <= m_p2.y) || (m_p2.y <= p.y && p.y <= m_p1.y)))
+		return true;
+	else 
+		return false;
+}
+
+void CEllipse::Translate(CPOINT2F p){
+	m_p1.x += p.x;
+	m_p1.y += p.y;
+	m_p2.x += p.x;
+	m_p2.y += p.y;
 }
 
 void CEllipse::ChangeFillColor(COLORREF c){

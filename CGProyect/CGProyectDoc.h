@@ -27,8 +27,8 @@ public:
 public:
 	std::vector<CShape *> m_figures;
 	int m_current;
-	POINT m_WindosSize;
-	bool m_pressed, m_bezier;
+	POINT m_WindosSize, m_lastClick, m_initialPoint;
+	bool m_pressed, m_bezier, m_insertmode;
 	std::vector<CShape *>::iterator position;
 	int m_triangle;
 
