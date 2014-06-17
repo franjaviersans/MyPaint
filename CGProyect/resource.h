@@ -7,6 +7,8 @@
 #define IDR_MAINFRAME                   128
 #define IDR_CGProyectTYPE               130
 #define IDR_MENU1                       312
+#define IDR_MENU2                       313
+#define IDR_MENU3                       314
 #define ID_BUTTON_LINE                  32771
 #define ID_BUTTON_CIRCLE                32772
 #define ID_BUTTON_ELLIPSE               32773
@@ -26,15 +28,21 @@
 #define ID_DELETE_KEY                   32798
 #define ID_DESELECT_KEY                 32799
 #define ID_CHANGE_UNSELECTFIGURE        32802
-#define ID_ACCELERATOR32803             32803
 #define ID_DELETE_ONE_KEY               32803
+#define ID_CHANGE_NEWBEZIERCURVE        32805
+#define ID_CHANGE_ENTERINSERTMODE       32806
+#define ID_CHANGE_SEPARATOR             32807
+#define ID_CHANGE_ENTEREDITMODE         32808
+#define ID_CHANGE_BR                    32809
+#define ID_ACCELERATORKEYI              32810
+#define ID_ACCELERATORKEYE              32811
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        314
-#define _APS_NEXT_COMMAND_VALUE         32805
+#define _APS_NEXT_RESOURCE_VALUE        315
+#define _APS_NEXT_COMMAND_VALUE         32813
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

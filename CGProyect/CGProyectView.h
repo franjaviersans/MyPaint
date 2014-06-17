@@ -64,6 +64,13 @@ public:
 	afx_msg void OnChangeDeteleallfigures();
 	afx_msg void OnChangeUnselectfigure();
 	afx_msg void OnDeleteOneKey();
+	afx_msg void OnChangeNewbeziercurve();
+	afx_msg void OnChangeEnterinsertmode();
+	afx_msg void OnChangeEntereditmode();
+	afx_msg void OnAccelerator32810();
+	afx_msg void OnAcceleratorheyi();
+	afx_msg void OnAcceleratorkeyi();
+	afx_msg void OnAcceleratorkeye();
 };
 
 #ifndef _DEBUG  // debug version in CGProyectView.cpp

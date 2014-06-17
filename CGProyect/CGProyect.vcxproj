@@ -134,6 +134,8 @@
     <ResourceCompile Include="CGProyect.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="arrow.cur" />
+    <None Include="arrowcop.cur" />
     <None Include="res\CGProyect.rc2" />
     <None Include="res\cursor1.cur" />
   </ItemGroup>

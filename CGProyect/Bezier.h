@@ -2,24 +2,25 @@
 #define CBEZIER_H
 
 #include <math.h>
+#include <vector>
 #include "Shape.h"
 
 
 class CBezier : public CShape
 {
 public:
-	CPOINT2F m_center;
-	CPOINT2F m_tangente;
+	std::vector< std::vector< CPOINT2F > > arr;
 	CBezier();
-	virtual void OnDraw(CDC *pDC);
+	virtual void OnDraw(CDC *pDC, POINT WindowsSize);
 	virtual void Serialize(CArchive& ar);
-	virtual bool Intersect(POINT);
+	virtual void DrawSelected(CDC *, POINT);
+	virtual bool Intersect(CPOINT2F);
+	virtual void Translate(CPOINT2F);
 	virtual void ChangeFillColor(COLORREF);
 	virtual void ChangeLineColor(COLORREF);
 	virtual void ChangeFilled();
-
-private:
-	void Draw8Points(int x, int y, POINT center, COLORREF color, CDC *pDC);
+	void addPoint(float x, float y);
+	void addControlpoint(float x, float y);
 };
 
 #endif

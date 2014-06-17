@@ -43,10 +43,11 @@ BOOL CCGProyectDoc::OnNewDocument()
 		return FALSE;
 
 	m_figures.clear();
-	position = m_figures.begin();
-	m_current = IM_LINE;
-	m_pressed = m_bezier = false;
-	m_triangle = 0;
+	position		= m_figures.begin();
+	m_current		= IM_LINE;
+	m_pressed		= m_bezier = false;
+	m_triangle		= 0;
+	m_insertmode	= true;
 
 	// TODO: add reinitialization code here
 	// (SDI documents will reuse this document)
@@ -94,6 +95,18 @@ void CCGProyectDoc::Serialize(CArchive& ar)
 					CEllipse *E = new CEllipse;
 					E->Serialize(ar);
 					m_figures.push_back(E);
+					break;
+				}
+				case IM_TRIANGLE:{
+					CTriangle *T = new CTriangle;
+					T->Serialize(ar);
+					m_figures.push_back(T);
+					break;
+				}
+				case IM_BEZIER:{
+					CBezier *B = new CBezier;
+					B->Serialize(ar);
+					m_figures.push_back(B);
 					break;
 				}
 			}
