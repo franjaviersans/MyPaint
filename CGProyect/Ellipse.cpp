@@ -188,6 +188,24 @@ void CEllipse::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 	// put back the old objects
 	pDC->SelectObject(pOldBrush);
+
+
+	// create and select a solid green brush
+	CBrush brushOrange(RGB(255, 100, 0));
+	pOldBrush = pDC->SelectObject(&brushOrange);
+
+
+	p0.x = (int)(m_p1.x * WindowsSize.x);
+	p0.y = (int)(m_p1.y * WindowsSize.y);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+
+	p0.x = (int)(m_p2.x * WindowsSize.x);
+	p0.y = (int)(m_p2.y * WindowsSize.y);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+
+
+	// put back the old objects
+	pDC->SelectObject(pOldBrush);
 }
 
 bool CEllipse::Intersect(CPOINT2F p){
@@ -196,6 +214,17 @@ bool CEllipse::Intersect(CPOINT2F p){
 		return true;
 	else 
 		return false;
+}
+
+CPOINT2F* CEllipse::IntersectControlPoint(CPOINT2F p){
+	double epsilon = 0.02;
+	if(abs((p.x - m_p1.x)) <= epsilon && abs((p.y - m_p1.y)) <= epsilon)
+		return &m_p1;
+
+	if(abs((p.x - m_p2.x)) <= epsilon && abs((p.y - m_p2.y)) <= epsilon)
+		return &m_p2;
+
+	return NULL;
 }
 
 void CEllipse::Translate(CPOINT2F p){

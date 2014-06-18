@@ -172,6 +172,24 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	// put back the old objects
 	pDC->SelectObject(pOldBrush);
 	
+
+	// create and select a solid green brush
+	CBrush brushOrange(RGB(255, 100, 0));
+	pOldBrush = pDC->SelectObject(&brushOrange);
+
+
+	p0.x = (int)(m_center.x * WindowsSize.x);
+	p0.y = (int)(m_center.y * WindowsSize.y);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+
+	p0.x = (int)(m_tangente.x * WindowsSize.x);
+	p0.y = (int)(m_tangente.y * WindowsSize.y);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+
+
+	// put back the old objects
+	pDC->SelectObject(pOldBrush);
+
 }
 
 bool CCircle::Intersect(CPOINT2F p){
@@ -187,6 +205,18 @@ bool CCircle::Intersect(CPOINT2F p){
 	else 
 		return false;
 }
+
+CPOINT2F* CCircle::IntersectControlPoint(CPOINT2F p){
+	double epsilon = 0.02;
+	if(abs((p.x - m_center.x)) <= epsilon && abs((p.y - m_center.y)) <= epsilon)
+		return &m_center;
+
+	if(abs((p.x - m_tangente.x)) <= epsilon && abs((p.y - m_tangente.y)) <= epsilon)
+		return &m_tangente;
+
+	return NULL;
+}
+
 
 void CCircle::Translate(CPOINT2F p){
 	m_center.x += p.x;
