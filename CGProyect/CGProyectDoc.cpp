@@ -48,6 +48,7 @@ BOOL CCGProyectDoc::OnNewDocument()
 	m_pressed		= m_bezier = false;
 	m_triangle		= 0;
 	m_insertmode	= true;
+	m_selectedPoint = NULL;
 
 	// TODO: add reinitialization code here
 	// (SDI documents will reuse this document)

@@ -34,7 +34,9 @@ void CBezier::OnDraw(CDC *pDC, POINT WindowsSize)
 	bool first = true;
 
 
-	for(t=0;t<=1;t+=0.01){
+	for(t=0;t<=5;t+=0.01){
+
+		if(t >= 1) t = 1;
 		for(r=1;r<n;++r){
 			for(j=0;j<n-r;++j){
 				arr[r][j].x = (float)((float) (1 - t) * arr[r-1][j].x + (float)t * arr[r-1][j+1].x);
@@ -58,6 +60,8 @@ void CBezier::OnDraw(CDC *pDC, POINT WindowsSize)
 			//pDC->LineTo(last);
 			CLine::DrawLine(p0, last, pDC, m_linecolor);
 		}
+
+		if(t == 1) break;
 	}
 }
 
@@ -110,28 +114,32 @@ void CBezier::addPoint(float x, float y){
 		}
 }
 
-void CBezier::addControlpoint(float x, float y){
+void CBezier::addControlpoint(){
+	unsigned int i;
+	unsigned int n = arr[0].size();
+
+	/*
+	std::ofstream off("out.txt");
+	std::cout.rdbuf(off.rdbuf()); //redirect std::cout to out.txt!
+    std::cout<<i<<"   "<< j<<"  "<<arr[0].size()<<std::endl;*/
+
 	CPOINT2F a;
 	a.x = 100;
 	a.y = 100;
 
+	n = arr[0].size();
 	arr[0].push_back(a);
 
-	unsigned int n = arr[0].size() - 1;
-	unsigned int i;
-
-	for( i = n;i > 1;--i)
-		arr[0][i] = arr[0][i-1];
-
-	arr[0][i].x = arr[0][i - 1].x * (i / (n + 1)) + (1 - (i / (n + 1))) * arr[0][i + 1].x;
-	arr[0][i].y = arr[0][i - 1].y * (i / (n + 1)) + (1 - (i / (n + 1))) * arr[0][i + 1].y;
-
-
-	n = arr[0].size() ;
-
-	while(n > arr.size()){
-		arr.push_back(*(new std::vector<CPOINT2F>));
+	for(i = n; i > 0 ; --i){
+		arr[0][i].x = arr[0][i - 1].x * ((float)i / n) + arr[0][i].x * (1.0f - ((float)i / n));
+		arr[0][i].y = arr[0][i - 1].y * ((float)i / n) + arr[0][i].y * (1.0f - ((float)i / n));
 	}
+
+	
+	n = arr[0].size();
+
+	while(n > arr.size())
+		arr.push_back(*(new std::vector<CPOINT2F>));
 
 	for(i=1; i<n ;++i)
 		while(arr[i].size() <= n-i){
@@ -207,6 +215,20 @@ void CBezier::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 	pDC->SelectObject(pOldPen);
 
+
+		// create and select a solid green brush
+	CBrush brushOrange(RGB(255, 100, 0));
+	pOldBrush = pDC->SelectObject(&brushOrange);
+
+	for(unsigned int i = 0;i< arr[0].size();++i){
+		p0.x = (int)(arr[0][i].x * WindowsSize.x);
+		p0.y = (int)(arr[0][i].y * WindowsSize.y);
+		
+		pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	}
+
+	// put back the old objects
+	pDC->SelectObject(pOldBrush);
 }
 
 bool CBezier::Intersect(CPOINT2F p){
@@ -229,6 +251,17 @@ bool CBezier::Intersect(CPOINT2F p){
 		return true;
 	else 
 		return false;
+}
+
+CPOINT2F* CBezier::IntersectControlPoint(CPOINT2F p){
+	double epsilon = 0.02;
+
+	for(unsigned int i = 0;i< arr[0].size();++i){
+		if(abs((p.x - arr[0][i].x)) <= epsilon && abs((p.y - arr[0][i].y)) <= epsilon)
+			return &arr[0][i];
+	}
+
+	return NULL;
 }
 
 void CBezier::Translate(CPOINT2F p){

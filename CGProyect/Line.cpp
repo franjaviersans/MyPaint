@@ -106,14 +106,15 @@ void CLine::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 
 	// create and select a solid green brush
-	CBrush brushBlue(RGB(0, 255, 0));
-	CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
+	CBrush brushOrange(RGB(255, 100, 0));
+	CBrush* pOldBrush = pDC->SelectObject(&brushOrange);
 
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
 	pDC->Rectangle(p1.x - 5, p1.y - 5, p1.x + 5, p1.y + 5);
 
 	// put back the old objects
 	pDC->SelectObject(pOldBrush);
+
 }
 
 bool CLine::Intersect(CPOINT2F p){
@@ -124,6 +125,17 @@ bool CLine::Intersect(CPOINT2F p){
 		return true;
 	else
 		return false;
+}
+
+CPOINT2F* CLine::IntersectControlPoint(CPOINT2F p){
+	double epsilon = 0.02;
+	if(abs((p.x - m_p1.x)) <= epsilon && abs((p.y - m_p1.y)) <= epsilon)
+		return &m_p1;
+
+	if(abs((p.x - m_p2.x)) <= epsilon && abs((p.y - m_p2.y)) <= epsilon)
+		return &m_p2;
+
+	return NULL;
 }
 
 void CLine::Translate(CPOINT2F p){

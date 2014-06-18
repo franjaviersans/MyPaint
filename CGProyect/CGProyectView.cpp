@@ -93,6 +93,8 @@ void CCGProyectView::OnDraw(CDC* pDC)
 	if(pDoc->position != pDoc->m_figures.end())
 		(*pDoc->position)->DrawSelected(pDC,pDoc->m_WindosSize);
 
+	
+
 }
 
 
@@ -183,23 +185,34 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 		Invalidate(1);
 	}else{
 		if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
-			 pDoc->m_initialPoint = point;
+			::SetCursor(::LoadCursor(0, IDC_HAND));
+
+			pDoc->m_initialPoint = point;
+			 
+		}else if ((nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end()){
+			
+
+			CPOINT2F p;
+			p.x = (float)point.x / pDoc->m_WindosSize.x;
+			p.y = (float)point.y / pDoc->m_WindosSize.y;
+
+			pDoc->m_selectedPoint = NULL;
+
+			for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
+				pDoc->m_selectedPoint = (*i)->IntersectControlPoint(p);
+				if(pDoc->m_selectedPoint != NULL){
+					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
+					break;
+				}
+			}
 		}else{
 			CPOINT2F p;
 			p.x = (float)point.x / pDoc->m_WindosSize.x;
 			p.y = (float)point.y / pDoc->m_WindosSize.y;
 
-			bool found = false;
-
-			if(pDoc->position != pDoc->m_figures.end()){
-				
-			}
-
-			if(!found){
-				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
-					if((*i)->Intersect(p)){
-						pDoc->position = i;
-					}
+			for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
+				if((*i)->Intersect(p)){
+					pDoc->position = i;
 				}
 			}
 		}
@@ -259,7 +272,7 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 		
 	}else{
 		if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
-			
+			//::SetCursor(::LoadCursor(0, IDC_ARROW));
 			CPOINT2F p;
 
 			 p.x = (float)(point.x - pDoc->m_initialPoint.x) / pDoc->m_WindosSize.x;
@@ -269,6 +282,10 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 
 			 pDoc->m_initialPoint = point;
 			 Invalidate(1);
+		}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
+			pDoc->m_selectedPoint->x = (float)point.x / pDoc->m_WindosSize.x;
+			pDoc->m_selectedPoint->y = (float)point.y / pDoc->m_WindosSize.y;
+			Invalidate(1);
 		}
 	}
 
@@ -281,6 +298,7 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 {
+
 	CCGProyectDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
@@ -323,7 +341,8 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}else{
 		if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
-			
+			::SetCursor(::LoadCursor(0, IDC_HAND));
+
 			CPOINT2F p;
 
 			 p.x = (float)(point.x - pDoc->m_initialPoint.x) / pDoc->m_WindosSize.x;
@@ -333,6 +352,12 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 
 			 pDoc->m_initialPoint = point;
 			 Invalidate(1);
+		}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
+			::SetCursor(::LoadCursor(0, IDC_SIZEALL));
+
+			pDoc->m_selectedPoint->x = (float)point.x / pDoc->m_WindosSize.x;
+			pDoc->m_selectedPoint->y = (float)point.y / pDoc->m_WindosSize.y;
+			Invalidate(1);
 		}
 
 	}
@@ -406,8 +431,7 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
         TPM_LEFTALIGN | TPM_LEFTBUTTON,
         point.x, point.y, this, NULL);
 
-	//m_lastClick = point;
-
+	Invalidate(1);
 }
 
 
@@ -580,7 +604,7 @@ void CCGProyectView::OnChangeNewbeziercurve()
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_BEZIER){
-			((CBezier*)(*pDoc->position))->addControlpoint(0,0);
+			((CBezier*)(*pDoc->position))->addControlpoint();
 		}
 	}
 }

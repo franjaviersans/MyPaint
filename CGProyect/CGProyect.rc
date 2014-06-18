@@ -144,7 +144,7 @@ IDR_MENU1 MENU
 BEGIN
     POPUP "Change"
     BEGIN
-        MENUITEM "Enter Insert Mode\tI",        ID_CHANGE_ENTERINSERTMODE
+        MENUITEM "Enter &Insert Mode\tI",       ID_CHANGE_ENTERINSERTMODE
         MENUITEM SEPARATOR
         MENUITEM "Change Background Color",     ID_CHANGE_BACKGROUNDCOLOR
         MENUITEM "Change Border Color",         ID_CHANGE_CHANGEBORDERCOLOR
@@ -161,7 +161,7 @@ IDR_MENU2 MENU
 BEGIN
     POPUP "Change"
     BEGIN
-        MENUITEM "Enter Insert Mode\tI",        ID_CHANGE_ENTERINSERTMODE
+        MENUITEM "Enter &Insert Mode\tI",       ID_CHANGE_ENTERINSERTMODE
         MENUITEM SEPARATOR
         MENUITEM "Change Background Color",     ID_CHANGE_BACKGROUNDCOLOR
         MENUITEM "Change Border Color",         ID_CHANGE_CHANGEBORDERCOLOR
@@ -171,6 +171,7 @@ BEGIN
         MENUITEM "&Unselect Figure\tU",         ID_CHANGE_UNSELECTFIGURE
         MENUITEM "Delete Figure\tDELETE",       ID_CHANGE_DELETEFIGURE
         MENUITEM "Detele All Figures\tCtrl+DELETE", ID_CHANGE_DETELEALLFIGURES
+        MENUITEM "Add Point to Bezier",         ID_CHANGE_NEWBEZIERCURVE
     END
 END
 
@@ -178,7 +179,7 @@ IDR_MENU3 MENU
 BEGIN
     POPUP "Change"
     BEGIN
-        MENUITEM "Enter Edit Mode\tE",          ID_CHANGE_ENTEREDITMODE
+        MENUITEM "Enter &Edit Mode\tE",         ID_CHANGE_ENTEREDITMODE
         MENUITEM SEPARATOR
         MENUITEM "Move to &Foreground\tF",      ID_CHANGE_MOVETOFOREGROUND
         MENUITEM "Move to &Background\tB",      ID_CHANGE_MOVETOBACKGROUND
