@@ -15,9 +15,16 @@ public:
 	virtual void OnDraw(CDC *, POINT);
 	virtual void Serialize(CArchive& ar);
 	virtual void DrawSelected(CDC *, POINT);
+	virtual bool Intersect(CPOINT2F);
+	virtual CPOINT2F* IntersectControlPoint(CPOINT2F);
+	virtual void Translate(CPOINT2F);
+	virtual void ChangeFillColor(COLORREF);
+	virtual void ChangeLineColor(COLORREF);
+	virtual void ChangeFilled();
 
 private:
 	void Draw8Points(int x, int y, POINT center, COLORREF color, CDC *pDC);
+
 };
 
 #endif

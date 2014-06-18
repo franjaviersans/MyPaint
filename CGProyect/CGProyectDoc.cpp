@@ -29,12 +29,12 @@ END_MESSAGE_MAP()
 
 CCGProyectDoc::CCGProyectDoc()
 {
-	// TODO: add one-time construction code here
-
+	
 }
 
 CCGProyectDoc::~CCGProyectDoc()
 {
+
 }
 
 BOOL CCGProyectDoc::OnNewDocument()
@@ -43,6 +43,13 @@ BOOL CCGProyectDoc::OnNewDocument()
 		return FALSE;
 
 	m_figures.clear();
+	position		= m_figures.begin();
+	m_current		= IM_LINE;
+	m_pressed		= m_bezier = false;
+	m_triangle		= 0;
+	m_insertmode	= true;
+	m_selectedPoint = NULL;
+
 	// TODO: add reinitialization code here
 	// (SDI documents will reuse this document)
 
@@ -59,12 +66,13 @@ void CCGProyectDoc::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		ar << m_figures.size();
-		for (list<CShape *>::iterator i = m_figures.begin(); i != m_figures.end(); i++)
+		for (std::vector<CShape *>::iterator i = m_figures.begin(); i != m_figures.end(); i++)
 			(*i)->Serialize(ar);
 	}
 	else
 	{
 		m_figures.clear();
+		position = m_figures.begin();
 		int n, id;
 		ar >> n;
 
@@ -88,6 +96,18 @@ void CCGProyectDoc::Serialize(CArchive& ar)
 					CEllipse *E = new CEllipse;
 					E->Serialize(ar);
 					m_figures.push_back(E);
+					break;
+				}
+				case IM_TRIANGLE:{
+					CTriangle *T = new CTriangle;
+					T->Serialize(ar);
+					m_figures.push_back(T);
+					break;
+				}
+				case IM_BEZIER:{
+					CBezier *B = new CBezier;
+					B->Serialize(ar);
+					m_figures.push_back(B);
 					break;
 				}
 			}

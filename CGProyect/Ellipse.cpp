@@ -8,6 +8,9 @@ CEllipse::CEllipse()
 	m_p1.x = m_p1.y = 0;
 	m_p2.x = m_p2.y = 0;
 	m_id = IM_ELLIPSE;
+	m_bgcolor = 0;
+	m_linecolor = 0;
+	m_filled = false;
 }
 
 void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
@@ -20,8 +23,6 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 	p1.y = (int)(m_p2.y * WindowsSize.y);
 	
 	POINT center;
-	COLORREF color;
-	color = 0;
 
 	int a, b, x, y, d, aa, bb, incx, incy, deltaincx, deltaincy;
 	a			= abs((int)(p1.x - p0.x)) >> 1;
@@ -30,6 +31,17 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 	bb			= b * b;
 	center.x	= (p1.x + p0.x) >> 1;
 	center.y	= (p1.y + p0.y) >> 1;
+
+	//Draw filled figured
+	if(m_filled){
+		CBrush brushBlue(m_bgcolor);
+		CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
+
+		pDC->Ellipse(center.x - a, center.y - b, center.x + a, center.y + b);
+
+		pDC->SelectObject(pOldBrush);
+	}
+
 
 	//Block 1
 	x = 0;
@@ -42,7 +54,7 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 	deltaincy	= aa << 3;
 
 	//Draw the 4 points of the ellipse
-	EllipsePoints(x,y,center, color, pDC);
+	EllipsePoints(x,y,center, m_linecolor, pDC);
 	while (((bb * (x + 1)) << 1) < aa * ((y << 1) - 1)) {
 		if (d < 0) {
 			d += incx;
@@ -53,7 +65,7 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 		}
 		++x;
 		incx += deltaincx; 
-		EllipsePoints(x,y,center, color, pDC);
+		EllipsePoints(x,y,center, m_linecolor, pDC);
 	}
 
 	
@@ -74,7 +86,7 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 		}
 		--y;
 		incy += deltaincy;
-		EllipsePoints(x,y,center, color, pDC);
+		EllipsePoints(x,y,center, m_linecolor, pDC);
 	}
 }
 
@@ -176,4 +188,60 @@ void CEllipse::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 	// put back the old objects
 	pDC->SelectObject(pOldBrush);
+
+
+	// create and select a solid green brush
+	CBrush brushOrange(RGB(255, 100, 0));
+	pOldBrush = pDC->SelectObject(&brushOrange);
+
+
+	p0.x = (int)(m_p1.x * WindowsSize.x);
+	p0.y = (int)(m_p1.y * WindowsSize.y);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+
+	p0.x = (int)(m_p2.x * WindowsSize.x);
+	p0.y = (int)(m_p2.y * WindowsSize.y);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+
+
+	// put back the old objects
+	pDC->SelectObject(pOldBrush);
+}
+
+bool CEllipse::Intersect(CPOINT2F p){
+	if(((m_p1.x <= p.x && p.x <= m_p2.x) || (m_p2.x <= p.x && p.x <= m_p1.x)) && 
+		((m_p1.y <= p.y && p.y <= m_p2.y) || (m_p2.y <= p.y && p.y <= m_p1.y)))
+		return true;
+	else 
+		return false;
+}
+
+CPOINT2F* CEllipse::IntersectControlPoint(CPOINT2F p){
+	double epsilon = 0.02;
+	if(abs((p.x - m_p1.x)) <= epsilon && abs((p.y - m_p1.y)) <= epsilon)
+		return &m_p1;
+
+	if(abs((p.x - m_p2.x)) <= epsilon && abs((p.y - m_p2.y)) <= epsilon)
+		return &m_p2;
+
+	return NULL;
+}
+
+void CEllipse::Translate(CPOINT2F p){
+	m_p1.x += p.x;
+	m_p1.y += p.y;
+	m_p2.x += p.x;
+	m_p2.y += p.y;
+}
+
+void CEllipse::ChangeFillColor(COLORREF c){
+	m_bgcolor = c;
+}
+
+void CEllipse::ChangeLineColor(COLORREF c){
+	m_linecolor = c;
+}
+
+void CEllipse::ChangeFilled(){
+	m_filled = !m_filled;
 }

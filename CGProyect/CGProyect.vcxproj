@@ -134,7 +134,11 @@
     <ResourceCompile Include="CGProyect.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="arrow.cur" />
+    <None Include="arrowcop.cur" />
     <None Include="res\CGProyect.rc2" />
+    <None Include="res\cursor1.cur" />
+    <None Include="res\cursor2.cur" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\CGProyect.ico" />

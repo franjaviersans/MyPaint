@@ -8,6 +8,9 @@ CCircle::CCircle()
 	m_center.x = m_center.y = 0;
 	m_tangente.x = m_tangente.y = 0;
 	m_id = IM_CIRCLE;
+	m_bgcolor = 0;
+	m_linecolor = 0;
+	m_filled = false;
 }
 
 void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
@@ -24,10 +27,16 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 	int incx, incy, delta;
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
 
-	//pDC->Ellipse(center.x - r, center.y - r, center.x + r, center.y + r);
+	//Draw filled figured
+	if(m_filled){
+		CBrush brushBlue(m_bgcolor);
+		CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
 
-	COLORREF color;
-	color = 0;
+		pDC->Ellipse(center.x - r, center.y - r, center.x + r, center.y + r);
+
+		pDC->SelectObject(pOldBrush);
+	}
+		
 
 	int x,y,d;
 	x = 0;
@@ -38,7 +47,7 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 	delta		= 2;
 	incy		= -2 * r +5;
 
-	Draw8Points(x, y, center, color, pDC);
+	Draw8Points(x, y, center, m_linecolor, pDC);
 	while (y > x){
 		if (d < 0) {
 			d += incx;
@@ -49,7 +58,7 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 		}
 		++x;
 		incx += delta;
-		Draw8Points(x, y, center, color, pDC);
+		Draw8Points(x, y, center, m_linecolor, pDC);
 	}
 }
 
@@ -106,7 +115,7 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 	POINT p0, p1;
 	p0.x = center.x - r;
-	p0.y	= center.y - r;
+	p0.y = center.y - r;
 	p1.x = center.x - r;
 	p1.y = center.y + r;
 
@@ -114,7 +123,7 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	pDC->LineTo(p1);
 
 	p0.x = center.x - r;
-	p0.y	= center.y - r;
+	p0.y = center.y - r;
 	p1.x = center.x + r;
 	p1.y = center.y - r;
 
@@ -122,7 +131,7 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	pDC->LineTo(p1);
 
 	p0.x = center.x - r;
-	p0.y	= center.y + r;
+	p0.y = center.y + r;
 	p1.x = center.x + r;
 	p1.y = center.y + r;
 
@@ -163,4 +172,67 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	// put back the old objects
 	pDC->SelectObject(pOldBrush);
 	
+
+	// create and select a solid green brush
+	CBrush brushOrange(RGB(255, 100, 0));
+	pOldBrush = pDC->SelectObject(&brushOrange);
+
+
+	p0.x = (int)(m_center.x * WindowsSize.x);
+	p0.y = (int)(m_center.y * WindowsSize.y);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+
+	p0.x = (int)(m_tangente.x * WindowsSize.x);
+	p0.y = (int)(m_tangente.y * WindowsSize.y);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+
+
+	// put back the old objects
+	pDC->SelectObject(pOldBrush);
+
+}
+
+bool CCircle::Intersect(CPOINT2F p){
+
+	double dx = m_center.x - m_tangente.x;
+	double dy = m_center.y - m_tangente.y;
+	double r = sqrt( (double)dx * dx + dy * dy);
+
+
+	if((m_center.x - r <= p.x && p.x <= m_center.x + r) && 
+		(m_center.y - r <= p.y && p.y <= m_center.y + r))
+		return true;
+	else 
+		return false;
+}
+
+CPOINT2F* CCircle::IntersectControlPoint(CPOINT2F p){
+	double epsilon = 0.02;
+	if(abs((p.x - m_center.x)) <= epsilon && abs((p.y - m_center.y)) <= epsilon)
+		return &m_center;
+
+	if(abs((p.x - m_tangente.x)) <= epsilon && abs((p.y - m_tangente.y)) <= epsilon)
+		return &m_tangente;
+
+	return NULL;
+}
+
+
+void CCircle::Translate(CPOINT2F p){
+	m_center.x += p.x;
+	m_center.y += p.y;
+	m_tangente.x += p.x;
+	m_tangente.y += p.y;
+}
+
+void CCircle::ChangeFillColor(COLORREF c){
+	m_bgcolor = c;
+}
+
+void CCircle::ChangeLineColor(COLORREF c){
+	m_linecolor = c;
+}
+
+void CCircle::ChangeFilled(){
+	m_filled = !m_filled;
 }
