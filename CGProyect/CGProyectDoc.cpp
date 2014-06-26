@@ -72,7 +72,6 @@ void CCGProyectDoc::Serialize(CArchive& ar)
 	else
 	{
 		m_figures.clear();
-		position = m_figures.begin();
 		int n, id;
 		ar >> n;
 
@@ -112,6 +111,7 @@ void CCGProyectDoc::Serialize(CArchive& ar)
 				}
 			}
 		}
+		position = m_figures.end();
 	}
 }
 

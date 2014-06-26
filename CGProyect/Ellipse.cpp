@@ -34,11 +34,16 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 
 	//Draw filled figured
 	if(m_filled){
+
 		CBrush brushBlue(m_bgcolor);
 		CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
-
+		CPen penBlack;
+		penBlack.CreatePen(PS_SOLID, 1, m_bgcolor);
+		CPen* pOldPen = pDC->SelectObject(&penBlack);
+	
 		pDC->Ellipse(center.x - a, center.y - b, center.x + a, center.y + b);
 
+		pDC->SelectObject(pOldPen);
 		pDC->SelectObject(pOldBrush);
 	}
 
@@ -95,6 +100,9 @@ void CEllipse::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		ar << m_id;
+		ar << m_bgcolor;
+		ar << m_linecolor;
+		ar << m_filled;
 		ar << m_p1.x;
 		ar << m_p1.y;
 		ar << m_p2.x;
@@ -102,6 +110,9 @@ void CEllipse::Serialize(CArchive& ar)
 	}
 	else
 	{
+		ar >> m_bgcolor;
+		ar >> m_linecolor;
+		ar >> m_filled;
 		ar >> m_p1.x;
 		ar >> m_p1.y;
 		ar >> m_p2.x;

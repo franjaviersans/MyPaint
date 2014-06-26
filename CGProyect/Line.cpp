@@ -83,6 +83,9 @@ void CLine::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		ar << m_id;
+		ar << m_bgcolor;
+		ar << m_linecolor;
+		ar << m_filled;
 		ar << m_p1.x;
 		ar << m_p1.y;
 		ar << m_p2.x;
@@ -90,6 +93,9 @@ void CLine::Serialize(CArchive& ar)
 	}
 	else
 	{
+		ar >> m_bgcolor;
+		ar >> m_linecolor;
+		ar >> m_filled;
 		ar >> m_p1.x;
 		ar >> m_p1.y;
 		ar >> m_p2.x;

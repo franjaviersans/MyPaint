@@ -31,9 +31,13 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 	if(m_filled){
 		CBrush brushBlue(m_bgcolor);
 		CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
-
+		CPen penBlack;
+		penBlack.CreatePen(PS_SOLID, 1, m_bgcolor);
+		CPen* pOldPen = pDC->SelectObject(&penBlack);
+	
 		pDC->Ellipse(center.x - r, center.y - r, center.x + r, center.y + r);
 
+		pDC->SelectObject(pOldPen);
 		pDC->SelectObject(pOldBrush);
 	}
 		
@@ -67,6 +71,9 @@ void CCircle::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		ar << m_id;
+		ar << m_bgcolor;
+		ar << m_linecolor;
+		ar << m_filled;
 		ar << m_center.x;
 		ar << m_center.y;
 		ar << m_tangente.x;
@@ -74,6 +81,9 @@ void CCircle::Serialize(CArchive& ar)
 	}
 	else
 	{
+		ar >> m_bgcolor;
+		ar >> m_linecolor;
+		ar >> m_filled;
 		ar >> m_center.x;
 		ar >> m_center.y;
 		ar >> m_tangente.x;
@@ -145,6 +155,7 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 	pDC->MoveTo(p0);
 	pDC->LineTo(p1);
+
 
 	pDC->SelectObject(pOldPen);
 

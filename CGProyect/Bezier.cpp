@@ -70,7 +70,11 @@ void CBezier::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		ar << m_id;
+		ar << m_bgcolor;
+		ar << m_linecolor;
+		ar << m_filled;
 		ar << arr[0].size();
+
 		for(unsigned int i = 0;i< arr[0].size();++i){
 			ar << arr[0][i].x;
 			ar << arr[0][i].y;
@@ -80,6 +84,9 @@ void CBezier::Serialize(CArchive& ar)
 	{
 		int n;
 		float x,y;
+		ar >> m_bgcolor;
+		ar >> m_linecolor;
+		ar >> m_filled;
 		ar >> n;
 		arr.clear();
 		arr.push_back(*(new std::vector<CPOINT2F>));
