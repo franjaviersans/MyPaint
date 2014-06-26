@@ -71,6 +71,10 @@ public:
 	afx_msg void OnAcceleratorheyi();
 	afx_msg void OnAcceleratorkeyi();
 	afx_msg void OnAcceleratorkeye();
+	afx_msg void OnChangeChangetriangle();
+	afx_msg void OnChagectp0();
+	afx_msg void OnChagectp1();
+	afx_msg void OnChagectp2();
 };
 
 #ifndef _DEBUG  // debug version in CGProyectView.cpp

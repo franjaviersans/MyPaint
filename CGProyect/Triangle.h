@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include "Shape.h"
+#include "Color.h"
 
 
 class CTriangle : public CShape
@@ -11,6 +12,9 @@ public:
 	CPOINT2F m_p0;
 	CPOINT2F m_p1;
 	CPOINT2F m_p2;
+	CColor	 m_c0;
+	CColor	 m_c1;
+	CColor	 m_c2;
 	CTriangle();
 	virtual void OnDraw(CDC *, POINT);
 	virtual void Serialize(CArchive& ar);
@@ -23,7 +27,7 @@ public:
 	virtual void ChangeFilled();
 
 private:
-	void Draw8Points(int x, int y, POINT center, COLORREF color, CDC *pDC);
+	void ScanLine(CDC *, POINT);
 
 };
 

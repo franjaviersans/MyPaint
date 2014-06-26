@@ -52,6 +52,9 @@ ON_COMMAND(ID_CHANGE_ENTERINSERTMODE, &CCGProyectView::OnChangeEnterinsertmode)
 ON_COMMAND(ID_CHANGE_ENTEREDITMODE, &CCGProyectView::OnChangeEntereditmode)
 ON_COMMAND(ID_ACCELERATORKEYI, &CCGProyectView::OnAcceleratorkeyi)
 ON_COMMAND(ID_ACCELERATORKEYE, &CCGProyectView::OnAcceleratorkeye)
+ON_COMMAND(ID_CHAGECTP0, &CCGProyectView::OnChagectp0)
+ON_COMMAND(ID_CHAGECTP1, &CCGProyectView::OnChagectp1)
+ON_COMMAND(ID_CHAGECTP2, &CCGProyectView::OnChagectp2)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -422,8 +425,9 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 	if(pDoc->m_insertmode){
 		menu.LoadMenu(IDR_MENU3);
 	}else{
-		if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_BEZIER)	menu.LoadMenu(IDR_MENU2);
-		else																					menu.LoadMenu(IDR_MENU1);
+		if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_BEZIER)			menu.LoadMenu(IDR_MENU2);
+		else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_TRIANGLE)	menu.LoadMenu(IDR_MENU4);	
+		else																							menu.LoadMenu(IDR_MENU1);
 	}
     CMenu *pSub = menu.GetSubMenu(0);
     // Modify menu items here if necessary (e.g. gray out items)
@@ -635,4 +639,58 @@ void CCGProyectView::OnAcceleratorkeye()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_insertmode = false;
+}
+
+
+
+
+
+void CCGProyectView::OnChagectp0()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_TRIANGLE){
+			COLORREF color;
+			CColorDialog dlg; 
+			if (dlg.DoModal() == IDOK){
+				color = dlg.GetColor(); 
+				((CTriangle*)(*pDoc->position))->m_c0 = color;
+				Invalidate(1);
+			}	
+		}
+	}
+}
+
+
+void CCGProyectView::OnChagectp1()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_TRIANGLE){
+			COLORREF color;
+			CColorDialog dlg; 
+			if (dlg.DoModal() == IDOK){
+				color = dlg.GetColor(); 
+				((CTriangle*)(*pDoc->position))->m_c1 = color;
+				Invalidate(1);
+			}	
+		}
+	}
+}
+
+
+void CCGProyectView::OnChagectp2()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_TRIANGLE){
+			COLORREF color;
+			CColorDialog dlg; 
+			if (dlg.DoModal() == IDOK){
+				color = dlg.GetColor(); 
+				((CTriangle*)(*pDoc->position))->m_c2 = color;
+				Invalidate(1);
+			}	
+		}
+	}
 }

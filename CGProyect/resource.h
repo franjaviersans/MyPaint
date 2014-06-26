@@ -9,6 +9,7 @@
 #define IDR_MENU1                       312
 #define IDR_MENU2                       313
 #define IDR_MENU3                       314
+#define IDR_MENU4                       315
 #define ID_BUTTON_LINE                  32771
 #define ID_BUTTON_CIRCLE                32772
 #define ID_BUTTON_ELLIPSE               32773
@@ -37,13 +38,17 @@
 #define ID_ACCELERATORKEYI              32810
 #define ID_ACCELERATORKEYE              32811
 #define ID_CHANGE_ADDPOINTTOBEZIER      32813
+#define ID_CHANGE_CHANGETRIANGLE        32814
+#define ID_CHAGECTP0                    32815
+#define ID_CHAGECTP1                    32816
+#define ID_CHAGECTP2                    32817
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        317
-#define _APS_NEXT_COMMAND_VALUE         32814
+#define _APS_NEXT_COMMAND_VALUE         32818
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
