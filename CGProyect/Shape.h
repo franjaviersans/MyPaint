@@ -5,8 +5,9 @@
 
 #include <afx.h>
 #include <afxwin.h>
-
 #include <algorithm>
+
+#include "BackBuffer.h"
 
 enum
 {
@@ -40,9 +41,9 @@ protected:
 	bool m_filled;
 
 public:
-	virtual void OnDraw(CDC *, POINT) = 0;
+	virtual void OnDraw(CBackBuffer *, POINT) = 0;
     virtual void Serialize(CArchive& ar) = 0;
-	virtual void DrawSelected(CDC *, POINT) = 0;
+	virtual void DrawSelected(CBackBuffer *, POINT) = 0;
 	virtual bool Intersect(CPOINT2F) = 0;
 	virtual CPOINT2F* IntersectControlPoint(CPOINT2F) = 0; 
 	virtual void Translate(CPOINT2F) = 0;

@@ -46,6 +46,22 @@ COLORREF CColor::ToCOLORREF()
 	return RGB(r,g,b);
 }
 
+void CColor::Serialize(CArchive& ar)
+{
+	if (ar.IsStoring())
+	{
+		ar << r;
+		ar << g;
+		ar << b;
+	}
+	else
+	{
+		ar >> r;
+		ar >> g;
+		ar >> b;
+	}
+}
+
 // Sobrecarga del operador + para la clase Pareja
 CColor operator +(const CColor &p1,const CColor &p2)
 {

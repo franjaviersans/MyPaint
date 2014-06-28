@@ -75,6 +75,11 @@ public:
 	afx_msg void OnChagectp0();
 	afx_msg void OnChagectp1();
 	afx_msg void OnChagectp2();
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
+	afx_msg void OnDestroy();
+//	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 };
 
 #ifndef _DEBUG  // debug version in CGProyectView.cpp

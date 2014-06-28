@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Circle.h"
+#include "Line.h"
 #include <iostream>
 #include <fstream>
 
@@ -13,7 +14,7 @@ CCircle::CCircle()
 	m_filled = false;
 }
 
-void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
+void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 
 	POINT center, tangent;
@@ -27,21 +28,6 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 	int incx, incy, delta;
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
 
-	//Draw filled figured
-	if(m_filled){
-		CBrush brushBlue(m_bgcolor);
-		CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
-		CPen penBlack;
-		penBlack.CreatePen(PS_SOLID, 1, m_bgcolor);
-		CPen* pOldPen = pDC->SelectObject(&penBlack);
-	
-		pDC->Ellipse(center.x - r, center.y - r, center.x + r, center.y + r);
-
-		pDC->SelectObject(pOldPen);
-		pDC->SelectObject(pOldBrush);
-	}
-		
-
 	int x,y,d;
 	x = 0;
 	y = r;
@@ -51,7 +37,9 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 	delta		= 2;
 	incy		= -2 * r +5;
 
-	Draw8Points(x, y, center, m_linecolor, pDC);
+	if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC);
+	else		Draw8Points(x, y, center, m_linecolor, pDC);
+
 	while (y > x){
 		if (d < 0) {
 			d += incx;
@@ -62,7 +50,8 @@ void CCircle::OnDraw(CDC *pDC, POINT WindowsSize)
 		}
 		++x;
 		incx += delta;
-		Draw8Points(x, y, center, m_linecolor, pDC);
+		if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC);
+		else		Draw8Points(x, y, center, m_linecolor, pDC);
 	}
 }
 
@@ -91,7 +80,7 @@ void CCircle::Serialize(CArchive& ar)
 	}
 }
 
-void CCircle::Draw8Points(int x, int y, POINT center, COLORREF color, CDC *pDC){
+void CCircle::Draw8Points(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC){
 	pDC->SetPixel(center.x + x,	center.y + y, color);
 	pDC->SetPixel(center.x - x,	center.y + y, color);
 	pDC->SetPixel(center.x - x, center.y - y, color);
@@ -102,7 +91,22 @@ void CCircle::Draw8Points(int x, int y, POINT center, COLORREF color, CDC *pDC){
 	pDC->SetPixel(center.x + y, center.y - x, color);
 }
 
-void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
+void CCircle::Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC){
+	pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
+	pDC->SetPixel(center.x + x,	center.y + y, color);
+	pDC->SetPixel(center.x - x,	center.y + y, color);
+	pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
+	pDC->SetPixel(center.x - x, center.y - y, color);
+	pDC->SetPixel(center.x + x, center.y - y, color);
+	pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
+	pDC->SetPixel(center.x + y, center.y + x, color);
+	pDC->SetPixel(center.x - y, center.y + x, color);
+	pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
+	pDC->SetPixel(center.x - y, center.y - x, color);
+	pDC->SetPixel(center.x + y, center.y - x, color);
+}
+
+void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 	POINT center, tangent;
 	center.x = (int)(m_center.x * WindowsSize.x);
@@ -114,92 +118,67 @@ void CCircle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	int dy = center.y - tangent.y;
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
 
-
-
-	// create and select a thick, black pen
-	CPen penBlack;
-	penBlack.CreatePen(PS_DOT, 1, RGB(255, 0, 0));
-	CPen* pOldPen = pDC->SelectObject(&penBlack);
-
-	// draw a thick black rectangle filled with blue
+	CColor red(255,0,0);
 
 	POINT p0, p1;
 	p0.x = center.x - r;
 	p0.y = center.y - r;
 	p1.x = center.x - r;
 	p1.y = center.y + r;
-
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = center.x - r;
 	p0.y = center.y - r;
 	p1.x = center.x + r;
 	p1.y = center.y - r;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = center.x - r;
 	p0.y = center.y + r;
 	p1.x = center.x + r;
 	p1.y = center.y + r;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = center.x + r;
 	p0.y = center.y - r;
 	p1.x = center.x + r;
 	p1.y = center.y + r;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 
-	pDC->SelectObject(pOldPen);
-
-	// create and select a solid green brush
-	CBrush brushBlue(RGB(0, 255, 0));
-	CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
+	CColor green(0, 255, 0);
 
 	p0.x = center.x + r;
 	p0.y = center.y - r;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 	p0.x = center.x + r;
 	p0.y = center.y + r;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 	p0.x = center.x - r;
 	p0.y = center.y - r;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 	p0.x = center.x - r;
 	p0.y = center.y + r;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 
-	// put back the old objects
-	pDC->SelectObject(pOldBrush);
-	
-
-	// create and select a solid green brush
-	CBrush brushOrange(RGB(255, 100, 0));
-	pOldBrush = pDC->SelectObject(&brushOrange);
+	CColor other(255, 100, 0);
 
 
 	p0.x = (int)(m_center.x * WindowsSize.x);
 	p0.y = (int)(m_center.y * WindowsSize.y);
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
 	p0.x = (int)(m_tangente.x * WindowsSize.x);
 	p0.y = (int)(m_tangente.y * WindowsSize.y);
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
-
-
-	// put back the old objects
-	pDC->SelectObject(pOldBrush);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
 }
 

@@ -16,9 +16,9 @@ public:
 	CColor	 m_c1;
 	CColor	 m_c2;
 	CTriangle();
-	virtual void OnDraw(CDC *, POINT);
+	virtual void OnDraw(CBackBuffer *, POINT);
 	virtual void Serialize(CArchive& ar);
-	virtual void DrawSelected(CDC *, POINT);
+	virtual void DrawSelected(CBackBuffer *, POINT);
 	virtual bool Intersect(CPOINT2F);
 	virtual CPOINT2F* IntersectControlPoint(CPOINT2F);
 	virtual void Translate(CPOINT2F);
@@ -27,7 +27,7 @@ public:
 	virtual void ChangeFilled();
 
 private:
-	void ScanLine(CDC *, POINT);
+	void ScanLine(CBackBuffer *, POINT);
 
 };
 

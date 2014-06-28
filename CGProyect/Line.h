@@ -9,10 +9,11 @@ class CLine : public CShape
 public:
 	CPOINT2F m_p1, m_p2;
 	CLine();
-	virtual void OnDraw(CDC *, POINT);
+	virtual void OnDraw(CBackBuffer *, POINT);
 	virtual void Serialize(CArchive &);
-	virtual void DrawSelected(CDC *, POINT);
-	static void DrawLine(POINT, POINT, CDC *, COLORREF);
+	virtual void DrawSelected(CBackBuffer *, POINT);
+	static void DrawLine(POINT, POINT, CBackBuffer *, COLORREF);
+	static void DrawDottedLine(POINT, POINT, CBackBuffer *, COLORREF);
 	virtual bool Intersect(CPOINT2F);
 	virtual CPOINT2F* IntersectControlPoint(CPOINT2F);
 	virtual void Translate(CPOINT2F);

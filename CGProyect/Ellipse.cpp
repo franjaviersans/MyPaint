@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Ellipse.h"
+#include "Line.h"
 #include <iostream>
 #include <fstream>
 
@@ -13,7 +14,7 @@ CEllipse::CEllipse()
 	m_filled = false;
 }
 
-void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
+void CEllipse::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 
 	POINT p0, p1;
@@ -33,20 +34,6 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 	center.y	= (p1.y + p0.y) >> 1;
 
 	//Draw filled figured
-	if(m_filled){
-
-		CBrush brushBlue(m_bgcolor);
-		CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
-		CPen penBlack;
-		penBlack.CreatePen(PS_SOLID, 1, m_bgcolor);
-		CPen* pOldPen = pDC->SelectObject(&penBlack);
-	
-		pDC->Ellipse(center.x - a, center.y - b, center.x + a, center.y + b);
-
-		pDC->SelectObject(pOldPen);
-		pDC->SelectObject(pOldBrush);
-	}
-
 
 	//Block 1
 	x = 0;
@@ -59,7 +46,9 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 	deltaincy	= aa << 3;
 
 	//Draw the 4 points of the ellipse
-	EllipsePoints(x,y,center, m_linecolor, pDC);
+	if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC);
+	else			EllipsePoints(x,y,center, m_linecolor, pDC);
+
 	while (((bb * (x + 1)) << 1) < aa * ((y << 1) - 1)) {
 		if (d < 0) {
 			d += incx;
@@ -70,7 +59,8 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 		}
 		++x;
 		incx += deltaincx; 
-		EllipsePoints(x,y,center, m_linecolor, pDC);
+		if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC);
+		else			EllipsePoints(x,y,center, m_linecolor, pDC);
 	}
 
 	
@@ -91,7 +81,8 @@ void CEllipse::OnDraw(CDC *pDC, POINT WindowsSize)
 		}
 		--y;
 		incy += deltaincy;
-		EllipsePoints(x,y,center, m_linecolor, pDC);
+		if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC);
+		else			EllipsePoints(x,y,center, m_linecolor, pDC);
 	}
 }
 
@@ -120,26 +111,32 @@ void CEllipse::Serialize(CArchive& ar)
 	}
 }
 
-void CEllipse::EllipsePoints(int x, int y, POINT center, COLORREF color, CDC *pDC){
+void CEllipse::EllipsePoints(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC){
 	pDC->SetPixel(center.x + x,	center.y + y, color);
 	pDC->SetPixel(center.x - x,	center.y + y, color);
 	pDC->SetPixel(center.x - x, center.y - y, color);
 	pDC->SetPixel(center.x + x, center.y - y, color);
 }
 
-void CEllipse::DrawSelected(CDC *pDC, POINT WindowsSize){
+
+void CEllipse::EllipsePointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC){
+	pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
+	pDC->SetPixel(center.x + x,	center.y + y, color);
+	pDC->SetPixel(center.x - x,	center.y + y, color);
+	pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
+	pDC->SetPixel(center.x - x, center.y - y, color);
+	pDC->SetPixel(center.x + x, center.y - y, color);
+}
+
+
+void CEllipse::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	POINT pp0, pp1;
 	pp0.x = (int)(m_p1.x * WindowsSize.x);
 	pp0.y = (int)(m_p1.y * WindowsSize.y);
 	pp1.x = (int)(m_p2.x * WindowsSize.x);
 	pp1.y = (int)(m_p2.y * WindowsSize.y);
 
-	// create and select a thick, black pen
-	CPen penBlack;
-	penBlack.CreatePen(PS_DOT, 1, RGB(255, 0, 0));
-	CPen* pOldPen = pDC->SelectObject(&penBlack);
-
-	// draw a thick black rectangle filled with blue
+	CColor red(255,0,0);
 
 	POINT p0, p1;
 	p0.x = pp0.x;
@@ -147,76 +144,58 @@ void CEllipse::DrawSelected(CDC *pDC, POINT WindowsSize){
 	p1.x = pp1.x;
 	p1.y = pp0.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = pp0.x;
 	p0.y = pp0.y;
 	p1.x = pp0.x;
 	p1.y = pp1.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = pp0.x;
 	p0.y = pp1.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = pp1.x;
 	p0.y = pp0.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
-	pDC->SelectObject(pOldPen);
 
-	// create and select a solid green brush
-	CBrush brushBlue(RGB(0, 255, 0));
-	CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
+	CColor green(0, 255, 0);
 
 	p0.x = pp0.x;
 	p0.y = pp0.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 	p0.x = pp0.x;
 	p0.y = pp1.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 	p0.x = pp1.x;
 	p0.y = pp1.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 	p0.x = pp1.x;
 	p0.y = pp0.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 
-	// put back the old objects
-	pDC->SelectObject(pOldBrush);
-
-
-	// create and select a solid green brush
-	CBrush brushOrange(RGB(255, 100, 0));
-	pOldBrush = pDC->SelectObject(&brushOrange);
-
+	CColor other(255, 100, 0);
 
 	p0.x = (int)(m_p1.x * WindowsSize.x);
 	p0.y = (int)(m_p1.y * WindowsSize.y);
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
 	p0.x = (int)(m_p2.x * WindowsSize.x);
 	p0.y = (int)(m_p2.y * WindowsSize.y);
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
-
-
-	// put back the old objects
-	pDC->SelectObject(pOldBrush);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 }
 
 bool CEllipse::Intersect(CPOINT2F p){

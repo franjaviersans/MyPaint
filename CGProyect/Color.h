@@ -14,6 +14,7 @@ public:
 	COLORREF ToCOLORREF();
 	void setColor(float,float,float);
 	void setColor(COLORREF);
+	void Serialize(CArchive& ar);
 	friend CColor operator +(const CColor &,const CColor &);
 	friend CColor operator -(const CColor &,const CColor &);
 	friend CColor operator *(const CColor &,const float &);

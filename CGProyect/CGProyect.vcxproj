@@ -101,6 +101,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BackBuffer.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="Circle.h" />
     <ClInclude Include="CGProyect.h" />
@@ -117,6 +118,7 @@
     <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BackBuffer.cpp" />
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="CGProyect.cpp" />

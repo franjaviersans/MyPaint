@@ -11,12 +11,14 @@
 
 #include "CGProyectDoc.h"
 #include "CGProyectView.h"
+#include <fstream>
 
+
+CBackBuffer *bb;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
 
 // CCGProyectView
 
@@ -55,6 +57,11 @@ ON_COMMAND(ID_ACCELERATORKEYE, &CCGProyectView::OnAcceleratorkeye)
 ON_COMMAND(ID_CHAGECTP0, &CCGProyectView::OnChagectp0)
 ON_COMMAND(ID_CHAGECTP1, &CCGProyectView::OnChagectp1)
 ON_COMMAND(ID_CHAGECTP2, &CCGProyectView::OnChagectp2)
+ON_WM_ERASEBKGND()
+ON_WM_ACTIVATE()
+ON_WM_DESTROY()
+//ON_WM_CREATE()
+ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -66,6 +73,7 @@ CCGProyectView::CCGProyectView()
 	menu->CreatePopupMenu();
 	// Add items to the menu
 	menu->AppendMenu(MF_STRING, 0, "Text");
+	bb = NULL;
 }
 
 CCGProyectView::~CCGProyectView()
@@ -85,19 +93,30 @@ BOOL CCGProyectView::PreCreateWindow(CREATESTRUCT& cs)
 
 void CCGProyectView::OnDraw(CDC* pDC)
 {
+
 	CCGProyectDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
-	for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++)
-		(*i)->OnDraw(pDC, pDoc->m_WindosSize);
-
-
-	if(pDoc->position != pDoc->m_figures.end())
-		(*pDoc->position)->DrawSelected(pDC,pDoc->m_WindosSize);
-
 	
 
+	if(bb != NULL){
+		//Clear Back buffer
+		bb->Clear();
+		
+
+		//Display all figures
+		for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++)
+		(*i)->OnDraw(bb, pDoc->m_WindosSize);
+
+		//Display selected figure
+		if(pDoc->position != pDoc->m_figures.end())
+		(*pDoc->position)->DrawSelected(bb,pDoc->m_WindosSize);
+
+
+		//Display backbuffer
+		bb->Display(pDC);
+	}
 }
 
 
@@ -185,7 +204,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			}
 
 		}
-		Invalidate(1);
+		Invalidate();
 	}else{
 		if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
 			::SetCursor(::LoadCursor(0, IDC_HAND));
@@ -220,7 +239,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			}
 		}
 
-		Invalidate(1);
+		Invalidate();
 		/*if(pDoc->position != pDoc->m_figures.end())
 			(*pDoc->position)->DrawSelected(pDC,pDoc->m_WindosSize);*/
 	}
@@ -270,7 +289,7 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 					break;
 				}
 			}
-			Invalidate(1);
+			Invalidate();
 		}
 		
 	}else{
@@ -284,11 +303,11 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 			 (*pDoc->position)->Translate(p);
 
 			 pDoc->m_initialPoint = point;
-			 Invalidate(1);
+			 Invalidate();
 		}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
 			pDoc->m_selectedPoint->x = (float)point.x / pDoc->m_WindosSize.x;
 			pDoc->m_selectedPoint->y = (float)point.y / pDoc->m_WindosSize.y;
-			Invalidate(1);
+			Invalidate();
 		}
 	}
 
@@ -340,7 +359,7 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 					break;
 				}
 			}
-			Invalidate(1);
+			Invalidate();
 		}
 	}else{
 		if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
@@ -354,13 +373,13 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 			 (*pDoc->position)->Translate(p);
 
 			 pDoc->m_initialPoint = point;
-			 Invalidate(1);
+			 Invalidate();
 		}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
 			::SetCursor(::LoadCursor(0, IDC_SIZEALL));
 
 			pDoc->m_selectedPoint->x = (float)point.x / pDoc->m_WindosSize.x;
 			pDoc->m_selectedPoint->y = (float)point.y / pDoc->m_WindosSize.y;
-			Invalidate(1);
+			Invalidate();
 		}
 
 	}
@@ -408,15 +427,6 @@ void CCGProyectView::OnButtonTriangle()
 }
 
 
-void CCGProyectView::OnSize(UINT nType, int cx, int cy)
-{
-	CView::OnSize(nType, cx, cy);
-
-	CCGProyectDoc* pDoc = GetDocument();
-	pDoc->m_WindosSize.x = cx;
-	pDoc->m_WindosSize.y = cy;
-}
-
 void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -435,7 +445,7 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
         TPM_LEFTALIGN | TPM_LEFTBUTTON,
         point.x, point.y, this, NULL);
 
-	Invalidate(1);
+	Invalidate();
 }
 
 
@@ -455,7 +465,7 @@ void CCGProyectView::OnChangeChangebordercolor()
 		if (dlg.DoModal() == IDOK){
 			color = dlg.GetColor(); 
 			(*pDoc->position)->ChangeLineColor(color);
-			Invalidate(1);
+			Invalidate();
 		}
 	}
 }
@@ -470,7 +480,7 @@ void CCGProyectView::OnChangeBackgroundcolor()
 		if (dlg.DoModal() == IDOK){
 			color = dlg.GetColor(); 
 			(*pDoc->position)->ChangeFillColor(color);
-			Invalidate(1);
+			Invalidate();
 		}
 	}
 }
@@ -481,7 +491,7 @@ void CCGProyectView::OnChangeDeletefigure()
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		pDoc->position = pDoc->m_figures.erase(pDoc->position);
-		Invalidate(1);
+		Invalidate();
 	}
 }
 
@@ -491,7 +501,7 @@ void CCGProyectView::OnChangeFillfigure()
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		(*pDoc->position)->ChangeFilled();
-		Invalidate(1);
+		Invalidate();
 	}
 }
 
@@ -504,7 +514,7 @@ void CCGProyectView::OnChangeMovetobackground()
 		if(it != pDoc->m_figures.begin()){
 			std::swap(*pDoc->position, *(--it));
 			pDoc->position = it;
-			Invalidate(1);
+			Invalidate();
 		}
 	}
 }
@@ -518,7 +528,7 @@ void CCGProyectView::OnChangeMovetoforeground()
 		if(++it != pDoc->m_figures.end()){
 			std::swap(*pDoc->position, *(it));
 			pDoc->position = it;
-			Invalidate(1);
+			Invalidate();
 		}
 	}
 }
@@ -533,7 +543,7 @@ void CCGProyectView::OnForegroundKey()
 		if(++it != pDoc->m_figures.end()){
 			std::swap(*pDoc->position, *(it));
 			pDoc->position = it;
-			Invalidate(1);
+			Invalidate();
 		}
 	}
 }
@@ -547,7 +557,7 @@ void CCGProyectView::OnBackgroundKey()
 		if(it != pDoc->m_figures.begin()){
 			std::swap(*pDoc->position, *(--it));
 			pDoc->position = it;
-			Invalidate(1);
+			Invalidate();
 		}
 	}
 }
@@ -557,7 +567,7 @@ void CCGProyectView::OnDeselectKey()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->position = pDoc->m_figures.end();
-	Invalidate(1);
+	Invalidate();
 }
 
 //Control + delete
@@ -567,7 +577,7 @@ void CCGProyectView::OnDeleteKey()
 	if(!pDoc->m_figures.empty()){
 		pDoc->m_figures.clear();
 		pDoc->position = pDoc->m_figures.begin();
-		Invalidate(1);
+		Invalidate();
 	}
 }
 
@@ -578,7 +588,7 @@ void CCGProyectView::OnChangeDeteleallfigures()
 	if(!pDoc->m_figures.empty()){
 		pDoc->m_figures.clear();
 		pDoc->position = pDoc->m_figures.begin();
-		Invalidate(1);
+		Invalidate();
 	}
 }
 
@@ -587,7 +597,7 @@ void CCGProyectView::OnChangeUnselectfigure()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->position = pDoc->m_figures.end();
-	Invalidate(1);
+	Invalidate();
 }
 
 //Delete only one figure
@@ -596,7 +606,7 @@ void CCGProyectView::OnDeleteOneKey()
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		pDoc->position = pDoc->m_figures.erase(pDoc->position);
-		Invalidate(1);
+		Invalidate();
 	}
 }
 
@@ -655,7 +665,7 @@ void CCGProyectView::OnChagectp0()
 			if (dlg.DoModal() == IDOK){
 				color = dlg.GetColor(); 
 				((CTriangle*)(*pDoc->position))->m_c0 = color;
-				Invalidate(1);
+				Invalidate();
 			}	
 		}
 	}
@@ -672,7 +682,7 @@ void CCGProyectView::OnChagectp1()
 			if (dlg.DoModal() == IDOK){
 				color = dlg.GetColor(); 
 				((CTriangle*)(*pDoc->position))->m_c1 = color;
-				Invalidate(1);
+				Invalidate();
 			}	
 		}
 	}
@@ -689,8 +699,56 @@ void CCGProyectView::OnChagectp2()
 			if (dlg.DoModal() == IDOK){
 				color = dlg.GetColor(); 
 				((CTriangle*)(*pDoc->position))->m_c2 = color;
-				Invalidate(1);
+				Invalidate();
 			}	
 		}
 	}
 }
+
+
+BOOL CCGProyectView::OnEraseBkgnd(CDC* pDC)
+{
+
+	return true;//CView::OnEraseBkgnd(pDC);
+}
+
+void CCGProyectView::OnSize(UINT nType, int cx, int cy)
+{
+	CView::OnSize(nType, cx, cy);
+
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->m_WindosSize.x = cx;
+	pDoc->m_WindosSize.y = cy;
+
+	if(bb == NULL)	bb = new CBackBuffer();
+	else			bb->Destroy();
+	
+
+	bb->ChangeSize(cx, cy, GetDC());
+
+	Invalidate();
+}
+
+void CCGProyectView::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
+{
+	CView::OnActivate(nState, pWndOther, bMinimized);
+}
+
+
+void CCGProyectView::OnDestroy()
+{
+	CView::OnDestroy();
+	if(bb != NULL){
+		bb->Destroy();
+	}
+}
+
+
+int CCGProyectView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CView::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+		return 0;
+}
+
