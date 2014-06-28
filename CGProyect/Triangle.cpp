@@ -22,7 +22,7 @@ CTriangle::CTriangle()
 	m_filled = false;
 }
 
-void CTriangle::OnDraw(CDC *pDC,POINT WindowsSize)
+void CTriangle::OnDraw(CBackBuffer *pDC,POINT WindowsSize)
 {
 
 	POINT p0, p1, p2;
@@ -43,7 +43,7 @@ void CTriangle::OnDraw(CDC *pDC,POINT WindowsSize)
 	CLine::DrawLine(p0, p2, pDC, m_linecolor);
 }
 
-void CTriangle::ScanLine(CDC *pDC, POINT WindowsSize){
+void CTriangle::ScanLine(CBackBuffer *pDC, POINT WindowsSize){
 	POINT p0, p1, p2;
 
 	//Transform the coordinates to integers
@@ -184,6 +184,9 @@ void CTriangle::Serialize(CArchive& ar)
 		ar << m_p1.y;
 		ar << m_p2.x;
 		ar << m_p2.y;
+		m_c0.Serialize(ar);
+		m_c1.Serialize(ar);
+		m_c2.Serialize(ar);
 	}
 	else
 	{
@@ -196,10 +199,13 @@ void CTriangle::Serialize(CArchive& ar)
 		ar >> m_p1.y;
 		ar >> m_p2.x;
 		ar >> m_p2.y;
+		m_c0.Serialize(ar);
+		m_c1.Serialize(ar);
+		m_c2.Serialize(ar);
 	}
 }
 
-void CTriangle::DrawSelected(CDC *pDC, POINT WindowsSize){
+void CTriangle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	POINT p0, p1, p2;
 	p0.x = (int)(m_p0.x * WindowsSize.x);
 	p0.y = (int)(m_p0.y * WindowsSize.y);
@@ -217,9 +223,7 @@ void CTriangle::DrawSelected(CDC *pDC, POINT WindowsSize){
 
 
 	// create and select a thick, black pen
-	CPen penBlack;
-	penBlack.CreatePen(PS_DOT, 1, RGB(255, 0, 0));
-	CPen* pOldPen = pDC->SelectObject(&penBlack);
+	CColor red(255,0,0);
 
 	// draw a thick black rectangle filled with blue
 	p0.x = pp0.x;
@@ -227,81 +231,65 @@ void CTriangle::DrawSelected(CDC *pDC, POINT WindowsSize){
 	p1.x = pp1.x;
 	p1.y = pp0.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());;
 
 	p0.x = pp0.x;
 	p0.y = pp0.y;
 	p1.x = pp0.x;
 	p1.y = pp1.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());;
 
 	p0.x = pp0.x;
 	p0.y = pp1.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = pp1.x;
 	p0.y = pp0.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
-	pDC->SelectObject(pOldPen);
 
-	// create and select a solid green brush
-	CBrush brushBlue(RGB(0, 255, 0));
-	CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
+	CColor green(0, 255, 0);
 
 	p0.x = pp0.x;
 	p0.y = pp0.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 	p0.x = pp0.x;
 	p0.y = pp1.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 	p0.x = pp1.x;
 	p0.y = pp1.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 	p0.x = pp1.x;
 	p0.y = pp0.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 
 
 
-	// put back the old objects
-	pDC->SelectObject(pOldBrush);
-
-
-	// create and select a solid green brush
-	CBrush brushOrange(RGB(255, 100, 0));
-	pOldBrush = pDC->SelectObject(&brushOrange);
+	CColor other(255, 100, 0);
 
 
 	p0.x = (int)(m_p0.x * WindowsSize.x);
 	p0.y = (int)(m_p0.y * WindowsSize.y);
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
 	p0.x = (int)(m_p1.x * WindowsSize.x);
 	p0.y = (int)(m_p1.y * WindowsSize.y);
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
 	p0.x = (int)(m_p2.x * WindowsSize.x);
 	p0.y = (int)(m_p2.y * WindowsSize.y);
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
-
-	// put back the old objects
-	pDC->SelectObject(pOldBrush);
 }
 
 

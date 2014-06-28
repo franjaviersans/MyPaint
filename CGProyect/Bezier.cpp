@@ -23,7 +23,7 @@ CBezier::CBezier()
 	m_filled = false;
 }
 
-void CBezier::OnDraw(CDC *pDC, POINT WindowsSize)
+void CBezier::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 	POINT last;
 
@@ -157,7 +157,7 @@ void CBezier::addControlpoint(){
 		}
 }
 
-void CBezier::DrawSelected(CDC *pDC, POINT WindowsSize){
+void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 	POINT p0, p1, minp, maxp;
 
@@ -167,8 +167,8 @@ void CBezier::DrawSelected(CDC *pDC, POINT WindowsSize){
 	maxp.x = -1000;
 	maxp.y = -1000;
 
-	CBrush brushBlue(RGB(0, 255, 0));
-	CBrush* pOldBrush = pDC->SelectObject(&brushBlue);
+	CColor green(0, 255, 0);
+
 	for(unsigned int i = 0;i< arr[0].size();++i){
 		p0.x = (int)(arr[0][i].x * WindowsSize.x);
 		p0.y = (int)(arr[0][i].y * WindowsSize.y);
@@ -178,64 +178,49 @@ void CBezier::DrawSelected(CDC *pDC, POINT WindowsSize){
 		maxp.x = max(p0.x, maxp.x);
 		maxp.y = max(p0.y, maxp.y);
 		
-		pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+		pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 	}
-	pDC->SelectObject(pOldBrush);
 
-	// create and select a thick, black pen
-	CPen penBlack;
-	penBlack.CreatePen(PS_DOT, 1, RGB(255, 0, 0));
-	CPen* pOldPen = pDC->SelectObject(&penBlack);
 
-	// draw a thick black rectangle filled with blue
+	CColor red(255,0,0);
+
 	p0.x = minp.x;
 	p0.y = minp.y;
 	p1.x = maxp.x;
 	p1.y = minp.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = minp.x;
 	p0.y = minp.y;
 	p1.x = minp.x;
 	p1.y = maxp.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = maxp.x;
 	p0.y = minp.y;
 	p1.x = maxp.x;
 	p1.y = maxp.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 	p0.x = minp.x;
 	p0.y = maxp.y;
 	p1.x = maxp.x;
 	p1.y = maxp.y;
 
-	pDC->MoveTo(p0);
-	pDC->LineTo(p1);
-
-	pDC->SelectObject(pOldPen);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
 
 
-		// create and select a solid green brush
-	CBrush brushOrange(RGB(255, 100, 0));
-	pOldBrush = pDC->SelectObject(&brushOrange);
+	CColor other(255, 100, 0);
 
 	for(unsigned int i = 0;i< arr[0].size();++i){
 		p0.x = (int)(arr[0][i].x * WindowsSize.x);
 		p0.y = (int)(arr[0][i].y * WindowsSize.y);
 		
-		pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5);
+		pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 	}
-
-	// put back the old objects
-	pDC->SelectObject(pOldBrush);
 }
 
 bool CBezier::Intersect(CPOINT2F p){

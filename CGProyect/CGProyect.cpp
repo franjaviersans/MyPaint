@@ -152,6 +152,7 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
+//	afx_msg void OnSize(UINT nType, int cx, int cy);
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -164,6 +165,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+//	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 // App command to run the dialog
@@ -172,6 +174,4 @@ void CCGProyectApp::OnAppAbout()
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
 }
-
-// CCGProyectApp message handlers
 
