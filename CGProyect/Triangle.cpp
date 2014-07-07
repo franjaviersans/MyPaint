@@ -33,14 +33,40 @@ void CTriangle::OnDraw(CBackBuffer *pDC,POINT WindowsSize)
 	p2.x = (int)(m_p2.x * WindowsSize.x);
 	p2.y = (int)(m_p2.y * WindowsSize.y);
 
+	POINT pp0, pp1;
+	pp0.x = min(p0.x, min(p1.x, p2.x));
+	pp0.y = min(p0.y, min(p1.y, p2.y));
+	pp1.x = max(p0.x, max(p1.x, p2.x));
+	pp1.y = max(p0.y, max(p1.y, p2.y));
 
-	//Draw filled figured
-	//TODO 
-	if(m_filled) ScanLine(pDC, WindowsSize);
+	int draw = 2;
 
-	CLine::DrawLine(p0, p1, pDC, m_linecolor);
-	CLine::DrawLine(p1, p2, pDC, m_linecolor);
-	CLine::DrawLine(p0, p2, pDC, m_linecolor);
+	if(pp1.x < 0 && pp0.x >= WindowsSize.x && pp1.y < 0 && pp0.y >= WindowsSize.y) draw = 0;
+
+	if(draw != 0){
+		//Draw filled figured
+		//TODO 
+		if(m_filled) ScanLine(pDC, WindowsSize);
+
+		
+		//Check if the figure is inside the drawing area
+		if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p0, p1, pDC, m_linecolor, draw);
+
+		//Check if the figure is inside the drawing area
+		if(max(p2.x, p1.x) < 0 && min(p2.x, p1.x) >= WindowsSize.x && max(p2.y, p1.y) < 0 && min(p2.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p2.x >= 0 && p2.x < WindowsSize.x && p2.y >= 0 && p2.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p1, p2, pDC, m_linecolor, draw);
+
+		//Check if the figure is inside the drawing area
+		if(max(p0.x, p2.x) < 0 && min(p0.x, p2.x) >= WindowsSize.x && max(p0.y, p2.y) < 0 && min(p0.y, p2.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p2.x >= 0 && p2.x < WindowsSize.x && p2.y >= 0 && p2.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p0, p2, pDC, m_linecolor, draw);
+	}
 }
 
 void CTriangle::ScanLine(CBackBuffer *pDC, POINT WindowsSize){
@@ -231,28 +257,46 @@ void CTriangle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p1.x = pp1.x;
 	p1.y = pp0.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());;
+	int draw;
+
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = pp0.x;
 	p0.y = pp0.y;
 	p1.x = pp0.x;
 	p1.y = pp1.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());;
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = pp0.x;
 	p0.y = pp1.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = pp1.x;
 	p0.y = pp0.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 
 	CColor green(0, 255, 0);

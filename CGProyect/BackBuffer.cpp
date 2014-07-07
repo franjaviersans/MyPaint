@@ -2,39 +2,39 @@
 #include "BackBuffer.h"
 
 void CBackBuffer::SetPixel(int x, int y, int r, int g, int b){
-	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
-		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
-		m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
-		m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
-	}
+	m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
+	m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
+	m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
 }
 
 void CBackBuffer::SetPixel(int x, int y, CColor c){
-	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
-		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) c.b;
-		m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) c.g;
-		m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) c.r;
-	}
+	m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) c.b;
+	m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) c.g;
+	m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) c.r;
 }
 
 void CBackBuffer::SetPixel(int x, int y, COLORREF c){
-	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
-		m_bmpBackData[y*BytesPerLine + x*3] = GetBValue(c);
-		m_bmpBackData[y*BytesPerLine + x*3+1] = GetGValue(c);
-		m_bmpBackData[y*BytesPerLine + x*3+2] = GetRValue(c);
-	}
+	m_bmpBackData[y*BytesPerLine + x*3] = GetBValue(c);
+	m_bmpBackData[y*BytesPerLine + x*3+1] = GetGValue(c);
+	m_bmpBackData[y*BytesPerLine + x*3+2] = GetRValue(c);
 }
 
 void CBackBuffer::FillLine(int x0, int y0, int x1, int y1, COLORREF c){
-	if(0 <= y0 && y0 < m_iHeight){
-		if(x1 <= x0) std::swap(x0,x1);
+	if(x1 <= x0) std::swap(x0,x1);
+	if(y1 <= y0) std::swap(y0,y1);
 
-		if(x0 < 0) x0 = 0;
-		if(x1 < 0) x1 = 0;
-		if(x0 >=  m_iWidth) x0 = m_iWidth - 1;
-		if(x1 >=  m_iWidth) x1 = m_iWidth - 1;
+	if(x0 < 0) x0 = 0;
+	if(x1 < 0) x1 = 0;
+	if(x0 >=  m_iWidth) x0 = m_iWidth;
+	if(x1 >=  m_iWidth) x1 = m_iWidth;
 
-		for(;x0 <= x1;++x0){
+	if(y0 < 0) y0 = 0;
+	if(y1 < 0) y1 = 0;
+	if(y0 >=  m_iHeight) y0 = m_iHeight - 1;
+	if(y1 >=  m_iHeight) y1 = m_iHeight - 1;
+
+	if(y0 != m_iHeight && y0 >=0){
+		for(;x0 < x1;++x0){
 			m_bmpBackData[y0*BytesPerLine + x0*3] = GetBValue(c);
 			m_bmpBackData[y0*BytesPerLine + x0*3+1] = GetGValue(c);
 			m_bmpBackData[y0*BytesPerLine + x0*3+2] = GetRValue(c);
@@ -45,6 +45,30 @@ void CBackBuffer::FillLine(int x0, int y0, int x1, int y1, COLORREF c){
 void CBackBuffer::Rectangle(int x0, int y0, int x1, int y1, COLORREF c){
 	for(;y0<=y1;++y0)
 		FillLine(x0,y0,x1,y0,c);
+}
+
+void CBackBuffer::SetPixelSecured(int x, int y, int r, int g, int b){
+	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
+		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
+		m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
+		m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
+	}
+}
+
+void CBackBuffer::SetPixelSecured(int x, int y, CColor c){
+	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
+		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) c.b;
+		m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) c.g;
+		m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) c.r;
+	}
+}
+
+void CBackBuffer::SetPixelSecured(int x, int y, COLORREF c){
+	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
+		m_bmpBackData[y*BytesPerLine + x*3] = GetBValue(c);
+		m_bmpBackData[y*BytesPerLine + x*3+1] = GetGValue(c);
+		m_bmpBackData[y*BytesPerLine + x*3+2] = GetRValue(c);
+	}
 }
 
 void CBackBuffer::Clear(){
@@ -80,7 +104,7 @@ void CBackBuffer::Destroy () {
 void CBackBuffer::Display(CDC* pdc) {
 	
 	// Display from CreateDIBSection creation
-		BitBlt (pdc->GetSafeHdc(), 0, 0, m_iWidth, m_iHeight, m_hdcSource, 0, 0, SRCCOPY);
+	BitBlt (pdc->GetSafeHdc(), 0, 0, m_iWidth, m_iHeight, m_hdcSource, 0, 0, SRCCOPY);
 }
 
 void CBackBuffer::ChangeSize(int x,int y, CDC* pdc){

@@ -25,64 +25,74 @@ void CEllipse::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	
 	POINT center;
 
-	int a, b, x, y, d, aa, bb, incx, incy, deltaincx, deltaincy;
-	a			= abs((int)(p1.x - p0.x)) >> 1;
-	b			= abs((int)(p1.y - p0.y)) >> 1;
-	aa			= a * a;
-	bb			= b * b;
-	center.x	= (p1.x + p0.x) >> 1;
-	center.y	= (p1.y + p0.y) >> 1;
+	int draw;
 
-	//Draw filled figured
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
 
-	//Block 1
-	x = 0;
-	y = b;
-	d = ((b * (b - aa)) << 2) + aa;
+	//If the figure must be draw
+	if(draw != 0){
+		int a, b, x, y, d, aa, bb, incx, incy, deltaincx, deltaincy;
+		a			= abs((int)(p1.x - p0.x)) >> 1;
+		b			= abs((int)(p1.y - p0.y)) >> 1;
+		aa			= a * a;
+		bb			= b * b;
+		center.x	= (p1.x + p0.x) >> 1;
+		center.y	= (p1.y + p0.y) >> 1;
 
-	incx		= (3 * bb) << 2;
-	deltaincx	= bb << 3;
-	incy		= (aa * (1 - b)) << 3;
-	deltaincy	= aa << 3;
+		//Draw filled figured
 
-	//Draw the 4 points of the ellipse
-	if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC);
-	else			EllipsePoints(x,y,center, m_linecolor, pDC);
+		//Block 1
+		x = 0;
+		y = b;
+		d = ((b * (b - aa)) << 2) + aa;
 
-	while (((bb * (x + 1)) << 1) < aa * ((y << 1) - 1)) {
-		if (d < 0) {
-			d += incx;
-		}else{
-			d += incx + incy;
-			incy += deltaincy;
-			--y;
-		}
-		++x;
-		incx += deltaincx; 
-		if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC);
-		else			EllipsePoints(x,y,center, m_linecolor, pDC);
-	}
+		incx		= (3 * bb) << 2;
+		deltaincx	= bb << 3;
+		incy		= (aa * (1 - b)) << 3;
+		deltaincy	= aa << 3;
 
-	
-	//Block 2
-	incx		= (bb * x + bb) << 3;
-	deltaincx	= bb << 3;
-	incy		= (((-aa * y)<< 1) + 3 * aa) << 2;
-	deltaincy	= aa << 3;
-	d			= bb * (((x * x) << 2) + (x << 2) + 1)+ ((aa * y * y - (y << 1) + 1) << 2) - ((aa * bb) << 2);
-	
-	while (y>0){
-		if (d < 0){
-			d += incx + incy;
-			incx += deltaincx;
+		//Draw the 4 points of the ellipse
+		if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC, draw);
+		else			EllipsePoints(x,y,center, m_linecolor, pDC, draw);
+
+		while (((bb * (x + 1)) << 1) < aa * ((y << 1) - 1)) {
+			if (d < 0) {
+				d += incx;
+			}else{
+				d += incx + incy;
+				incy += deltaincy;
+				--y;
+			}
 			++x;
-		}else{
-			d += incy;
+			incx += deltaincx; 
+			if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC, draw);
+			else			EllipsePoints(x,y,center, m_linecolor, pDC, draw);
 		}
-		--y;
-		incy += deltaincy;
-		if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC);
-		else			EllipsePoints(x,y,center, m_linecolor, pDC);
+
+	
+		//Block 2
+		incx		= (bb * x + bb) << 3;
+		deltaincx	= bb << 3;
+		incy		= (((-aa * y)<< 1) + 3 * aa) << 2;
+		deltaincy	= aa << 3;
+		d			= bb * (((x * x) << 2) + (x << 2) + 1)+ ((aa * y * y - (y << 1) + 1) << 2) - ((aa * bb) << 2);
+	
+		while (y>0){
+			if (d < 0){
+				d += incx + incy;
+				incx += deltaincx;
+				++x;
+			}else{
+				d += incy;
+			}
+			--y;
+			incy += deltaincy;
+			if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC, draw);
+			else			EllipsePoints(x,y,center, m_linecolor, pDC, draw);
+		}
 	}
 }
 
@@ -111,21 +121,37 @@ void CEllipse::Serialize(CArchive& ar)
 	}
 }
 
-void CEllipse::EllipsePoints(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC){
-	pDC->SetPixel(center.x + x,	center.y + y, color);
-	pDC->SetPixel(center.x - x,	center.y + y, color);
-	pDC->SetPixel(center.x - x, center.y - y, color);
-	pDC->SetPixel(center.x + x, center.y - y, color);
+void CEllipse::EllipsePoints(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int draw){
+	if(draw == 2){
+		pDC->SetPixel(center.x + x,	center.y + y, color);
+		pDC->SetPixel(center.x - x,	center.y + y, color);
+		pDC->SetPixel(center.x - x, center.y - y, color);
+		pDC->SetPixel(center.x + x, center.y - y, color);
+	}else{
+		pDC->SetPixelSecured(center.x + x,	center.y + y, color);
+		pDC->SetPixelSecured(center.x - x,	center.y + y, color);
+		pDC->SetPixelSecured(center.x - x, center.y - y, color);
+		pDC->SetPixelSecured(center.x + x, center.y - y, color);
+	}
 }
 
 
-void CEllipse::EllipsePointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC){
-	pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
-	pDC->SetPixel(center.x + x,	center.y + y, color);
-	pDC->SetPixel(center.x - x,	center.y + y, color);
-	pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
-	pDC->SetPixel(center.x - x, center.y - y, color);
-	pDC->SetPixel(center.x + x, center.y - y, color);
+void CEllipse::EllipsePointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int draw){
+	if(draw == 2){
+		pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
+		pDC->SetPixel(center.x + x,	center.y + y, color);
+		pDC->SetPixel(center.x - x,	center.y + y, color);
+		pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
+		pDC->SetPixel(center.x - x, center.y - y, color);
+		pDC->SetPixel(center.x + x, center.y - y, color);
+	}else{
+		pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
+		pDC->SetPixelSecured(center.x + x,	center.y + y, color);
+		pDC->SetPixelSecured(center.x - x,	center.y + y, color);
+		pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
+		pDC->SetPixelSecured(center.x - x, center.y - y, color);
+		pDC->SetPixelSecured(center.x + x, center.y - y, color);
+	}
 }
 
 
@@ -144,28 +170,46 @@ void CEllipse::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p1.x = pp1.x;
 	p1.y = pp0.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	int draw;
+
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = pp0.x;
 	p0.y = pp0.y;
 	p1.x = pp0.x;
 	p1.y = pp1.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = pp0.x;
 	p0.y = pp1.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = pp1.x;
 	p0.y = pp0.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 
 	CColor green(0, 255, 0);

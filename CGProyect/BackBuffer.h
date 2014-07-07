@@ -26,7 +26,9 @@ public:
 	void SetPixel(int, int, COLORREF);
 	void FillLine(int, int, int, int, COLORREF);
 	void Rectangle(int, int, int, int, COLORREF);
-	void DrawSegment(int, int, int, int, CColor);
+	void SetPixelSecured(int, int, int, int ,int);
+	void SetPixelSecured(int, int, CColor);
+	void SetPixelSecured(int, int, COLORREF);
 	void Clear();
 	// simple accessors
 	int Height(void) const

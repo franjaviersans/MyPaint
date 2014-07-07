@@ -56,9 +56,7 @@ void CBezier::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 			last.x = (int)(arr[n-1][0].x * WindowsSize.x);
 			last.y = (int)(arr[n-1][0].y * WindowsSize.y);
 
-			//pDC->MoveTo(p0);
-			//pDC->LineTo(last);
-			CLine::DrawLine(p0, last, pDC, m_linecolor);
+			CLine::DrawLine(p0, last, pDC, m_linecolor, 1);
 		}
 
 		if(t == 1) break;
@@ -125,11 +123,6 @@ void CBezier::addControlpoint(){
 	unsigned int i;
 	unsigned int n = arr[0].size();
 
-	/*
-	std::ofstream off("out.txt");
-	std::cout.rdbuf(off.rdbuf()); //redirect std::cout to out.txt!
-    std::cout<<i<<"   "<< j<<"  "<<arr[0].size()<<std::endl;*/
-
 	CPOINT2F a;
 	a.x = 100;
 	a.y = 100;
@@ -142,7 +135,6 @@ void CBezier::addControlpoint(){
 		arr[0][i].y = arr[0][i - 1].y * ((float)i / n) + arr[0][i].y * (1.0f - ((float)i / n));
 	}
 
-	
 	n = arr[0].size();
 
 	while(n > arr.size())
@@ -181,6 +173,7 @@ void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 		pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 	}
 
+	int draw;
 
 	CColor red(255,0,0);
 
@@ -188,29 +181,45 @@ void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p0.y = minp.y;
 	p1.x = maxp.x;
 	p1.y = minp.y;
-
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = minp.x;
 	p0.y = minp.y;
 	p1.x = minp.x;
 	p1.y = maxp.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = maxp.x;
 	p0.y = minp.y;
 	p1.x = maxp.x;
 	p1.y = maxp.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = minp.x;
 	p0.y = maxp.y;
 	p1.x = maxp.x;
 	p1.y = maxp.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 
 	CColor other(255, 100, 0);

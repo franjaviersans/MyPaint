@@ -12,8 +12,8 @@ public:
 	virtual void OnDraw(CBackBuffer *, POINT);
 	virtual void Serialize(CArchive &);
 	virtual void DrawSelected(CBackBuffer *, POINT);
-	static void DrawLine(POINT, POINT, CBackBuffer *, COLORREF);
-	static void DrawDottedLine(POINT, POINT, CBackBuffer *, COLORREF);
+	static void DrawLine(POINT, POINT, CBackBuffer *, COLORREF, int);
+	static void DrawDottedLine(POINT, POINT, CBackBuffer *, COLORREF, int);
 	virtual bool Intersect(CPOINT2F, POINT);
 	virtual CPOINT2F* IntersectControlPoint(CPOINT2F, POINT);
 	virtual void Translate(CPOINT2F);

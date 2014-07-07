@@ -22,8 +22,8 @@ public:
 	virtual void ChangeFilled();
 
 private:
-	void Draw8Points(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC);
-	void Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC);
+	void Draw8Points(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int);
+	void Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int);
 };
 
 #endif

@@ -16,7 +16,8 @@ CCircle::CCircle()
 
 void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
-
+	// 0 Don't draw, 1 draw secured, 2 draw normal
+	int draw;
 	POINT center, tangent;
 	center.x = (int)(m_center.x * WindowsSize.x);
 	center.y = (int)(m_center.y * WindowsSize.y);
@@ -25,33 +26,52 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	
 	int dx = center.x - tangent.x;
 	int dy = center.y - tangent.y;
-	int incx, incy, delta;
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
 
-	int x,y,d;
-	x = 0;
-	y = r;
-	d = 1-r;
+	//Check if the figure is inside the drawing area
+	if(center.x + r < 0 && center.x - r >= WindowsSize.x && center.y + r < 0 && center.y - r >= WindowsSize.y)
+		draw = 0;
+	else if(center.x - r >= 0 && center.x + r < WindowsSize.x && center.y - r >= 0 && center.y + r < WindowsSize.y) draw = 2;
+	else draw = 1;
 
-	incx		= 3;
-	delta		= 2;
-	incy		= -2 * r +5;
+	//If the figure must be draw
+	if(draw != 0){
+		POINT center, tangent;
+		center.x = (int)(m_center.x * WindowsSize.x);
+		center.y = (int)(m_center.y * WindowsSize.y);
+		tangent.x = (int)(m_tangente.x * WindowsSize.x);
+		tangent.y = (int)(m_tangente.y * WindowsSize.y);
+	
+		int dx = center.x - tangent.x;
+		int dy = center.y - tangent.y;
+		int incx, incy, delta;
+		int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
 
-	if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC);
-	else		Draw8Points(x, y, center, m_linecolor, pDC);
+		int x,y,d;
+		x = 0;
+		y = r;
+		d = 1-r;
 
-	while (y > x){
-		if (d < 0) {
-			d += incx;
-		}else{
-			d += incx + incy;
-			incy += delta;
-			--y;
+		incx		= 3;
+		delta		= 2;
+		incy		= -2 * r +5;
+
+		if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
+		else		Draw8Points(x, y, center, m_linecolor, pDC, draw);
+
+		while (y > x){
+			if (d < 0) {
+				d += incx;
+			}else{
+				d += incx + incy;
+				incy += delta;
+				--y;
+			}
+			++x;
+			incx += delta;
+			if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
+			else		Draw8Points(x, y, center, m_linecolor, pDC, draw);
 		}
-		++x;
-		incx += delta;
-		if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC);
-		else		Draw8Points(x, y, center, m_linecolor, pDC);
 	}
 }
 
@@ -80,30 +100,56 @@ void CCircle::Serialize(CArchive& ar)
 	}
 }
 
-void CCircle::Draw8Points(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC){
-	pDC->SetPixel(center.x + x,	center.y + y, color);
-	pDC->SetPixel(center.x - x,	center.y + y, color);
-	pDC->SetPixel(center.x - x, center.y - y, color);
-	pDC->SetPixel(center.x + x, center.y - y, color);
-	pDC->SetPixel(center.x + y, center.y + x, color);
-	pDC->SetPixel(center.x - y, center.y + x, color);
-	pDC->SetPixel(center.x - y, center.y - x, color);
-	pDC->SetPixel(center.x + y, center.y - x, color);
+void CCircle::Draw8Points(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int draw){
+	if(draw == 2){
+		pDC->SetPixel(center.x + x,	center.y + y, color);
+		pDC->SetPixel(center.x - x,	center.y + y, color);
+		pDC->SetPixel(center.x - x, center.y - y, color);
+		pDC->SetPixel(center.x + x, center.y - y, color);
+		pDC->SetPixel(center.x + y, center.y + x, color);
+		pDC->SetPixel(center.x - y, center.y + x, color);
+		pDC->SetPixel(center.x - y, center.y - x, color);
+		pDC->SetPixel(center.x + y, center.y - x, color);
+	}else{
+		pDC->SetPixelSecured(center.x + x,	center.y + y, color);
+		pDC->SetPixelSecured(center.x - x,	center.y + y, color);
+		pDC->SetPixelSecured(center.x - x, center.y - y, color);
+		pDC->SetPixelSecured(center.x + x, center.y - y, color);
+		pDC->SetPixelSecured(center.x + y, center.y + x, color);
+		pDC->SetPixelSecured(center.x - y, center.y + x, color);
+		pDC->SetPixelSecured(center.x - y, center.y - x, color);
+		pDC->SetPixelSecured(center.x + y, center.y - x, color);
+	}
 }
 
-void CCircle::Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC){
-	pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
-	pDC->SetPixel(center.x + x,	center.y + y, color);
-	pDC->SetPixel(center.x - x,	center.y + y, color);
-	pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
-	pDC->SetPixel(center.x - x, center.y - y, color);
-	pDC->SetPixel(center.x + x, center.y - y, color);
-	pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
-	pDC->SetPixel(center.x + y, center.y + x, color);
-	pDC->SetPixel(center.x - y, center.y + x, color);
-	pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
-	pDC->SetPixel(center.x - y, center.y - x, color);
-	pDC->SetPixel(center.x + y, center.y - x, color);
+void CCircle::Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int draw){
+	if(draw ==  2){
+		pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
+		pDC->SetPixel(center.x + x,	center.y + y, color);
+		pDC->SetPixel(center.x - x,	center.y + y, color);
+		pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
+		pDC->SetPixel(center.x - x, center.y - y, color);
+		pDC->SetPixel(center.x + x, center.y - y, color);
+		pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
+		pDC->SetPixel(center.x + y, center.y + x, color);
+		pDC->SetPixel(center.x - y, center.y + x, color);
+		pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
+		pDC->SetPixel(center.x - y, center.y - x, color);
+		pDC->SetPixel(center.x + y, center.y - x, color);
+	}else{
+		pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
+		pDC->SetPixelSecured(center.x + x,	center.y + y, color);
+		pDC->SetPixelSecured(center.x - x,	center.y + y, color);
+		pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
+		pDC->SetPixelSecured(center.x - x, center.y - y, color);
+		pDC->SetPixelSecured(center.x + x, center.y - y, color);
+		pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
+		pDC->SetPixelSecured(center.x + y, center.y + x, color);
+		pDC->SetPixelSecured(center.x - y, center.y + x, color);
+		pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
+		pDC->SetPixelSecured(center.x - y, center.y - x, color);
+		pDC->SetPixelSecured(center.x + y, center.y - x, color);
+	}
 }
 
 void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
@@ -117,6 +163,7 @@ void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	int dx = center.x - tangent.x;
 	int dy = center.y - tangent.y;
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
+	int draw;
 
 	CColor red(255,0,0);
 
@@ -126,28 +173,44 @@ void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p1.x = center.x - r;
 	p1.y = center.y + r;
 	
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = center.x - r;
 	p0.y = center.y - r;
 	p1.x = center.x + r;
 	p1.y = center.y - r;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = center.x - r;
 	p0.y = center.y + r;
 	p1.x = center.x + r;
 	p1.y = center.y + r;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = center.x + r;
 	p0.y = center.y - r;
 	p1.x = center.x + r;
 	p1.y = center.y + r;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 
 	CColor green(0, 255, 0);

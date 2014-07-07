@@ -22,8 +22,8 @@ public:
 	virtual void ChangeFilled();
 
 private:
-	void EllipsePoints(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC);
-	void EllipsePointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC);
+	void EllipsePoints(int , int , POINT , COLORREF , CBackBuffer *, int);
+	void EllipsePointsFilled(int , int , POINT , COLORREF , CBackBuffer *, int);
 };
 
 #endif

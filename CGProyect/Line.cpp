@@ -12,110 +12,133 @@ CLine::CLine()
 	m_filled = false;
 }
 
-void CLine::DrawLine(POINT p0, POINT p1, CBackBuffer *pDC, COLORREF color){
-	bool invert = false;
-	int dx, dy, x, y, d, IncD1, IncD2, inc1 = 1, inc2 = 0;
+void CLine::DrawLine(POINT p0, POINT p1, CBackBuffer *pDC, COLORREF color, int draw){
+	if(draw != 0){
+		bool invert = false;
+		int dx, dy, x, y, d, IncD1, IncD2, inc1 = 1, inc2 = 0;
 
-	if(abs(p1.x - p0.x) < abs(p1.y - p0.y)){
-		std::swap(p0.x,p0.y);
-		std::swap(p1.x,p1.y);
-		invert = true;
-	}
-
-	if(p1.x <= p0.x)
-		std::swap(p1, p0);
-
-	dx = p1.x - p0.x;
-	dy = p1.y - p0.y;
-
-	if(dy <= 0){
-		dx = -dx;
-		IncD2	= - (dy << 1);
-		IncD1	= (dx - dy) << 1;
-		inc2	= -1;
-		inc1	= 0;
-	}else{
-		d		= dx - (dy << 1);
-		IncD1	= - (dy << 1);
-		IncD2	= (dx - dy) << 1;
-	}
-
-	d	= dx - (dy << 1);
-	x	= p0.x;
-	y	= p0.y;
-	
-	if(!invert) pDC->SetPixel(x, y, color);
-	else		pDC->SetPixel(y, x, color);
-
-	while(x < p1.x){
-		if(d <= 0){
-			d += IncD2;
-			y += inc1;
-		}else{
-			d += IncD1;
-			y += inc2;
+		if(abs(p1.x - p0.x) < abs(p1.y - p0.y)){
+			std::swap(p0.x,p0.y);
+			std::swap(p1.x,p1.y);
+			invert = true;
 		}
-		++x;
 
-		if(!invert) pDC->SetPixel(x, y, color);
-		else pDC->SetPixel(y, x, color);
+		if(p1.x <= p0.x)
+			std::swap(p1, p0);
+
+		dx = p1.x - p0.x;
+		dy = p1.y - p0.y;
+
+		if(dy <= 0){
+			dx = -dx;
+			IncD2	= - (dy << 1);
+			IncD1	= (dx - dy) << 1;
+			inc2	= -1;
+			inc1	= 0;
+		}else{
+			d		= dx - (dy << 1);
+			IncD1	= - (dy << 1);
+			IncD2	= (dx - dy) << 1;
+		}
+
+		d	= dx - (dy << 1);
+		x	= p0.x;
+		y	= p0.y;
+	
+		//Normal draw
+		if(draw == 2)
+			if(!invert) pDC->SetPixel(x, y, color);
+			else		pDC->SetPixel(y, x, color);
+		else //Secure draw
+			if(!invert) pDC->SetPixelSecured(x, y, color);
+			else		pDC->SetPixelSecured(y, x, color);
+
+		while(x < p1.x){
+			if(d <= 0){
+				d += IncD2;
+				y += inc1;
+			}else{
+				d += IncD1;
+				y += inc2;
+			}
+			++x;
+
+			//Normal draw
+			if(draw == 2)
+				if(!invert) pDC->SetPixel(x, y, color);
+				else		pDC->SetPixel(y, x, color);
+			else //Secure draw
+				if(!invert) pDC->SetPixelSecured(x, y, color);
+				else		pDC->SetPixelSecured(y, x, color);
+		}
 	}
 }
 
-void CLine::DrawDottedLine(POINT p0, POINT p1, CBackBuffer *pDC, COLORREF color){
+void CLine::DrawDottedLine(POINT p0, POINT p1, CBackBuffer *pDC, COLORREF color, int draw){
+	if(draw != 0){
+		boolean mask[] = {true,true,true,false,false,false,true,true,true,false,false,false};
+		int masksize = 12, maskind = 0;
 
-	boolean mask[] = {true,true,true,false,false,false,true,true,true,false,false,false};
-	int masksize = 12, maskind = 0;
+		bool invert = false;
+		int dx, dy, x, y, d, IncD1, IncD2, inc1 = 1, inc2 = 0;
 
-	bool invert = false;
-	int dx, dy, x, y, d, IncD1, IncD2, inc1 = 1, inc2 = 0;
+		if(abs(p1.x - p0.x) < abs(p1.y - p0.y)){
+			std::swap(p0.x,p0.y);
+			std::swap(p1.x,p1.y);
+			invert = true;
+		}
 
-	if(abs(p1.x - p0.x) < abs(p1.y - p0.y)){
-		std::swap(p0.x,p0.y);
-		std::swap(p1.x,p1.y);
-		invert = true;
-	}
+		if(p1.x <= p0.x)
+			std::swap(p1, p0);
 
-	if(p1.x <= p0.x)
-		std::swap(p1, p0);
+		dx = p1.x - p0.x;
+		dy = p1.y - p0.y;
 
-	dx = p1.x - p0.x;
-	dy = p1.y - p0.y;
-
-	if(dy <= 0){
-		dx = -dx;
-		IncD2	= - (dy << 1);
-		IncD1	= (dx - dy) << 1;
-		inc2	= -1;
-		inc1	= 0;
-	}else{
-		d		= dx - (dy << 1);
-		IncD1	= - (dy << 1);
-		IncD2	= (dx - dy) << 1;
-	}
-
-	d	= dx - (dy << 1);
-	x	= p0.x;
-	y	= p0.y;
-	
-	if(!invert) pDC->SetPixel(x, y, color);
-	else		pDC->SetPixel(y, x, color);
-
-	while(x < p1.x){
-		if(d <= 0){
-			d += IncD2;
-			y += inc1;
+		if(dy <= 0){
+			dx = -dx;
+			IncD2	= - (dy << 1);
+			IncD1	= (dx - dy) << 1;
+			inc2	= -1;
+			inc1	= 0;
 		}else{
-			d += IncD1;
-			y += inc2;
+			d		= dx - (dy << 1);
+			IncD1	= - (dy << 1);
+			IncD2	= (dx - dy) << 1;
 		}
-		++x;
 
-		if(mask[maskind]){
+		d	= dx - (dy << 1);
+		x	= p0.x;
+		y	= p0.y;
+	
+		//Normal draw
+		if(draw == 2)
 			if(!invert) pDC->SetPixel(x, y, color);
-			else pDC->SetPixel(y, x, color);
+			else		pDC->SetPixel(y, x, color);
+		else //Secure draw
+			if(!invert) pDC->SetPixelSecured(x, y, color);
+			else		pDC->SetPixelSecured(y, x, color);
+
+		while(x < p1.x){
+			if(d <= 0){
+				d += IncD2;
+				y += inc1;
+			}else{
+				d += IncD1;
+				y += inc2;
+			}
+			++x;
+
+			if(mask[maskind]){
+				//Normal draw
+				if(draw == 2)
+					if(!invert) pDC->SetPixel(x, y, color);
+					else		pDC->SetPixel(y, x, color);
+				else //Secure draw
+					if(!invert) pDC->SetPixelSecured(x, y, color);
+					else		pDC->SetPixelSecured(y, x, color);
+			}
+			maskind = (maskind++) % masksize;
 		}
-		maskind = (maskind++) % masksize;
 	}
 }
 
@@ -129,7 +152,13 @@ void CLine::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	p1.x = (int)(m_p2.x * WindowsSize.x);
 	p1.y = (int)(m_p2.y * WindowsSize.y);
 
-	CLine::DrawLine(p0, p1, pDC, m_linecolor);
+	int draw;
+
+	//Check if the figure is inside the drawing area
+	if(p0.x < 0 && p1.x >= WindowsSize.x && p0.y < 0 && p1.y >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawLine(p0, p1, pDC, m_linecolor, draw);
 }
 
 void CLine::Serialize(CArchive& ar)
