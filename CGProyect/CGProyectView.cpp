@@ -185,7 +185,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 				((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
 				((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
 				pDoc->m_triangle = 0;
-
+				pDoc->m_current = -1;
 			}else{
 				CTriangle *T = new CTriangle;
 				T->m_p0.x = T->m_p1.x = T->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
@@ -194,7 +194,6 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 				pDoc->m_figures.push_back(T);
 				pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 
-				
 			}
 			break;
 		}
@@ -263,19 +262,25 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 			case IM_CIRCLE:	{
 				((CCircle*)(*i))->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
 				((CCircle*)(*i))->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
-			
+				//((CButton*)GetDlgItem(ID_BUTTON_CIRCLE))->SetCheck(false);
+			//	((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.CheckDlgButton(ID_BUTTON_CIRCLE,false);
+
+
+				pDoc->m_current = -1;
 				break;
 			}
 			case IM_LINE:	{
 				((CLine *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
 				((CLine *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
 				
+				pDoc->m_current = -1;
 				break;
 			}
 			case IM_ELLIPSE:{
 				((CEllipse *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
 				((CEllipse *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
 
+				pDoc->m_current = -1;
 				break;
 			}
 			case IM_TRIANGLE:{
@@ -288,6 +293,7 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 			case IM_BEZIER:  {
 				((CBezier *)(*i))->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
 				((CBezier *)(*i))->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+				pDoc->m_current = -1;
 
 				break;
 			}
