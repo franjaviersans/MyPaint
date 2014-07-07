@@ -13,6 +13,8 @@
 #include "Line.h"
 #include "Triangle.h"
 #include "Bezier.h"
+#include "CGProyect.h"
+#include "MainFrm.h"
 
 class CCGProyectDoc : public CDocument
 {
@@ -28,10 +30,12 @@ public:
 	std::vector<CShape *> m_figures;
 	int m_current;
 	POINT m_WindosSize, m_initialPoint;
-	bool m_pressed, m_bezier, m_insertmode;
+	bool m_pressed, m_bezier;
 	CPOINT2F* m_selectedPoint;
 	std::vector<CShape *>::iterator position;
 	int m_triangle;
+	CToolBar* m_pToolBar;
+	CMainFrame* m_pFrame;
 
 // Overrides
 public:

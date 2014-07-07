@@ -182,22 +182,28 @@ void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 }
 
-bool CCircle::Intersect(CPOINT2F p){
+bool CCircle::Intersect(CPOINT2F p, POINT WindowsSize){
+	
+	POINT center, tangent, p0;
+	center.x = (int)(m_center.x * WindowsSize.x);
+	center.y = (int)(m_center.y * WindowsSize.y);
+	tangent.x = (int)(m_tangente.x * WindowsSize.x);
+	tangent.y = (int)(m_tangente.y * WindowsSize.y);
+	p0.x = (int)(p.x * WindowsSize.x);
+	p0.y = (int)(p.y * WindowsSize.y);
 
-	double dx = m_center.x - m_tangente.x;
-	double dy = m_center.y - m_tangente.y;
-	double r = sqrt( (double)dx * dx + dy * dy);
+	double dx = center.x - tangent.x;
+	double dy = center.y - tangent.y;
+	double rr = dx * dx + dy * dy;
+	dx = center.x - p0.x;
+	dy = center.y - p0.y;
+	double dd = dx * dx + dy * dy;
 
-
-	if((m_center.x - r <= p.x && p.x <= m_center.x + r) && 
-		(m_center.y - r <= p.y && p.y <= m_center.y + r))
-		return true;
-	else 
-		return false;
+	return	(m_filled && dd < rr) || (!m_filled && abs(sqrt(dd) - sqrt(rr)) <= 2);
 }
 
-CPOINT2F* CCircle::IntersectControlPoint(CPOINT2F p){
-	double epsilon = 0.02;
+CPOINT2F* CCircle::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
+	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
 	if(abs((p.x - m_center.x)) <= epsilon && abs((p.y - m_center.y)) <= epsilon)
 		return &m_center;
 

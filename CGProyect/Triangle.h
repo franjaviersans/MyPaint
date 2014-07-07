@@ -19,8 +19,8 @@ public:
 	virtual void OnDraw(CBackBuffer *, POINT);
 	virtual void Serialize(CArchive& ar);
 	virtual void DrawSelected(CBackBuffer *, POINT);
-	virtual bool Intersect(CPOINT2F);
-	virtual CPOINT2F* IntersectControlPoint(CPOINT2F);
+	virtual bool Intersect(CPOINT2F, POINT);
+	virtual CPOINT2F* IntersectControlPoint(CPOINT2F, POINT);
 	virtual void Translate(CPOINT2F);
 	virtual void ChangeFillColor(COLORREF);
 	virtual void ChangeLineColor(COLORREF);
@@ -28,6 +28,7 @@ public:
 
 private:
 	void ScanLine(CBackBuffer *, POINT);
+	float sign(CPOINT2F,CPOINT2F,CPOINT2F);
 
 };
 
