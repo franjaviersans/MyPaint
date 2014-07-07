@@ -198,16 +198,31 @@ void CEllipse::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 }
 
-bool CEllipse::Intersect(CPOINT2F p){
-	if(((m_p1.x <= p.x && p.x <= m_p2.x) || (m_p2.x <= p.x && p.x <= m_p1.x)) && 
-		((m_p1.y <= p.y && p.y <= m_p2.y) || (m_p2.y <= p.y && p.y <= m_p1.y)))
-		return true;
-	else 
-		return false;
+bool CEllipse::Intersect(CPOINT2F p, POINT WindowsSize){
+
+	
+	POINT center, axis, p0;
+	center.x = (int)((m_p1.x + m_p2.x)/2.0 * WindowsSize.x);
+	center.y = (int)((m_p1.y + m_p2.y)/2.0 * WindowsSize.y);
+	axis.x = (int)(abs(m_p1.x * WindowsSize.x - center.x) );
+	axis.y = (int)(abs(m_p1.y * WindowsSize.y - center.y));
+	p0.x = (int)(p.x * WindowsSize.x);
+	p0.y = (int)(p.y * WindowsSize.y);
+
+	axis.x = axis.x * axis.x;
+	axis.y  = axis.y * axis.y ;
+	double dx = p0.x - center.x;
+	double dy = p0.y - center.y;
+	dx = dx * dx;
+	dy = dy * dy;
+	dx = dx / axis.x + dy / axis.y;
+
+	return	(m_filled && dx <= 1) || (!m_filled && abs(dx - 1) <= 0.025);
 }
 
-CPOINT2F* CEllipse::IntersectControlPoint(CPOINT2F p){
-	double epsilon = 0.02;
+CPOINT2F* CEllipse::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
+	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
+
 	if(abs((p.x - m_p1.x)) <= epsilon && abs((p.y - m_p1.y)) <= epsilon)
 		return &m_p1;
 

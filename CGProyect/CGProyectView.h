@@ -80,6 +80,12 @@ public:
 	afx_msg void OnDestroy();
 //	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnUpdateButtonCircle(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateButtonBezier(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateButtonEllipse(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateButtonLine(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateButtonTriangle(CCmdUI *pCmdUI);
+	afx_msg void OnButtonCancel();
 };
 
 #ifndef _DEBUG  // debug version in CGProyectView.cpp

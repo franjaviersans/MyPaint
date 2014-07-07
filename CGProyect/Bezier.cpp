@@ -223,7 +223,9 @@ void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	}
 }
 
-bool CBezier::Intersect(CPOINT2F p){
+bool CBezier::Intersect(CPOINT2F p, POINT WindowsSize){
+	double epsilon = (WindowsSize.x > WindowsSize.y)? 2.0/WindowsSize.x : 2.0/WindowsSize.y;
+	//TODO: Interseccion super compleja
 	CPOINT2F p0, p1;
 
 	p0.x = 9999999;
@@ -245,8 +247,8 @@ bool CBezier::Intersect(CPOINT2F p){
 		return false;
 }
 
-CPOINT2F* CBezier::IntersectControlPoint(CPOINT2F p){
-	double epsilon = 0.02;
+CPOINT2F* CBezier::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
+	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
 
 	for(unsigned int i = 0;i< arr[0].size();++i){
 		if(abs((p.x - arr[0][i].x)) <= epsilon && abs((p.y - arr[0][i].y)) <= epsilon)

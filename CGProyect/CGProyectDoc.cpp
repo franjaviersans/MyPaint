@@ -44,11 +44,13 @@ BOOL CCGProyectDoc::OnNewDocument()
 
 	m_figures.clear();
 	position		= m_figures.begin();
-	m_current		= IM_LINE;
+	m_current		= -1;
 	m_pressed		= m_bezier = false;
 	m_triangle		= 0;
-	m_insertmode	= true;
 	m_selectedPoint = NULL;
+
+	m_pFrame = (CMainFrame*) AfxGetApp()->m_pMainWnd;
+	m_pToolBar = &m_pFrame->m_wndToolBar;
 
 	// TODO: add reinitialization code here
 	// (SDI documents will reuse this document)

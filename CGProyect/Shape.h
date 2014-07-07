@@ -44,8 +44,8 @@ public:
 	virtual void OnDraw(CBackBuffer *, POINT) = 0;
     virtual void Serialize(CArchive& ar) = 0;
 	virtual void DrawSelected(CBackBuffer *, POINT) = 0;
-	virtual bool Intersect(CPOINT2F) = 0;
-	virtual CPOINT2F* IntersectControlPoint(CPOINT2F) = 0; 
+	virtual bool Intersect(CPOINT2F, POINT) = 0;
+	virtual CPOINT2F* IntersectControlPoint(CPOINT2F, POINT) = 0; 
 	virtual void Translate(CPOINT2F) = 0;
 	virtual void ChangeFillColor(COLORREF) = 0;
 	virtual void ChangeLineColor(COLORREF) = 0;

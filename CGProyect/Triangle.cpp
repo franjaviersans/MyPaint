@@ -293,23 +293,70 @@ void CTriangle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 }
 
 
-bool CTriangle::Intersect(CPOINT2F p){
-
-	CPOINT2F p0, p1;
-	p0.x = min(m_p0.x, min(m_p1.x, m_p2.x));
-	p0.y = min(m_p0.y, min(m_p1.y, m_p2.y));
-	p1.x = max(m_p0.x, max(m_p1.x, m_p2.x));
-	p1.y = max(m_p0.y, max(m_p1.y, m_p2.y));
-
-	if((p0.x <= p.x && p.x <= p1.x) && 
-		(p0.y <= p.y && p.y <= p1.y))
-		return true;
-	else 
-		return false;
+float CTriangle::sign(CPOINT2F p1,CPOINT2F p2,CPOINT2F p3){
+		return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y); 
 }
 
-CPOINT2F* CTriangle::IntersectControlPoint(CPOINT2F p){
-	double epsilon = 0.02;
+bool CTriangle::Intersect(CPOINT2F p, POINT WindowsSize){
+	double epsilon = (WindowsSize.x > WindowsSize.y)? 2.0/WindowsSize.x : 2.0/WindowsSize.y;
+	
+	double	sign1, sign2, sign3;
+	
+	if(!m_filled){
+		sign1 = abs((p.x - m_p1.x) * (m_p2.y - m_p1.y)  - (p.y - m_p1.y) * (m_p2.x - m_p1.x));
+		sign2 = abs((p.x - m_p0.x) * (m_p1.y - m_p0.y)  - (p.y - m_p0.y) * (m_p1.x - m_p0.x));
+		sign3 = abs((p.x - m_p2.x) * (m_p0.y - m_p2.y)  - (p.y - m_p2.y) * (m_p0.x - m_p2.x));
+
+		//Intersect with first line
+		CPOINT2F p0, p1;
+		p0.x = min(m_p1.x, m_p2.x);
+		p0.y = min(m_p1.y, m_p2.y);
+		p1.x = max(m_p1.x, m_p2.x);
+		p1.y = max(m_p1.y, m_p2.y);
+
+		if( sign1 <= epsilon 
+			&& ((p0.x <= p.x && p.x <= p1.x) || (p0.x <= p.x && p.x <= p1.x)) 
+			&& ((p0.y <= p.y && p.y <= p1.y) || (p0.y <= p.y && p.y <= p1.y)))
+			return true;
+		
+		p0.x = min(m_p1.x, m_p0.x);
+		p0.y = min(m_p1.y, m_p0.y);
+		p1.x = max(m_p1.x, m_p0.x);
+		p1.y = max(m_p1.y, m_p0.y);
+
+		//Intersect with second line
+		if( sign2 <= epsilon 
+			&& ((p0.x <= p.x && p.x <= p1.x) || (p0.x <= p.x && p.x <= p1.x)) 
+			&& ((p0.y <= p.y && p.y <= p1.y) || (p0.y <= p.y && p.y <= p1.y)))
+			return true;
+
+		p0.x = min(m_p0.x, m_p2.x);
+		p0.y = min(m_p0.y, m_p2.y);
+		p1.x = max(m_p0.x, m_p2.x);
+		p1.y = max(m_p0.y, m_p2.y);
+		
+		//Intersect with third line
+		if( sign3 <= epsilon 
+			&& ((p0.x <= p.x && p.x <= p1.x) || (p0.x <= p.x && p.x <= p1.x)) 
+			&& ((p0.y <= p.y && p.y <= p1.y) || (p0.y <= p.y && p.y <= p1.y)))
+			return true;
+
+		return false;
+	}else {
+		sign1 = sign(p, m_p0, m_p1);
+		sign2 = sign(p, m_p1, m_p2);
+		sign3 = sign(p, m_p2, m_p0);
+
+		//Check if the point is inside triangle
+		bool	b1 = sign1 < 0.0f,
+				b2 = sign2 < 0.0f,
+				b3 = sign3 < 0.0f;
+		return ((b1 == b2) && (b2 == b3));
+	}
+}
+
+CPOINT2F* CTriangle::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
+	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
 
 	if(abs((p.x - m_p0.x)) <= epsilon && abs((p.y - m_p0.y)) <= epsilon)
 		return &m_p0;

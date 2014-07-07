@@ -171,22 +171,20 @@ void CLine::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	pDC->Rectangle(p1.x - 5, p1.y - 5, p1.x + 5, p1.y + 5,other.ToCOLORREF());
 }
 
-bool CLine::Intersect(CPOINT2F p){
-	double epsilon = 0.02;
-	if(abs((p.x - m_p1.x) * (m_p2.y - m_p1.y)  - (p.y - m_p1.y) * (m_p2.x - m_p1.x)) <= epsilon 
-		&& ((m_p1.x <= p.x && p.x <= m_p2.x) || (m_p2.x <= p.x && p.x <= m_p1.x)) 
-		&& ((m_p1.y <= p.y && p.y <= m_p2.y) || (m_p2.y <= p.y && p.y <= m_p1.y)))
-		return true;
-	else
-		return false;
+bool CLine::Intersect(CPOINT2F p, POINT WindowsSize){
+	double epsilon = (WindowsSize.x > WindowsSize.y)? 2.0/WindowsSize.x : 2.0/WindowsSize.y;
+
+	return abs((p.x - m_p1.x) * (m_p2.y - m_p1.y)  - (p.y - m_p1.y) * (m_p2.x - m_p1.x)) <= epsilon 
+			&& ((m_p1.x <= p.x && p.x <= m_p2.x) || (m_p2.x <= p.x && p.x <= m_p1.x)) 
+			&& ((m_p1.y <= p.y && p.y <= m_p2.y) || (m_p2.y <= p.y && p.y <= m_p1.y));
 }
 
-CPOINT2F* CLine::IntersectControlPoint(CPOINT2F p){
-	double epsilon = 0.02;
-	if(abs((p.x - m_p1.x)) <= epsilon && abs((p.y - m_p1.y)) <= epsilon)
+CPOINT2F* CLine::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
+	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
+	if(abs(p.x - m_p1.x) <= epsilon && abs(p.y - m_p1.y) <= epsilon)
 		return &m_p1;
 
-	if(abs((p.x - m_p2.x)) <= epsilon && abs((p.y - m_p2.y)) <= epsilon)
+	if(abs(p.x - m_p2.x) <= epsilon && abs(p.y - m_p2.y) <= epsilon)
 		return &m_p2;
 
 	return NULL;
