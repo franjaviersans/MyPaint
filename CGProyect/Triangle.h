@@ -27,7 +27,7 @@ public:
 	virtual void ChangeFilled();
 
 private:
-	void ScanLine(CBackBuffer *);
+	void ScanLine(CBackBuffer *, int);
 	float sign(CPOINT2F,CPOINT2F,CPOINT2F);
 
 };
