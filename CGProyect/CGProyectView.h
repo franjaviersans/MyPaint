@@ -86,6 +86,7 @@ public:
 	afx_msg void OnUpdateButtonLine(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateButtonTriangle(CCmdUI *pCmdUI);
 	afx_msg void OnButtonCancel();
+	afx_msg void OnDivideBezier();
 };
 
 #ifndef _DEBUG  // debug version in CGProyectView.cpp

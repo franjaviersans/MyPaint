@@ -168,6 +168,7 @@ BEGIN
         MENUITEM "Delete Figure\tDELETE",       ID_CHANGE_DELETEFIGURE
         MENUITEM "Detele All Figures\tCtrl+DELETE", ID_CHANGE_DETELEALLFIGURES
         MENUITEM "Add Point to Bezier",         ID_CHANGE_NEWBEZIERCURVE
+        MENUITEM "Subdivide Bezier Curve",      ID_DIVIDE_BEZIER
     END
 END
 
