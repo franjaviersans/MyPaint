@@ -157,24 +157,24 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		case IM_CIRCLE:	  {
 			CCircle *C = new CCircle;
-			C->m_center.x  = C->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
-			C->m_center.y  = C->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
+			C->m_center = point;
+			C->m_tangente = point;
 			pDoc->m_figures.push_back(C);
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
 		}
 		case IM_LINE:	  {
 			CLine *L = new CLine;
-			L->m_p1.x = L->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-			L->m_p1.y = L->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+			L->m_p1 = point;
+			L->m_p2 = point;
 			pDoc->m_figures.push_back(L);
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
 		}
 		case IM_ELLIPSE:  {
 			CEllipse *E = new CEllipse;
-			E->m_p1.x = E->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-			E->m_p1.y = E->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+			E->m_p1 = point;
+			E->m_p2 = point;
 			pDoc->m_figures.push_back(E);
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
@@ -182,14 +182,14 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 		case IM_TRIANGLE:{
 			if(pDoc->m_triangle == 1){
 				std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
-				((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CTriangle *)(*i))->m_p2 = point;
 				pDoc->m_triangle = 0;
 				pDoc->m_current = -1;
 			}else{
 				CTriangle *T = new CTriangle;
-				T->m_p0.x = T->m_p1.x = T->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				T->m_p0.y = T->m_p1.y = T->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				T->m_p0 = point;
+				T->m_p1 = point;
+				T->m_p2 = point;
 				++pDoc->m_triangle;
 				pDoc->m_figures.push_back(T);
 				pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
@@ -199,8 +199,8 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 		case IM_BEZIER:  {
 			CBezier *B = new CBezier;
-			B->arr[0][0].x = B->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
-			B->arr[0][0].y = B->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+			B->arr[0][0] = point;
+			B->arr[0][1] = point;
 			pDoc->m_figures.push_back(B);
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
@@ -214,26 +214,19 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			}else if ((nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end()){
 			
 
-				CPOINT2F p;
-				p.x = (float)point.x / pDoc->m_WindosSize.x;
-				p.y = (float)point.y / pDoc->m_WindosSize.y;
-
 				pDoc->m_selectedPoint = NULL;
 
 				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
-					pDoc->m_selectedPoint = (*i)->IntersectControlPoint(p,pDoc->m_WindosSize);
+					pDoc->m_selectedPoint = (*i)->IntersectControlPoint(point);
 					if(pDoc->m_selectedPoint != NULL){
 						::SetCursor(::LoadCursor(0, IDC_SIZEALL));
 						break;
 					}
 				}
 			}else{
-				CPOINT2F p;
-				p.x = (float)point.x / pDoc->m_WindosSize.x;
-				p.y = (float)point.y / pDoc->m_WindosSize.y;
 
 				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
-					if((*i)->Intersect(p,pDoc->m_WindosSize)){
+					if((*i)->Intersect(point)){
 						pDoc->position = i;
 					}
 				}
@@ -260,8 +253,7 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 		switch (pDoc->m_current)
 		{
 			case IM_CIRCLE:	{
-				((CCircle*)(*i))->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CCircle*)(*i))->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CCircle*)(*i))->m_tangente = point;
 				//((CButton*)GetDlgItem(ID_BUTTON_CIRCLE))->SetCheck(false);
 			//	((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.CheckDlgButton(ID_BUTTON_CIRCLE,false);
 
@@ -270,29 +262,26 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				break;
 			}
 			case IM_LINE:	{
-				((CLine *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CLine *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CLine *)(*i))->m_p2 = point;
 				
 				pDoc->m_current = -1;
 				break;
 			}
 			case IM_ELLIPSE:{
-				((CEllipse *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CEllipse *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CEllipse *)(*i))->m_p2 = point;
 
 				pDoc->m_current = -1;
 				break;
 			}
 			case IM_TRIANGLE:{
 				if(pDoc->m_triangle == 1){
-					((CTriangle *)(*i))->m_p1.x = ((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-					((CTriangle *)(*i))->m_p1.y = ((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					((CTriangle *)(*i))->m_p1 = point;
+					((CTriangle *)(*i))->m_p2 = point;
 				}
 				break;
 			}
 			case IM_BEZIER:  {
-				((CBezier *)(*i))->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
-				((CBezier *)(*i))->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+				((CBezier *)(*i))->arr[0][1] = point;
 				pDoc->m_current = -1;
 
 				break;
@@ -300,17 +289,17 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 			default:{
 				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					//::SetCursor(::LoadCursor(0, IDC_ARROW));
-					CPOINT2F p;
+					POINT p;
 
-					p.x = (float)(point.x - pDoc->m_initialPoint.x) / pDoc->m_WindosSize.x;
-					p.y = (float)(point.y - pDoc->m_initialPoint.y) / pDoc->m_WindosSize.y;
+					p.x = (point.x - pDoc->m_initialPoint.x) ;
+					p.y = (point.y - pDoc->m_initialPoint.y) ;
 
 					(*pDoc->position)->Translate(p);
 
 					pDoc->m_initialPoint = point;
 				}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
-					pDoc->m_selectedPoint->x = (float)point.x / pDoc->m_WindosSize.x;
-					pDoc->m_selectedPoint->y = (float)point.y / pDoc->m_WindosSize.y;
+					pDoc->m_selectedPoint->x = (float)point.x ;
+					pDoc->m_selectedPoint->y = (float)point.y ;
 				}
 			break;
 			}
@@ -340,50 +329,45 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 		switch (pDoc->m_current)
 		{
 			case IM_CIRCLE:	{
-				((CCircle*)(*i))->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CCircle*)(*i))->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CCircle*)(*i))->m_tangente = point;
 				break;
 			}
 			case IM_LINE:	{
-				((CLine *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CLine *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CLine *)(*i))->m_p2 = point;
 				break;
 			}
 			case IM_ELLIPSE:{
-				((CEllipse *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CEllipse *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CEllipse *)(*i))->m_p2 = point;
 				break;
 			}
 			case IM_TRIANGLE:{
 				if(pDoc->m_triangle == 1){
-					((CTriangle *)(*i))->m_p1.x = ((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-					((CTriangle *)(*i))->m_p1.y = ((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					((CTriangle *)(*i))->m_p1 = point;
 				}
 				break;
 			}
 			case IM_BEZIER:  {
-				((CBezier *)(*i))->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
-				((CBezier *)(*i))->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+				((CBezier *)(*i))->arr[0][1] = point;
 				break;
 			}
 			default:{
 				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					::SetCursor(::LoadCursor(0, IDC_HAND));
 
-					CPOINT2F p;
+					POINT p;
 
-						p.x = (float)(point.x - pDoc->m_initialPoint.x) / pDoc->m_WindosSize.x;
-						p.y = (float)(point.y - pDoc->m_initialPoint.y) / pDoc->m_WindosSize.y;
+					p.x = (point.x - pDoc->m_initialPoint.x) ;
+					p.y = (point.y - pDoc->m_initialPoint.y) ;
 
-						(*pDoc->position)->Translate(p);
+					(*pDoc->position)->Translate(p);
 
 						pDoc->m_initialPoint = point;
 						Invalidate();
 				}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
 					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
 
-					pDoc->m_selectedPoint->x = (float)point.x / pDoc->m_WindosSize.x;
-					pDoc->m_selectedPoint->y = (float)point.y / pDoc->m_WindosSize.y;
+					pDoc->m_selectedPoint->x = (float)point.x ;
+					pDoc->m_selectedPoint->y = (float)point.y ;
 					Invalidate();
 				}
 				break;

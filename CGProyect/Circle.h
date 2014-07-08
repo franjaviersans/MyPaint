@@ -14,16 +14,16 @@ public:
 	virtual void OnDraw(CBackBuffer *, POINT);
 	virtual void Serialize(CArchive& ar);
 	virtual void DrawSelected(CBackBuffer *, POINT);
-	virtual bool Intersect(CPOINT2F, POINT);
-	virtual CPOINT2F* IntersectControlPoint(CPOINT2F, POINT);
-	virtual void Translate(CPOINT2F);
+	virtual bool Intersect(POINT);
+	virtual CPOINT2F* IntersectControlPoint(POINT);
+	virtual void Translate(POINT);
 	virtual void ChangeFillColor(COLORREF);
 	virtual void ChangeLineColor(COLORREF);
 	virtual void ChangeFilled();
 
 private:
-	void Draw8Points(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int);
-	void Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int);
+	void Draw8Points(int, int, POINT, COLORREF, CBackBuffer *, int);
+	void Draw8PointsFilled(int, int, POINT, COLORREF, CBackBuffer *, int);
 };
 
 #endif

@@ -18,10 +18,10 @@ void CEllipse::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 
 	POINT p0, p1;
-	p0.x = (int)(m_p1.x * WindowsSize.x);
-	p0.y = (int)(m_p1.y * WindowsSize.y);
-	p1.x = (int)(m_p2.x * WindowsSize.x);
-	p1.y = (int)(m_p2.y * WindowsSize.y);
+	p0.x = (int)m_p1.x;
+	p0.y = (int)m_p1.y;
+	p1.x = (int)m_p2.x;
+	p1.y = (int)m_p2.y;
 	
 	POINT center;
 
@@ -157,10 +157,10 @@ void CEllipse::EllipsePointsFilled(int x, int y, POINT center, COLORREF color, C
 
 void CEllipse::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	POINT pp0, pp1;
-	pp0.x = (int)(m_p1.x * WindowsSize.x);
-	pp0.y = (int)(m_p1.y * WindowsSize.y);
-	pp1.x = (int)(m_p2.x * WindowsSize.x);
-	pp1.y = (int)(m_p2.y * WindowsSize.y);
+	pp0.x = (int)m_p1.x;
+	pp0.y = (int)m_p1.y;
+	pp1.x = (int)m_p2.x;
+	pp1.y = (int)m_p2.y;
 
 	CColor red(255,0,0);
 
@@ -233,25 +233,23 @@ void CEllipse::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 	CColor other(255, 100, 0);
 
-	p0.x = (int)(m_p1.x * WindowsSize.x);
-	p0.y = (int)(m_p1.y * WindowsSize.y);
+	p0.x = (int)m_p1.x;
+	p0.y = (int)m_p1.y;
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
-	p0.x = (int)(m_p2.x * WindowsSize.x);
-	p0.y = (int)(m_p2.y * WindowsSize.y);
+	p0.x = (int)m_p2.x;
+	p0.y = (int)m_p2.y;
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 }
 
-bool CEllipse::Intersect(CPOINT2F p, POINT WindowsSize){
+bool CEllipse::Intersect(POINT p){
 
 	
-	POINT center, axis, p0;
-	center.x = (int)((m_p1.x + m_p2.x)/2.0 * WindowsSize.x);
-	center.y = (int)((m_p1.y + m_p2.y)/2.0 * WindowsSize.y);
-	axis.x = (int)(abs(m_p1.x * WindowsSize.x - center.x) );
-	axis.y = (int)(abs(m_p1.y * WindowsSize.y - center.y));
-	p0.x = (int)(p.x * WindowsSize.x);
-	p0.y = (int)(p.y * WindowsSize.y);
+	CPOINT2F center, axis, p0(p);
+	center.x = (m_p1.x + m_p2.x)/2.0f;
+	center.y = (m_p1.y + m_p2.y)/2.0f;
+	axis.x = abs(m_p1.x - center.x);
+	axis.y = abs(m_p1.y - center.y);
 
 	axis.x = axis.x * axis.x;
 	axis.y  = axis.y * axis.y ;
@@ -261,11 +259,11 @@ bool CEllipse::Intersect(CPOINT2F p, POINT WindowsSize){
 	dy = dy * dy;
 	dx = dx / axis.x + dy / axis.y;
 
-	return	(m_filled && dx <= 1) || (!m_filled && abs(dx - 1) <= 0.025);
+	return	(m_filled && dx <= 1) || (!m_filled && abs(dx - 1) <= 0.2);
 }
 
-CPOINT2F* CEllipse::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
-	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
+CPOINT2F* CEllipse::IntersectControlPoint(POINT p){
+	double epsilon = 4;
 
 	if(abs((p.x - m_p1.x)) <= epsilon && abs((p.y - m_p1.y)) <= epsilon)
 		return &m_p1;
@@ -276,7 +274,7 @@ CPOINT2F* CEllipse::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
 	return NULL;
 }
 
-void CEllipse::Translate(CPOINT2F p){
+void CEllipse::Translate(POINT p){
 	m_p1.x += p.x;
 	m_p1.y += p.y;
 	m_p2.x += p.x;

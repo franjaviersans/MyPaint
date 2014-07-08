@@ -147,10 +147,10 @@ void CLine::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 	
 	POINT p0, p1;
-	p0.x = (int)(m_p1.x * WindowsSize.x);
-	p0.y = (int)(m_p1.y * WindowsSize.y);
-	p1.x = (int)(m_p2.x * WindowsSize.x);
-	p1.y = (int)(m_p2.y * WindowsSize.y);
+	p0.x = (int)m_p1.x;
+	p0.y = (int)m_p1.y;
+	p1.x = (int)m_p2.x;
+	p1.y = (int)m_p2.y;
 
 	int draw;
 
@@ -188,10 +188,10 @@ void CLine::Serialize(CArchive& ar)
 
 void CLine::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	POINT p0, p1;
-	p0.x = (int)(m_p1.x * WindowsSize.x);
-	p0.y = (int)(m_p1.y * WindowsSize.y);
-	p1.x = (int)(m_p2.x * WindowsSize.x);
-	p1.y = (int)(m_p2.y * WindowsSize.y);
+	p0.x = (int)m_p1.x;
+	p0.y = (int)m_p1.y;
+	p1.x = (int)m_p2.x;
+	p1.y = (int)m_p2.y;
 
 
 	CColor other(255, 100, 0);
@@ -200,16 +200,25 @@ void CLine::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	pDC->Rectangle(p1.x - 5, p1.y - 5, p1.x + 5, p1.y + 5,other.ToCOLORREF());
 }
 
-bool CLine::Intersect(CPOINT2F p, POINT WindowsSize){
-	double epsilon = (WindowsSize.x > WindowsSize.y)? 2.0/WindowsSize.x : 2.0/WindowsSize.y;
+bool CLine::Intersect(POINT p){
+	double epsilon = 4;
 
-	return abs((p.x - m_p1.x) * (m_p2.y - m_p1.y)  - (p.y - m_p1.y) * (m_p2.x - m_p1.x)) <= epsilon 
-			&& ((m_p1.x <= p.x && p.x <= m_p2.x) || (m_p2.x <= p.x && p.x <= m_p1.x)) 
-			&& ((m_p1.y <= p.y && p.y <= m_p2.y) || (m_p2.y <= p.y && p.y <= m_p1.y));
+	CPOINT2F p1, p0;
+	p0.x = min(m_p2.x, m_p1.x);
+	p0.y = min(m_p2.y, m_p1.y);
+	p1.x = max(m_p2.x, m_p1.x);
+	p1.y = max(m_p2.y, m_p1.y);
+
+	float dx = m_p2.x - m_p1.x, dy = m_p2.y - m_p1.y;
+
+	return (abs((p.x - m_p1.x) * dy - (p.y - m_p1.y) * dx) / sqrt(dx * dx + dy * dy)  <= epsilon)
+			&& (p0.x <= p.x && p.x <= p1.x) 
+			&& (p0.y <= p.y && p.y <= p1.y);
 }
 
-CPOINT2F* CLine::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
-	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
+CPOINT2F* CLine::IntersectControlPoint(POINT p){
+	double epsilon = 4;
+
 	if(abs(p.x - m_p1.x) <= epsilon && abs(p.y - m_p1.y) <= epsilon)
 		return &m_p1;
 
@@ -219,7 +228,7 @@ CPOINT2F* CLine::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
 	return NULL;
 }
 
-void CLine::Translate(CPOINT2F p){
+void CLine::Translate(POINT p){
 	m_p1.x += p.x;
 	m_p1.y += p.y;
 	m_p2.x += p.x;

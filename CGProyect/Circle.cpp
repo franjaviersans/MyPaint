@@ -19,10 +19,10 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	// 0 Don't draw, 1 draw secured, 2 draw normal
 	int draw;
 	POINT center, tangent;
-	center.x = (int)(m_center.x * WindowsSize.x);
-	center.y = (int)(m_center.y * WindowsSize.y);
-	tangent.x = (int)(m_tangente.x * WindowsSize.x);
-	tangent.y = (int)(m_tangente.y * WindowsSize.y);
+	center.x = (int)m_center.x;
+	center.y = (int)m_center.y;
+	tangent.x = (int)m_tangente.x;
+	tangent.y = (int)m_tangente.y;
 	
 	int dx = center.x - tangent.x;
 	int dy = center.y - tangent.y;
@@ -36,12 +36,6 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 
 	//If the figure must be draw
 	if(draw != 0){
-		POINT center, tangent;
-		center.x = (int)(m_center.x * WindowsSize.x);
-		center.y = (int)(m_center.y * WindowsSize.y);
-		tangent.x = (int)(m_tangente.x * WindowsSize.x);
-		tangent.y = (int)(m_tangente.y * WindowsSize.y);
-	
 		int dx = center.x - tangent.x;
 		int dy = center.y - tangent.y;
 		int incx, incy, delta;
@@ -155,10 +149,10 @@ void CCircle::Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBac
 void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 	POINT center, tangent;
-	center.x = (int)(m_center.x * WindowsSize.x);
-	center.y = (int)(m_center.y * WindowsSize.y);
-	tangent.x = (int)(m_tangente.x * WindowsSize.x);
-	tangent.y = (int)(m_tangente.y * WindowsSize.y);
+	center.x = (int)m_center.x;
+	center.y = (int)m_center.y;
+	tangent.x = (int)m_tangente.x;
+	tangent.y = (int)m_tangente.y;
 	
 	int dx = center.x - tangent.x;
 	int dy = center.y - tangent.y;
@@ -235,25 +229,25 @@ void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	CColor other(255, 100, 0);
 
 
-	p0.x = (int)(m_center.x * WindowsSize.x);
-	p0.y = (int)(m_center.y * WindowsSize.y);
+	p0.x = (int)m_center.x;
+	p0.y = (int)m_center.y;
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
-	p0.x = (int)(m_tangente.x * WindowsSize.x);
-	p0.y = (int)(m_tangente.y * WindowsSize.y);
+	p0.x = (int)m_tangente.x;
+	p0.y = (int)m_tangente.y;
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
 }
 
-bool CCircle::Intersect(CPOINT2F p, POINT WindowsSize){
+bool CCircle::Intersect(POINT p){
 	
 	POINT center, tangent, p0;
-	center.x = (int)(m_center.x * WindowsSize.x);
-	center.y = (int)(m_center.y * WindowsSize.y);
-	tangent.x = (int)(m_tangente.x * WindowsSize.x);
-	tangent.y = (int)(m_tangente.y * WindowsSize.y);
-	p0.x = (int)(p.x * WindowsSize.x);
-	p0.y = (int)(p.y * WindowsSize.y);
+	center.x = (int)m_center.x;
+	center.y = (int)m_center.y;
+	tangent.x = (int)m_tangente.x;
+	tangent.y = (int)m_tangente.y;
+	p0.x = p.x;
+	p0.y = p.y;
 
 	double dx = center.x - tangent.x;
 	double dy = center.y - tangent.y;
@@ -265,8 +259,10 @@ bool CCircle::Intersect(CPOINT2F p, POINT WindowsSize){
 	return	(m_filled && dd < rr) || (!m_filled && abs(sqrt(dd) - sqrt(rr)) <= 2);
 }
 
-CPOINT2F* CCircle::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
-	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
+CPOINT2F* CCircle::IntersectControlPoint(POINT p){
+
+	double epsilon = 4;
+	
 	if(abs((p.x - m_center.x)) <= epsilon && abs((p.y - m_center.y)) <= epsilon)
 		return &m_center;
 
@@ -277,7 +273,7 @@ CPOINT2F* CCircle::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
 }
 
 
-void CCircle::Translate(CPOINT2F p){
+void CCircle::Translate(POINT p){
 	m_center.x += p.x;
 	m_center.y += p.y;
 	m_tangente.x += p.x;
