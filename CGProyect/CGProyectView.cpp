@@ -213,15 +213,12 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			 
 			}else if ((nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end()){
 			
-
+				//Select a control point of the selected figure
 				pDoc->m_selectedPoint = NULL;
-
-				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
-					pDoc->m_selectedPoint = (*i)->IntersectControlPoint(point);
-					if(pDoc->m_selectedPoint != NULL){
-						::SetCursor(::LoadCursor(0, IDC_SIZEALL));
-						break;
-					}
+				pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(point);
+				if(pDoc->m_selectedPoint != NULL){
+					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
+					break;
 				}
 			}else{
 

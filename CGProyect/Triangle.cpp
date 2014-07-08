@@ -44,9 +44,11 @@ void CTriangle::OnDraw(CBackBuffer *pDC,POINT WindowsSize)
 	if(pp1.x < 0 && pp0.x >= WindowsSize.x && pp1.y < 0 && pp0.y >= WindowsSize.y) draw = 0;
 
 	if(draw != 0){
-		//Draw filled figured
-		//TODO 
-		if(m_filled) ScanLine(pDC);
+
+		if(0 <= pp0.x && pp1.x < WindowsSize.x && 0 <= pp0.y && pp1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+
+		if(m_filled) ScanLine(pDC, draw);
 
 		
 		//Check if the figure is inside the drawing area
@@ -69,7 +71,7 @@ void CTriangle::OnDraw(CBackBuffer *pDC,POINT WindowsSize)
 	}
 }
 
-void CTriangle::ScanLine(CBackBuffer *pDC){
+void CTriangle::ScanLine(CBackBuffer *pDC, int draw){
 	POINT p0, p1, p2;
 
 	//Transform the coordinates to integers
@@ -140,8 +142,9 @@ void CTriangle::ScanLine(CBackBuffer *pDC){
 		cx = (xmax - xmin == 0)? 0.5f:(1.0f/(xmax - xmin));
 
 		//Go throught every x
-		for(x = xmin; x < xmax; ++x){
-			pDC->SetPixel(x, y, colorDif2.ToCOLORREF());
+		for(x = xmin; x <= xmax; ++x){
+			if(draw == 2)	pDC->SetPixel(x, y, colorDif2.ToCOLORREF());
+			else			pDC->SetPixelSecured(x, y, colorDif2.ToCOLORREF());
 			colorDif2 = colorDif2 + colorInc2 * cx;
 		}
 
@@ -184,8 +187,9 @@ void CTriangle::ScanLine(CBackBuffer *pDC){
 		cx = (xmax - xmin == 0)? 0.5f: (1.0f/(xmax - xmin));
 
 		//Go throught every x
-		for(x = xmin; x < xmax; ++x){
-			pDC->SetPixel(x, y, colorDif2.ToCOLORREF());
+		for(x = xmin; x <= xmax; ++x){
+			if(draw == 2)	pDC->SetPixel(x, y, colorDif2.ToCOLORREF());
+			else			pDC->SetPixelSecured(x, y, colorDif2.ToCOLORREF());
 
 			colorDif2 = colorDif2 + colorInc2 * cx;
 		}
