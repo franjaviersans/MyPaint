@@ -222,6 +222,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 					break;
 				}
 			}else{
+				pDoc->position = pDoc->m_figures.end();
 
 				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
 					if((*i)->Intersect(point)){

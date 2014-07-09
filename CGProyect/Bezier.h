@@ -27,8 +27,8 @@ public:
 	void Divide(std::vector< CPOINT2F > &, std::vector< CPOINT2F > &, float);
 
 private:
-	bool IntersectBezier(std::vector< CPOINT2F > &, POINT &, float &);
-	void Divide(std::vector< CPOINT2F > &, std::vector< CPOINT2F > &, std::vector< CPOINT2F > &, float);
+	bool IntersectBezier(std::vector< CPOINT2F > *, POINT *, float);
+	void Divide(std::vector< CPOINT2F > *, std::vector< CPOINT2F > *, std::vector< CPOINT2F > *, float);
 };
 
 #endif
