@@ -64,6 +64,7 @@ ON_UPDATE_COMMAND_UI(ID_BUTTON_ELLIPSE, &CCGProyectView::OnUpdateButtonEllipse)
 ON_UPDATE_COMMAND_UI(ID_BUTTON_LINE, &CCGProyectView::OnUpdateButtonLine)
 ON_UPDATE_COMMAND_UI(ID_BUTTON_TRIANGLE, &CCGProyectView::OnUpdateButtonTriangle)
 ON_COMMAND(ID_BUTTON_CANCEL, &CCGProyectView::OnButtonCancel)
+ON_COMMAND(ID_DIVIDE_BEZIER, &CCGProyectView::OnDivideBezier)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -221,6 +222,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 					break;
 				}
 			}else{
+				pDoc->position = pDoc->m_figures.end();
 
 				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
 					if((*i)->Intersect(point)){
@@ -765,4 +767,28 @@ void CCGProyectView::OnButtonCancel()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = -1;
+}
+
+//Subdivide Bezier Curve
+void CCGProyectView::OnDivideBezier()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_BEZIER){
+			std::vector< CPOINT2F > firsthalf, secondhalf;
+			((CBezier*)(*pDoc->position))->Divide(firsthalf, secondhalf, 0.5);
+
+
+			CBezier *B = new CBezier(firsthalf);
+			pDoc->m_figures.push_back(B);
+
+			B = new CBezier(secondhalf);
+			pDoc->m_figures.push_back(B);
+			
+
+			firsthalf.clear();
+			secondhalf.clear();	
+			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+		}
+	}
 }

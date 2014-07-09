@@ -11,6 +11,8 @@ class CBezier : public CShape
 public:
 	std::vector< std::vector< CPOINT2F > > arr;
 	CBezier();
+	CBezier(std::vector< CPOINT2F > &);
+	~CBezier();
 	virtual void OnDraw(CBackBuffer *, POINT);
 	virtual void Serialize(CArchive& );
 	virtual void DrawSelected(CBackBuffer *, POINT);
@@ -22,6 +24,11 @@ public:
 	virtual void ChangeFilled();
 	void addPoint(int x, int y);
 	void addControlpoint();
+	void Divide(std::vector< CPOINT2F > &, std::vector< CPOINT2F > &, float);
+
+private:
+	bool IntersectBezier(std::vector< CPOINT2F > *, POINT *, float);
+	void Divide(std::vector< CPOINT2F > *, std::vector< CPOINT2F > *, std::vector< CPOINT2F > *, float);
 };
 
 #endif

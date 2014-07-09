@@ -6,8 +6,8 @@
 
 CBezier::CBezier()
 {
-
-	arr.push_back(*(new std::vector<CPOINT2F>));
+	std::vector< CPOINT2F > va;
+	arr.push_back(va);
 	addPoint(0,0);
 	addPoint(0,0);
 	/*arr[0].resize(2);
@@ -23,6 +23,49 @@ CBezier::CBezier()
 	m_filled = false;
 }
 
+CBezier::CBezier(std::vector< CPOINT2F > &copy){
+	std::vector< CPOINT2F > va;
+	arr.push_back(va);
+	addPoint(0,0);
+	addPoint(0,0);
+
+	//Allocate the space
+	arr[0].resize(copy.size());
+
+
+	unsigned int n = copy.size();
+	unsigned int i;
+
+	//Copy the data
+	for(i=0;i<n;++i)
+		arr[0][i] = copy[i];
+
+	//Create Matrix
+	while(n > arr.size()){
+		arr.push_back(va);
+	}
+
+	for(i=1; i<n ;++i)
+		while(arr[i].size() <= n-i){
+			CPOINT2F a(0,0);
+			arr[i].push_back(a);
+		}
+
+	m_id = IM_BEZIER;
+	m_bgcolor = 0;
+	m_linecolor = 0;
+	m_filled = false;
+}
+
+CBezier::~CBezier(){
+	unsigned int n=arr[0].size();
+	unsigned int r;
+	for(r=0;r<n;++r){
+		arr[r].clear();
+	}
+	arr.clear();
+}
+
 void CBezier::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 	POINT last;
@@ -34,7 +77,7 @@ void CBezier::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	bool first = true;
 
 
-	for(t=0;t<=5;t+=0.01){
+	for(t=0;t<=1.1;t+=0.01){
 
 		if(t >= 1) t = 1;
 		for(r=1;r<n;++r){
@@ -86,7 +129,8 @@ void CBezier::Serialize(CArchive& ar)
 		ar >> m_filled;
 		ar >> n;
 		arr.clear();
-		arr.push_back(*(new std::vector<CPOINT2F>));
+		std::vector<CPOINT2F> va;
+		arr.push_back(va);
 		for(int i = 0; i < n;++i){
 			ar >> x;
 			ar >> y;
@@ -103,8 +147,9 @@ void CBezier::addPoint(int x, int y){
 	unsigned int n = arr[0].size();
 	unsigned int i;
 
+	std::vector<CPOINT2F> va;
 	while(n > arr.size()){
-		arr.push_back(*(new std::vector<CPOINT2F>));
+		arr.push_back(va);
 	}
 
 	for(i=1; i<n ;++i)
@@ -129,9 +174,10 @@ void CBezier::addControlpoint(){
 	}
 
 	n = arr[0].size();
+	std::vector<CPOINT2F> va;
 
 	while(n > arr.size())
-		arr.push_back(*(new std::vector<CPOINT2F>));
+		arr.push_back(va);
 
 	for(i=1; i<n ;++i)
 		while(arr[i].size() <= n-i){
@@ -224,7 +270,7 @@ void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 }
 
 bool CBezier::Intersect(POINT p){
-	double epsilon = 4;
+	/*double epsilon = 4;
 	//TODO: Interseccion super compleja
 	CPOINT2F p0, p1;
 
@@ -244,7 +290,68 @@ bool CBezier::Intersect(POINT p){
 		(p0.y <= p.y && p.y <= p1.y))
 		return true;
 	else 
-		return false;
+		return false;*/
+
+	float ep = 4;
+
+	return IntersectBezier(&arr[0],&p,ep);
+
+}
+
+bool CBezier::IntersectBezier(std::vector< CPOINT2F > *controlPoints, POINT *p, float epsilon){
+	
+   	if(controlPoints->size() == 0) return false;
+
+	std::vector<CPOINT2F> *f = new std::vector<CPOINT2F>(),*s = new std::vector<CPOINT2F>();
+
+	//Obtain the two halves
+	Divide(controlPoints,f,s,0.5);
+
+	//Check with the first half
+	CPOINT2F p0(9999999, 9999999), p1(-9999999,-9999999);
+
+	bool result = false;
+	
+	for(unsigned int i = 0;i< f->size();++i){
+		p0.x = min(p0.x, (*f)[i].x);
+		p0.y = min(p0.y, (*f)[i].y);
+		p1.x = max(p1.x, (*f)[i].x);
+		p1.y = max(p1.y, (*f)[i].y);
+	}
+	
+	if(p0.x - epsilon <= p->x && p->x <= p1.x + epsilon && p0.y - epsilon <= p->y && p->y <= p1.y + epsilon){
+		if(p1.x - p0.x <= epsilon && p1.y - p0.y <= epsilon) result = true;
+		if(!result && IntersectBezier(f, p, epsilon)) result = true;
+	}
+
+	if(!result){
+		//Check with the first half
+		p0.x = 9999999;
+		p0.y = 9999999;
+		p1.x = -9999999;
+		p1.y = -9999999;
+
+		for(unsigned int i = 0;i< s->size();++i){
+			p0.x = min(p0.x, (*s)[i].x);
+			p0.y = min(p0.y, (*s)[i].y);
+			p1.x = max(p1.x, (*s)[i].x);
+			p1.y = max(p1.y, (*s)[i].y);
+		}
+
+		//Check with the second half
+		if(p0.x - epsilon <= p->x && p->x <= p1.x + epsilon && p0.y - epsilon <= p->y && p->y <= p1.y + epsilon){
+			if(p1.x - p0.x <= epsilon && p1.y - p0.y <= epsilon) result = true;
+			if(IntersectBezier(s, p, epsilon)) result =  true;
+		}	
+	}
+
+	f->clear();
+	s->clear();
+
+	delete s;
+	delete f;
+
+	return result;
 }
 
 CPOINT2F* CBezier::IntersectControlPoint(POINT p){
@@ -276,4 +383,78 @@ void CBezier::ChangeLineColor(COLORREF c){
 
 void CBezier::ChangeFilled(){
 	m_filled = !m_filled;
+}
+
+
+/**
+* Function to subdivide a bezier curve
+*
+*/
+void CBezier::Divide(std::vector< CPOINT2F > &firsthalf, std::vector< CPOINT2F > &secondhalf, float t){
+
+	int n = arr[0].size(), r, j;
+
+	//Form the poligon
+	for(r=1;r<n;++r){
+		for(j=0;j<n-r;++j){
+			arr[r][j].x = ((float) (1 - t) * arr[r-1][j].x + (float) t * arr[r-1][j+1].x);
+			arr[r][j].y = ((float) (1 - t) * arr[r-1][j].y + (float) t * arr[r-1][j+1].y);
+		}
+	}
+
+	//Form first half
+	for(r=0;r<n;++r) firsthalf.push_back(arr[r][0]);
+		
+	for(r=n-1;r>=0;--r) secondhalf.push_back(arr[r][n-1-r]);
+
+}
+
+
+/**
+* Function to subdivide a bezier curve from a given vector of points
+*
+*/
+void CBezier::Divide(std::vector< CPOINT2F > *arr, std::vector< CPOINT2F > *firsthalf, std::vector< CPOINT2F > *secondhalf, float t){
+
+	//Create an array to store all the control points
+	std::vector< std::vector< CPOINT2F > > auxiliar;
+	std::vector< CPOINT2F > half, va;
+
+	int n = (int)arr->size(), j;
+	int r;
+
+	auxiliar.push_back(va);
+
+	for(unsigned int k=0;k<arr->size();++k)
+		auxiliar[0].push_back((*arr)[k]);
+
+	//Create the array
+	while(n > (int)auxiliar.size())
+		auxiliar.push_back(va);
+
+	for(r=1; r<n ;++r)
+		while((int)auxiliar[r].size() <= n-r){
+			CPOINT2F a(0,0);
+			auxiliar[r].push_back(a);
+		}
+
+	//Form the poligon
+	for(r=1;r<n;++r){
+		for(j=0;j<n-r;++j){
+			auxiliar[r][j].x = ((float) (1 - t) * auxiliar[r-1][j].x + (float) t * auxiliar[r-1][j+1].x);
+			auxiliar[r][j].y = ((float) (1 - t) * auxiliar[r-1][j].y + (float) t * auxiliar[r-1][j+1].y);
+		}
+	}
+
+	//Form first half
+	for(r=0;r<n;++r) firsthalf->push_back(auxiliar[r][0]);
+		
+	for(r=n-1;r>=0;--r) secondhalf->push_back(auxiliar[r][n-1-r]);
+
+	//Clear memory
+	for(r=0; r<n ;++r)
+		auxiliar[r].clear();
+
+	auxiliar.clear();
+
 }
