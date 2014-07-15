@@ -437,7 +437,9 @@ void CTriangle::Translate(POINT p){
 }
 
 void CTriangle::ChangeFillColor(COLORREF c){
-	m_bgcolor = c;
+	m_c0 = c;
+	m_c1 = c;
+	m_c2 = c;
 }
 
 void CTriangle::ChangeLineColor(COLORREF c){
