@@ -447,3 +447,11 @@ void CTriangle::ChangeLineColor(COLORREF c){
 void CTriangle::ChangeFilled(){
 	m_filled = !m_filled;
 }
+
+void CTriangle::setColor(CPOINT2F *p, COLORREF c){
+
+	if(p == &m_p0)	m_c0 = c;
+	if(p == &m_p1)	m_c1 = c;
+	if(p == &m_p2)	m_c2 = c;
+	
+}

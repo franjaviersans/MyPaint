@@ -177,6 +177,7 @@ BEGIN
     POPUP "Change"
     BEGIN
         MENUITEM "Change Background Color",     ID_CHANGE_BACKGROUNDCOLOR
+        MENUITEM "Change Point Color",          ID_CHANGE_CHANGEPOINTCOLOR
         MENUITEM "Change Border Color",         ID_CHANGE_CHANGEBORDERCOLOR
         MENUITEM "Fill Figure",                 ID_CHANGE_FILLFIGURE
         MENUITEM "Move to &Foreground\tF",      ID_CHANGE_MOVETOFOREGROUND
@@ -184,9 +185,6 @@ BEGIN
         MENUITEM "&Unselect Figure\tU",         ID_CHANGE_UNSELECTFIGURE
         MENUITEM "Delete Figure\tDELETE",       ID_CHANGE_DELETEFIGURE
         MENUITEM "Detele All Figures\tCtrl+DELETE", ID_CHANGE_DETELEALLFIGURES
-        MENUITEM "Change Triangle's Point 0 color", ID_CHAGECTP0
-        MENUITEM "Change Triangle's Point 1 color", ID_CHAGECTP1
-        MENUITEM "Change Triangle's Point 2 color", ID_CHAGECTP2
     END
 END
 

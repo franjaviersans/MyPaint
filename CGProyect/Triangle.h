@@ -25,6 +25,7 @@ public:
 	virtual void ChangeFillColor(COLORREF);
 	virtual void ChangeLineColor(COLORREF);
 	virtual void ChangeFilled();
+	void setColor(CPOINT2F *, COLORREF);
 
 private:
 	void ScanLine(CBackBuffer *, int);
