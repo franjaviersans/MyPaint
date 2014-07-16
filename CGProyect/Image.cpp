@@ -12,72 +12,53 @@ CMyImage::CMyImage()
 	m_bgcolor = 0;
 	m_linecolor = 0;
 	m_filled = false;
+	m_bmpBackData = NULL;
 }
 
 void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 	POINT p0, p1;
-	p0.x = (int)m_p1.x;
-	p0.y = (int)m_p1.y;
-	p1.x = (int)m_p2.x;
-	p1.y = (int)m_p2.y;
-
-	POINT pp0, pp1;
-	pp0.x = min(p0.x, p1.x);
-	pp0.y = min(p0.y, p1.y);
-	pp1.x = max(p0.x, p1.x);
-	pp1.y = max(p0.y, p1.y);
+	p0.x = min(m_p1.x, m_p2.x);
+	p0.y = min(m_p1.y, m_p2.y);
+	p1.x = max(m_p1.x, m_p2.x);
+	p1.y = max(m_p1.y, m_p2.y);
 
 	int draw = 2;
 
 	if(p1.x < 0 || p0.x >= WindowsSize.x || p1.y < 0 || p0.y >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
 
 	if(draw != 0){
-		p0.x = pp0.x;
-		p0.y = pp0.y;
-		p1.x = pp1.x;
-		p1.y = pp0.y;
+		if(m_bmpBackData == NULL){
+			for(int i = p0.y; i < p1.y ; ++i){
+				for(int j = p0.x; j < p1.x ; ++j){
+					pDC->SetPixelSecured(j,i,1,0,0);
+				}
+			}
+		}else{
+			int offset;
 
-		int draw;
-
-		//Check if the figure is inside the drawing area
-		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
-		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
-		else draw = 1;
-		CLine::DrawLine(p0,p1,pDC,m_linecolor,draw);
-
-		p0.x = pp0.x;
-		p0.y = pp0.y;
-		p1.x = pp0.x;
-		p1.y = pp1.y;
-
-		//Check if the figure is inside the drawing area
-		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
-		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
-		else draw = 1;
-		CLine::DrawLine(p0,p1,pDC,m_linecolor,draw);
-
-		p0.x = pp0.x;
-		p0.y = pp1.y;
-		p1.x = pp1.x;
-		p1.y = pp1.y;
-
-		//Check if the figure is inside the drawing area
-		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
-		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
-		else draw = 1;
-		CLine::DrawLine(p0,p1,pDC,m_linecolor,draw);
-
-		p0.x = pp1.x;
-		p0.y = pp0.y;
-		p1.x = pp1.x;
-		p1.y = pp1.y;
-
-		//Check if the figure is inside the drawing area
-		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
-		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
-		else draw = 1;
-		CLine::DrawLine(p0,p1,pDC,m_linecolor,draw);
+			if(bm.bmBitsPixel == 32){
+				for(int i = p0.y, k=m_iHeight - 1; i < p1.y ; ++i,--k)
+					for(int j = p0.x, l=0; j < p1.x ; ++j,++l){
+						int offset = k*m_iBytesPerLine + l*4;
+						pDC->SetPixelSecured(j,i, m_bmpBackData[offset], m_bmpBackData[offset + 1],m_bmpBackData[offset + 2]);
+					}
+			}else if(bm.bmBitsPixel == 24){
+				for(int i = p0.y, k=m_iHeight - 1; i < p1.y ; ++i,--k)
+					for(int j = p0.x, l=0; j < p1.x ; ++j,++l){
+						int offset = k*m_iBytesPerLine + l*3;
+						pDC->SetPixelSecured(j,i, m_bmpBackData[offset], m_bmpBackData[offset + 1],m_bmpBackData[offset + 2]);
+					}
+			}else if(bm.bmBitsPixel == 8){
+				for(int i = p0.y, k=m_iHeight - 1; i < p1.y ; ++i,--k)
+					for(int j = p0.x, l=0; j < p1.x ; ++j,++l){
+						int offset = k*m_iBytesPerLine + l*1;
+						pDC->SetPixelSecured(j,i, m_bmpBackData[offset], m_bmpBackData[offset],m_bmpBackData[offset]);
+					}
+			}
+		}
 	}
 
 	
@@ -197,23 +178,14 @@ void CMyImage::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 bool CMyImage::Intersect(POINT p){
 
-	
+	POINT p0, p1;
+	p0.x = min(m_p1.x, m_p2.x);
+	p0.y = min(m_p1.y, m_p2.y);
+	p1.x = max(m_p1.x, m_p2.x);
+	p1.y = max(m_p1.y, m_p2.y);
+
+	if(p0.x <= p.x && p.x <= p1.x && p0.y <= p.y && p.y <= p1.y) return true;
 	return false;
-	/*CPOINT2F center, axis, p0(p);
-	center.x = (m_p1.x + m_p2.x)/2.0f;
-	center.y = (m_p1.y + m_p2.y)/2.0f;
-	axis.x = abs(m_p1.x - center.x);
-	axis.y = abs(m_p1.y - center.y);
-
-	axis.x = axis.x * axis.x;
-	axis.y  = axis.y * axis.y ;
-	double dx = p0.x - center.x;
-	double dy = p0.y - center.y;
-	dx = dx * dx;
-	dy = dy * dy;
-	dx = dx / axis.x + dy / axis.y;
-
-	return	(m_filled && dx <= 1) || (!m_filled && abs(dx - 1) <= 0.2);*/
 }
 
 CPOINT2F* CMyImage::IntersectControlPoint(POINT p){
@@ -235,6 +207,8 @@ void CMyImage::Translate(POINT p){
 	m_p2.y += p.y;
 }
 
+
+
 void CMyImage::ChangeFillColor(COLORREF c){
 }
 
@@ -242,4 +216,44 @@ void CMyImage::ChangeLineColor(COLORREF c){
 }
 
 void CMyImage::ChangeFilled(){
+}
+
+void CMyImage::SetBitmap(CString strBitmap)
+{
+	m_sBitmap = strBitmap;
+
+	HBITMAP hBitmap = (HBITMAP) ::LoadImage(AfxGetInstanceHandle(),
+						m_sBitmap, IMAGE_BITMAP, 0, 0, 
+						LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+   
+	// Do we have a valid handle for the loaded image?
+	if (hBitmap)
+	{
+		// Delete the current bitmap
+		if (m_bmpBitmap.DeleteObject())
+		m_bmpBitmap.Detach(); // If there was a bitmap, detach it
+		// Attach the currently loaded bitmap to the bitmap object
+		m_bmpBitmap.Attach(hBitmap);
+
+		m_bmpBitmap.GetBitmap(&bm);  //Get Bitmap Structure
+		m_iWidth = bm.bmWidth;
+		m_iHeight = bm.bmHeight;
+		
+
+		if(bm.bmBitsPixel == 32)		m_iBytesPerLine = m_iWidth * 4;
+		else if(bm.bmBitsPixel == 24)	m_iBytesPerLine = m_iWidth * 3;
+		else if(bm.bmBitsPixel == 8)	m_iBytesPerLine = m_iWidth * 1;
+
+
+		if (m_iBytesPerLine % 4 != 0) m_iBytesPerLine += 4 - m_iBytesPerLine % 4;
+		
+		m_p1.x = 0;
+		m_p1.y = 0;
+		m_p2.x = m_iWidth;
+		m_p2.y = m_iHeight;
+
+		
+
+		m_bmpBackData    = (BYTE*) bm.bmBits;
+	}
 }

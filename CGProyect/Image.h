@@ -10,6 +10,13 @@ class CMyImage : public CShape
 public:
 	CPOINT2F m_p1;
 	CPOINT2F m_p2;
+	CString m_sBitmap;
+    CBitmap m_bmpBitmap;
+    BITMAP bm;
+	int m_iWidth;
+	int m_iHeight;
+	int m_iBytesPerLine;
+	BYTE* m_bmpBackData;
 	CMyImage();
 	virtual void OnDraw(CBackBuffer *, POINT);
 	virtual void Serialize(CArchive& );
@@ -20,7 +27,7 @@ public:
 	virtual void ChangeFillColor(COLORREF);
 	virtual void ChangeLineColor(COLORREF);
 	virtual void ChangeFilled();
-
+	void SetBitmap(CString strBitmap);
 };
 
 #endif

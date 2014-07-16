@@ -206,14 +206,6 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
 		}
-		case IM_IMAGE:  {
-			CMyImage *I = new CMyImage;
-			I->m_p1 = point;
-			I->m_p2 = point;
-			pDoc->m_figures.push_back(I);
-			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
-			break;
-		}
 		default:{
 			if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
 				::SetCursor(::LoadCursor(0, IDC_HAND));
@@ -289,11 +281,6 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 
 				break;
 			}
-			case IM_IMAGE:{
-				((CMyImage *)(*i))->m_p2 = point;
-				pDoc->m_current = -1;
-				break;
-			}
 			default:{
 				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					//::SetCursor(::LoadCursor(0, IDC_ARROW));
@@ -357,11 +344,7 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 			case IM_BEZIER:  {
 				((CBezier *)(*i))->arr[0][1] = point;
 				break;
-			}
-			case IM_IMAGE:{
-				((CMyImage *)(*i))->m_p2 = point;
-				break;
-			}			 
+			}		 
 			default:{
 				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					::SetCursor(::LoadCursor(0, IDC_HAND));
@@ -432,6 +415,29 @@ void CCGProyectView::OnButtonImage()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_IMAGE;
+
+	
+	//Create a Dialog to search for an image
+	CFileDialog dlg(true,".bmp","image",NULL,_T("BMP Files (*.bmp)|*.bmp|"), this);
+
+	if(dlg.DoModal() == IDOK)
+	{
+		//Create an image
+		CMyImage *I = new CMyImage;
+		CString filename;
+
+		filename = dlg.GetPathName(); // return full path and filename
+		
+		//Set the image to the  class
+		I->SetBitmap(filename);
+
+		//Put it in the vector of figures
+		pDoc->m_figures.push_back(I);
+		pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+		Invalidate();
+	}
+
+	pDoc->m_current = -1;
 }
 
 
@@ -644,6 +650,7 @@ BOOL CCGProyectView::OnEraseBkgnd(CDC* pDC)
 	return true;//CView::OnEraseBkgnd(pDC);
 }
 
+//On window resize
 void CCGProyectView::OnSize(UINT nType, int cx, int cy)
 {
 	CView::OnSize(nType, cx, cy);
@@ -783,7 +790,7 @@ void CCGProyectView::OnDivideBezier()
 	}
 }
 
-
+//Change the color of a point in a triangle
 void CCGProyectView::OnChangeChangepointcolor()
 {
 	CCGProyectDoc* pDoc = GetDocument();
