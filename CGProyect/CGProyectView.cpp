@@ -63,6 +63,8 @@ ON_UPDATE_COMMAND_UI(ID_BUTTON_TRIANGLE, &CCGProyectView::OnUpdateButtonTriangle
 ON_COMMAND(ID_BUTTON_CANCEL, &CCGProyectView::OnButtonCancel)
 ON_COMMAND(ID_DIVIDE_BEZIER, &CCGProyectView::OnDivideBezier)
 ON_COMMAND(ID_CHANGE_CHANGEPOINTCOLOR, &CCGProyectView::OnChangeChangepointcolor)
+ON_UPDATE_COMMAND_UI(ID_BUTTON_IMAGE, &CCGProyectView::OnUpdateButtonImage)
+ON_COMMAND(ID_BUTTON_IMAGE, &CCGProyectView::OnButtonImage)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -204,6 +206,14 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
 		}
+		case IM_IMAGE:  {
+			CMyImage *I = new CMyImage;
+			I->m_p1 = point;
+			I->m_p2 = point;
+			pDoc->m_figures.push_back(I);
+			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+			break;
+		}
 		default:{
 			if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
 				::SetCursor(::LoadCursor(0, IDC_HAND));
@@ -253,20 +263,16 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				((CCircle*)(*i))->m_tangente = point;
 				//((CButton*)GetDlgItem(ID_BUTTON_CIRCLE))->SetCheck(false);
 			//	((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.CheckDlgButton(ID_BUTTON_CIRCLE,false);
-
-
 				pDoc->m_current = -1;
 				break;
 			}
 			case IM_LINE:	{
 				((CLine *)(*i))->m_p2 = point;
-				
 				pDoc->m_current = -1;
 				break;
 			}
 			case IM_ELLIPSE:{
 				((CEllipse *)(*i))->m_p2 = point;
-
 				pDoc->m_current = -1;
 				break;
 			}
@@ -281,6 +287,11 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				((CBezier *)(*i))->arr[0][1] = point;
 				pDoc->m_current = -1;
 
+				break;
+			}
+			case IM_IMAGE:{
+				((CMyImage *)(*i))->m_p2 = point;
+				pDoc->m_current = -1;
 				break;
 			}
 			default:{
@@ -347,6 +358,10 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 				((CBezier *)(*i))->arr[0][1] = point;
 				break;
 			}
+			case IM_IMAGE:{
+				((CMyImage *)(*i))->m_p2 = point;
+				break;
+			}			 
 			default:{
 				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					::SetCursor(::LoadCursor(0, IDC_HAND));
@@ -411,6 +426,12 @@ void CCGProyectView::OnButtonTriangle()
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_triangle = 0;
 	pDoc->m_current = IM_TRIANGLE;
+}
+
+void CCGProyectView::OnButtonImage()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->m_current = IM_IMAGE;
 }
 
 
@@ -718,6 +739,18 @@ void CCGProyectView::OnUpdateButtonTriangle(CCmdUI *pCmdUI)
 	}
 }
 
+//Set the Image button checked
+void CCGProyectView::OnUpdateButtonImage(CCmdUI *pCmdUI)
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->m_current == IM_IMAGE){
+		pCmdUI->SetCheck(true);
+	}else{
+		pCmdUI->SetCheck(false);
+	}
+}
+
+
 //Cancel the insertion of buttons
 void CCGProyectView::OnButtonCancel()
 {
@@ -766,3 +799,7 @@ void CCGProyectView::OnChangeChangepointcolor()
 		}
 	}		
 }
+
+
+
+

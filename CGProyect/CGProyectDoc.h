@@ -13,6 +13,7 @@
 #include "Line.h"
 #include "Triangle.h"
 #include "Bezier.h"
+#include "Image.h"
 #include "CGProyect.h"
 #include "MainFrm.h"
 
