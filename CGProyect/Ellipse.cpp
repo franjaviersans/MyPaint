@@ -28,7 +28,7 @@ void CEllipse::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	int draw;
 
 	//Check if the figure is inside the drawing area
-	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
 	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
 	else draw = 1;
 
@@ -173,7 +173,7 @@ void CEllipse::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	int draw;
 
 	//Check if the figure is inside the drawing area
-	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
 	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
 	else draw = 1;
 	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
@@ -184,7 +184,7 @@ void CEllipse::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p1.y = pp1.y;
 
 	//Check if the figure is inside the drawing area
-	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
 	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
 	else draw = 1;
 	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
@@ -195,7 +195,7 @@ void CEllipse::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p1.y = pp1.y;
 
 	//Check if the figure is inside the drawing area
-	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
 	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
 	else draw = 1;
 	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
@@ -206,7 +206,7 @@ void CEllipse::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p1.y = pp1.y;
 
 	//Check if the figure is inside the drawing area
-	if(max(p0.x, p1.x) < 0 && min(p0.x, p1.x) >= WindowsSize.x && max(p0.y, p1.y) < 0 && min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
 	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
 	else draw = 1;
 	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);

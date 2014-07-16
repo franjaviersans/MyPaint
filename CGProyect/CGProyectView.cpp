@@ -50,9 +50,6 @@ ON_COMMAND(ID_CHANGE_DETELEALLFIGURES, &CCGProyectView::OnChangeDeteleallfigures
 ON_COMMAND(ID_CHANGE_UNSELECTFIGURE, &CCGProyectView::OnChangeUnselectfigure)
 ON_COMMAND(ID_DELETE_ONE_KEY, &CCGProyectView::OnDeleteOneKey)
 ON_COMMAND(ID_CHANGE_NEWBEZIERCURVE, &CCGProyectView::OnChangeNewbeziercurve)
-ON_COMMAND(ID_CHAGECTP0, &CCGProyectView::OnChagectp0)
-ON_COMMAND(ID_CHAGECTP1, &CCGProyectView::OnChagectp1)
-ON_COMMAND(ID_CHAGECTP2, &CCGProyectView::OnChagectp2)
 ON_WM_ERASEBKGND()
 ON_WM_ACTIVATE()
 ON_WM_DESTROY()
@@ -65,6 +62,9 @@ ON_UPDATE_COMMAND_UI(ID_BUTTON_LINE, &CCGProyectView::OnUpdateButtonLine)
 ON_UPDATE_COMMAND_UI(ID_BUTTON_TRIANGLE, &CCGProyectView::OnUpdateButtonTriangle)
 ON_COMMAND(ID_BUTTON_CANCEL, &CCGProyectView::OnButtonCancel)
 ON_COMMAND(ID_DIVIDE_BEZIER, &CCGProyectView::OnDivideBezier)
+ON_COMMAND(ID_CHANGE_CHANGEPOINTCOLOR, &CCGProyectView::OnChangeChangepointcolor)
+ON_UPDATE_COMMAND_UI(ID_BUTTON_IMAGE, &CCGProyectView::OnUpdateButtonImage)
+ON_COMMAND(ID_BUTTON_IMAGE, &CCGProyectView::OnButtonImage)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -206,6 +206,14 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
 		}
+		case IM_IMAGE:  {
+			CMyImage *I = new CMyImage;
+			I->m_p1 = point;
+			I->m_p2 = point;
+			pDoc->m_figures.push_back(I);
+			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+			break;
+		}
 		default:{
 			if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
 				::SetCursor(::LoadCursor(0, IDC_HAND));
@@ -255,20 +263,16 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				((CCircle*)(*i))->m_tangente = point;
 				//((CButton*)GetDlgItem(ID_BUTTON_CIRCLE))->SetCheck(false);
 			//	((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.CheckDlgButton(ID_BUTTON_CIRCLE,false);
-
-
 				pDoc->m_current = -1;
 				break;
 			}
 			case IM_LINE:	{
 				((CLine *)(*i))->m_p2 = point;
-				
 				pDoc->m_current = -1;
 				break;
 			}
 			case IM_ELLIPSE:{
 				((CEllipse *)(*i))->m_p2 = point;
-
 				pDoc->m_current = -1;
 				break;
 			}
@@ -283,6 +287,11 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				((CBezier *)(*i))->arr[0][1] = point;
 				pDoc->m_current = -1;
 
+				break;
+			}
+			case IM_IMAGE:{
+				((CMyImage *)(*i))->m_p2 = point;
+				pDoc->m_current = -1;
 				break;
 			}
 			default:{
@@ -349,6 +358,10 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 				((CBezier *)(*i))->arr[0][1] = point;
 				break;
 			}
+			case IM_IMAGE:{
+				((CMyImage *)(*i))->m_p2 = point;
+				break;
+			}			 
 			default:{
 				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					::SetCursor(::LoadCursor(0, IDC_HAND));
@@ -415,6 +428,12 @@ void CCGProyectView::OnButtonTriangle()
 	pDoc->m_current = IM_TRIANGLE;
 }
 
+void CCGProyectView::OnButtonImage()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->m_current = IM_IMAGE;
+}
+
 
 void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 {
@@ -423,8 +442,17 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 	CMenu menu;
 
 	if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_BEZIER)			menu.LoadMenu(IDR_MENU2);
-	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_TRIANGLE)	menu.LoadMenu(IDR_MENU4);	
-	else																							menu.LoadMenu(IDR_MENU1);
+	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_TRIANGLE){ 
+
+		CPoint q = point;
+		ScreenToClient(&q);
+
+		pDoc->m_selectedPoint = NULL;
+		pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(q);
+		
+		if(pDoc->m_selectedPoint != NULL)	menu.LoadMenu(IDR_MENU4);	
+		else								menu.LoadMenu(IDR_MENU2);
+	}else																							menu.LoadMenu(IDR_MENU1);
 
     CMenu *pSub = menu.GetSubMenu(0);
     // Modify menu items here if necessary (e.g. gray out items)
@@ -610,57 +638,6 @@ void CCGProyectView::OnChangeNewbeziercurve()
 	}
 }
 
-void CCGProyectView::OnChagectp0()
-{
-	CCGProyectDoc* pDoc = GetDocument();
-	if(pDoc->position != pDoc->m_figures.end()){
-		if((*pDoc->position)->GetID() == IM_TRIANGLE){
-			COLORREF color;
-			CColorDialog dlg; 
-			if (dlg.DoModal() == IDOK){
-				color = dlg.GetColor(); 
-				((CTriangle*)(*pDoc->position))->m_c0 = color;
-				Invalidate();
-			}	
-		}
-	}
-}
-
-
-void CCGProyectView::OnChagectp1()
-{
-	CCGProyectDoc* pDoc = GetDocument();
-	if(pDoc->position != pDoc->m_figures.end()){
-		if((*pDoc->position)->GetID() == IM_TRIANGLE){
-			COLORREF color;
-			CColorDialog dlg; 
-			if (dlg.DoModal() == IDOK){
-				color = dlg.GetColor(); 
-				((CTriangle*)(*pDoc->position))->m_c1 = color;
-				Invalidate();
-			}	
-		}
-	}
-}
-
-
-void CCGProyectView::OnChagectp2()
-{
-	CCGProyectDoc* pDoc = GetDocument();
-	if(pDoc->position != pDoc->m_figures.end()){
-		if((*pDoc->position)->GetID() == IM_TRIANGLE){
-			COLORREF color;
-			CColorDialog dlg; 
-			if (dlg.DoModal() == IDOK){
-				color = dlg.GetColor(); 
-				((CTriangle*)(*pDoc->position))->m_c2 = color;
-				Invalidate();
-			}	
-		}
-	}
-}
-
-
 BOOL CCGProyectView::OnEraseBkgnd(CDC* pDC)
 {
 
@@ -762,6 +739,18 @@ void CCGProyectView::OnUpdateButtonTriangle(CCmdUI *pCmdUI)
 	}
 }
 
+//Set the Image button checked
+void CCGProyectView::OnUpdateButtonImage(CCmdUI *pCmdUI)
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->m_current == IM_IMAGE){
+		pCmdUI->SetCheck(true);
+	}else{
+		pCmdUI->SetCheck(false);
+	}
+}
+
+
 //Cancel the insertion of buttons
 void CCGProyectView::OnButtonCancel()
 {
@@ -772,6 +761,7 @@ void CCGProyectView::OnButtonCancel()
 //Subdivide Bezier Curve
 void CCGProyectView::OnDivideBezier()
 {
+
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_BEZIER){
@@ -792,3 +782,24 @@ void CCGProyectView::OnDivideBezier()
 		}
 	}
 }
+
+
+void CCGProyectView::OnChangeChangepointcolor()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_TRIANGLE && pDoc->m_selectedPoint != NULL){
+			COLORREF color;
+			CColorDialog dlg; 
+			if (dlg.DoModal() == IDOK){
+				color = dlg.GetColor(); 
+				((CTriangle*)(*pDoc->position))->setColor(pDoc->m_selectedPoint, color);
+				Invalidate();
+			}
+		}
+	}		
+}
+
+
+
+

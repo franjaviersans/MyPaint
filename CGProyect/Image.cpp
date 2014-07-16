@@ -16,6 +16,70 @@ CMyImage::CMyImage()
 
 void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
+	POINT p0, p1;
+	p0.x = (int)m_p1.x;
+	p0.y = (int)m_p1.y;
+	p1.x = (int)m_p2.x;
+	p1.y = (int)m_p2.y;
+
+	POINT pp0, pp1;
+	pp0.x = min(p0.x, p1.x);
+	pp0.y = min(p0.y, p1.y);
+	pp1.x = max(p0.x, p1.x);
+	pp1.y = max(p0.y, p1.y);
+
+	int draw = 2;
+
+	if(p1.x < 0 || p0.x >= WindowsSize.x || p1.y < 0 || p0.y >= WindowsSize.y) draw = 0;
+
+	if(draw != 0){
+		p0.x = pp0.x;
+		p0.y = pp0.y;
+		p1.x = pp1.x;
+		p1.y = pp0.y;
+
+		int draw;
+
+		//Check if the figure is inside the drawing area
+		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p0,p1,pDC,m_linecolor,draw);
+
+		p0.x = pp0.x;
+		p0.y = pp0.y;
+		p1.x = pp0.x;
+		p1.y = pp1.y;
+
+		//Check if the figure is inside the drawing area
+		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p0,p1,pDC,m_linecolor,draw);
+
+		p0.x = pp0.x;
+		p0.y = pp1.y;
+		p1.x = pp1.x;
+		p1.y = pp1.y;
+
+		//Check if the figure is inside the drawing area
+		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p0,p1,pDC,m_linecolor,draw);
+
+		p0.x = pp1.x;
+		p0.y = pp0.y;
+		p1.x = pp1.x;
+		p1.y = pp1.y;
+
+		//Check if the figure is inside the drawing area
+		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p0,p1,pDC,m_linecolor,draw);
+	}
+
 	
 }
 
