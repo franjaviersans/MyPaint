@@ -256,7 +256,7 @@ void CTriangle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	CColor red(255,0,0);
 
 	// draw a thick black rectangle filled with blue
-	p0.x = pp0.x;
+	/*p0.x = pp0.x;
 	p0.y = pp0.y;
 	p1.x = pp1.x;
 	p1.y = pp0.y;
@@ -319,7 +319,7 @@ void CTriangle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 	p0.x = pp1.x;
 	p0.y = pp0.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());*/
 
 
 

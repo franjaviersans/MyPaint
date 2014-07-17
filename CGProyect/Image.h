@@ -17,7 +17,9 @@ public:
 	int m_iHeight;
 	int m_iBytesPerLine;
 	BYTE* m_bmpBackData;
+	float *m_ImageData;
 	CMyImage();
+	~CMyImage();
 	virtual void OnDraw(CBackBuffer *, POINT);
 	virtual void Serialize(CArchive& );
 	virtual void DrawSelected(CBackBuffer *, POINT);

@@ -418,7 +418,7 @@ void CCGProyectView::OnButtonImage()
 
 	
 	//Create a Dialog to search for an image
-	CFileDialog dlg(true,".bmp","image",NULL,_T("BMP Files (*.bmp)|*.bmp|"), this);
+	CFileDialog dlg(true,_T(".bmp"),_T(".bmp"),NULL,_T("BMP Files (*.bmp)|*.bmp||"));
 
 	if(dlg.DoModal() == IDOK)
 	{

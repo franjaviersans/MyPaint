@@ -13,6 +13,15 @@ CMyImage::CMyImage()
 	m_linecolor = 0;
 	m_filled = false;
 	m_bmpBackData = NULL;
+	m_ImageData = NULL;
+}
+
+CMyImage::~CMyImage(){
+	// if we have a bitmap destroy
+	if (m_bmpBitmap.DeleteObject())
+		m_bmpBitmap.Detach(); // If there was a bitmap, detach it
+
+	if(m_ImageData != NULL) delete [] m_ImageData;
 }
 
 void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
@@ -22,6 +31,9 @@ void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	p0.y = min(m_p1.y, m_p2.y);
 	p1.x = max(m_p1.x, m_p2.x);
 	p1.y = max(m_p1.y, m_p2.y);
+
+	
+	
 
 	int draw = 2;
 
@@ -39,25 +51,13 @@ void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 		}else{
 			int offset;
 
-			if(bm.bmBitsPixel == 32){
-				for(int i = p0.y, k=m_iHeight - 1; i < p1.y ; ++i,--k)
-					for(int j = p0.x, l=0; j < p1.x ; ++j,++l){
-						int offset = k*m_iBytesPerLine + l*4;
-						pDC->SetPixelSecured(j,i, m_bmpBackData[offset], m_bmpBackData[offset + 1],m_bmpBackData[offset + 2]);
+			for(int i = 0; i < m_iHeight ; ++i)
+					for(int j = 0; j < m_iWidth; ++j){
+						offset = i * m_iWidth * 3 + j * 3;
+						//std::cout<<m_ImageData[offset]<< "   "<< m_ImageData[offset +1]<<"   "<<m_ImageData[offset+2] <<std::endl;
+						pDC->SetPixelSecured(j,i, m_ImageData[offset], m_ImageData[offset + 1],m_ImageData[offset + 2]);
 					}
-			}else if(bm.bmBitsPixel == 24){
-				for(int i = p0.y, k=m_iHeight - 1; i < p1.y ; ++i,--k)
-					for(int j = p0.x, l=0; j < p1.x ; ++j,++l){
-						int offset = k*m_iBytesPerLine + l*3;
-						pDC->SetPixelSecured(j,i, m_bmpBackData[offset], m_bmpBackData[offset + 1],m_bmpBackData[offset + 2]);
-					}
-			}else if(bm.bmBitsPixel == 8){
-				for(int i = p0.y, k=m_iHeight - 1; i < p1.y ; ++i,--k)
-					for(int j = p0.x, l=0; j < p1.x ; ++j,++l){
-						int offset = k*m_iBytesPerLine + l*1;
-						pDC->SetPixelSecured(j,i, m_bmpBackData[offset], m_bmpBackData[offset],m_bmpBackData[offset]);
-					}
-			}
+			
 		}
 	}
 
@@ -255,5 +255,37 @@ void CMyImage::SetBitmap(CString strBitmap)
 		
 
 		m_bmpBackData    = (BYTE*) bm.bmBits;
+
+		m_ImageData = new float[m_iWidth * m_iHeight * 3];
+
+		int offset1, offset2;
+
+
+		if(bm.bmBitsPixel == 32){
+				for(int i = 0, k=m_iHeight - 1; i < m_iHeight ; ++i,--k)
+					for(int j = 0, l=0; j < m_iWidth; ++j,++l){
+						offset1 = k * m_iBytesPerLine + l * 4;
+						offset2 = i * m_iWidth * 3 + j * 3;
+						
+						m_ImageData[offset2]			= (int)m_bmpBackData[offset1];
+						m_ImageData[offset2 + 1]		= (int)m_bmpBackData[offset1 + 1];
+						m_ImageData[offset2 + 2]		= (int)m_bmpBackData[offset1 + 2];
+					}
+		}else if(bm.bmBitsPixel == 24){
+			for(int i = 0, k=m_iHeight - 1; i < m_iHeight ; ++i,--k)
+				for(int j = 0, l=0; j < m_iWidth; ++j,++l){
+					offset1 = k * m_iBytesPerLine + l * 3;
+					offset2 = i * m_iWidth * 3 + j * 3;
+					m_ImageData[offset2]			= (int)m_bmpBackData[offset1];
+					m_ImageData[offset2 + 1]		= (int)m_bmpBackData[offset1 + 1];
+					m_ImageData[offset2 + 2]		= (int)m_bmpBackData[offset1 + 2];
+				}
+		}else if(bm.bmBitsPixel == 8){
+			/*for(int i = p0.y, k=m_iHeight - 1; i < p1.y ; ++i,--k)
+				for(int j = p0.x, l=0; j < p1.x ; ++j,++l){
+					int offset = k*m_iBytesPerLine + l*1;
+					pDC->SetPixelSecured(j,i, m_bmpBackData[offset], m_bmpBackData[offset],m_bmpBackData[offset]);
+				}*/
+		}
 	}
 }
