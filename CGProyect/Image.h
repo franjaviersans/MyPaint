@@ -29,7 +29,7 @@ public:
 	virtual void ChangeFillColor(COLORREF);
 	virtual void ChangeLineColor(COLORREF);
 	virtual void ChangeFilled();
-	void SetBitmap(CString strBitmap);
+	bool SetBitmap(CString strBitmap);
 };
 
 #endif

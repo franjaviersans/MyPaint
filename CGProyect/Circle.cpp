@@ -157,7 +157,6 @@ void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	int dx = center.x - tangent.x;
 	int dy = center.y - tangent.y;
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
-	int draw;
 
 	CColor red(255,0,0);
 

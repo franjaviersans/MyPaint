@@ -188,7 +188,7 @@ void CBezier::addControlpoint(){
 
 void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
-	POINT p0, p1, minp, maxp, last;
+	POINT p0, p1, minp, maxp;
 
 	minp.x = 99999;
 	minp.y = 99999;

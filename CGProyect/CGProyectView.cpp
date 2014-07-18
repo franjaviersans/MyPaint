@@ -375,35 +375,35 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 
 }
 
-
+//Create a Bezier Curve
 void CCGProyectView::OnButtonBezier()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_BEZIER;
 }
 
-
+//Create a Circle
 void CCGProyectView::OnButtonCircle()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_CIRCLE;
 }
 
-
+//Create an Ellipse
 void CCGProyectView::OnButtonEllipse()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_ELLIPSE;
 }
 
-
+//Create a Line
 void CCGProyectView::OnButtonLine()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_LINE;
 }
 
-
+//Create a Trinagle
 void CCGProyectView::OnButtonTriangle()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -411,6 +411,7 @@ void CCGProyectView::OnButtonTriangle()
 	pDoc->m_current = IM_TRIANGLE;
 }
 
+//Create a canvas for an image
 void CCGProyectView::OnButtonImage()
 {
 	CCGProyectDoc* pDoc = GetDocument();
@@ -418,7 +419,7 @@ void CCGProyectView::OnButtonImage()
 
 	
 	//Create a Dialog to search for an image
-	CFileDialog dlg(true,_T(".bmp"),_T(".bmp"),NULL,_T("BMP Files (*.bmp)|*.bmp||"));
+	CFileDialog dlg(true,NULL,NULL,NULL,_T("BMP Files (*.bmp)|*.bmp||"));
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -429,12 +430,15 @@ void CCGProyectView::OnButtonImage()
 		filename = dlg.GetPathName(); // return full path and filename
 		
 		//Set the image to the  class
-		I->SetBitmap(filename);
+		if(I->SetBitmap(filename)){
 
-		//Put it in the vector of figures
-		pDoc->m_figures.push_back(I);
-		pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
-		Invalidate();
+			//Put it in the vector of figures
+			pDoc->m_figures.push_back(I);
+			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+			Invalidate();
+		}else {
+			delete I;
+		}
 	}
 
 	pDoc->m_current = -1;

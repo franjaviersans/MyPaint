@@ -17,20 +17,16 @@ CMyImage::CMyImage()
 }
 
 CMyImage::~CMyImage(){
-	// if we have a bitmap destroy
-	if (m_bmpBitmap.DeleteObject())
-		m_bmpBitmap.Detach(); // If there was a bitmap, detach it
-
 	if(m_ImageData != NULL) delete [] m_ImageData;
 }
 
 void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 	POINT p0, p1;
-	p0.x = min(m_p1.x, m_p2.x);
-	p0.y = min(m_p1.y, m_p2.y);
-	p1.x = max(m_p1.x, m_p2.x);
-	p1.y = max(m_p1.y, m_p2.y);
+	p0.x = (int)min(m_p1.x, m_p2.x);
+	p0.y = (int)min(m_p1.y, m_p2.y);
+	p1.x = (int)max(m_p1.x, m_p2.x);
+	p1.y = (int)max(m_p1.y, m_p2.y);
 
 	
 	
@@ -45,7 +41,7 @@ void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 		if(m_bmpBackData == NULL){
 			for(int i = p0.y; i < p1.y ; ++i){
 				for(int j = p0.x; j < p1.x ; ++j){
-					pDC->SetPixelSecured(j,i,1,0,0);
+					pDC->SetPixelSecured(j,i,0,0,0);
 				}
 			}
 		}else{
@@ -179,10 +175,10 @@ void CMyImage::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 bool CMyImage::Intersect(POINT p){
 
 	POINT p0, p1;
-	p0.x = min(m_p1.x, m_p2.x);
-	p0.y = min(m_p1.y, m_p2.y);
-	p1.x = max(m_p1.x, m_p2.x);
-	p1.y = max(m_p1.y, m_p2.y);
+	p0.x = (int)min(m_p1.x, m_p2.x);
+	p0.y = (int)min(m_p1.y, m_p2.y);
+	p1.x = (int)max(m_p1.x, m_p2.x);
+	p1.y = (int)max(m_p1.y, m_p2.y);
 
 	if(p0.x <= p.x && p.x <= p1.x && p0.y <= p.y && p.y <= p1.y) return true;
 	return false;
@@ -218,14 +214,14 @@ void CMyImage::ChangeLineColor(COLORREF c){
 void CMyImage::ChangeFilled(){
 }
 
-void CMyImage::SetBitmap(CString strBitmap)
+bool CMyImage::SetBitmap(CString strBitmap)
 {
 	m_sBitmap = strBitmap;
 
 	HBITMAP hBitmap = (HBITMAP) ::LoadImage(AfxGetInstanceHandle(),
 						m_sBitmap, IMAGE_BITMAP, 0, 0, 
 						LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-   
+	
 	// Do we have a valid handle for the loaded image?
 	if (hBitmap)
 	{
@@ -238,7 +234,6 @@ void CMyImage::SetBitmap(CString strBitmap)
 		m_bmpBitmap.GetBitmap(&bm);  //Get Bitmap Structure
 		m_iWidth = bm.bmWidth;
 		m_iHeight = bm.bmHeight;
-		
 
 		if(bm.bmBitsPixel == 32)		m_iBytesPerLine = m_iWidth * 4;
 		else if(bm.bmBitsPixel == 24)	m_iBytesPerLine = m_iWidth * 3;
@@ -247,45 +242,87 @@ void CMyImage::SetBitmap(CString strBitmap)
 
 		if (m_iBytesPerLine % 4 != 0) m_iBytesPerLine += 4 - m_iBytesPerLine % 4;
 		
+		//Set the BB
 		m_p1.x = 0;
 		m_p1.y = 0;
-		m_p2.x = m_iWidth;
-		m_p2.y = m_iHeight;
+		m_p2.x = (float)m_iWidth;
+		m_p2.y = (float)m_iHeight;
 
-		
-
+		//Get a pointer to the information
 		m_bmpBackData    = (BYTE*) bm.bmBits;
 
+		//Transform the image
 		m_ImageData = new float[m_iWidth * m_iHeight * 3];
+
 
 		int offset1, offset2;
 
-
+		//Transform bitmap to 24 bits
 		if(bm.bmBitsPixel == 32){
+
 				for(int i = 0, k=m_iHeight - 1; i < m_iHeight ; ++i,--k)
-					for(int j = 0, l=0; j < m_iWidth; ++j,++l){
-						offset1 = k * m_iBytesPerLine + l * 4;
+					for(int j = 0; j < m_iWidth; ++j){
+						offset1 = k * m_iBytesPerLine + j * 4;
 						offset2 = i * m_iWidth * 3 + j * 3;
 						
-						m_ImageData[offset2]			= (int)m_bmpBackData[offset1];
-						m_ImageData[offset2 + 1]		= (int)m_bmpBackData[offset1 + 1];
-						m_ImageData[offset2 + 2]		= (int)m_bmpBackData[offset1 + 2];
+						m_ImageData[offset2]			= (float)m_bmpBackData[offset1];
+						m_ImageData[offset2 + 1]		= (float)m_bmpBackData[offset1 + 1];
+						m_ImageData[offset2 + 2]		= (float)m_bmpBackData[offset1 + 2];
 					}
 		}else if(bm.bmBitsPixel == 24){
 			for(int i = 0, k=m_iHeight - 1; i < m_iHeight ; ++i,--k)
-				for(int j = 0, l=0; j < m_iWidth; ++j,++l){
-					offset1 = k * m_iBytesPerLine + l * 3;
+				for(int j = 0; j < m_iWidth; ++j){
+					offset1 = k * m_iBytesPerLine + j * 3;
 					offset2 = i * m_iWidth * 3 + j * 3;
-					m_ImageData[offset2]			= (int)m_bmpBackData[offset1];
-					m_ImageData[offset2 + 1]		= (int)m_bmpBackData[offset1 + 1];
-					m_ImageData[offset2 + 2]		= (int)m_bmpBackData[offset1 + 2];
+					m_ImageData[offset2]			= (float)m_bmpBackData[offset1];
+					m_ImageData[offset2 + 1]		= (float)m_bmpBackData[offset1 + 1];
+					m_ImageData[offset2 + 2]		= (float)m_bmpBackData[offset1 + 2];
 				}
 		}else if(bm.bmBitsPixel == 8){
-			/*for(int i = p0.y, k=m_iHeight - 1; i < p1.y ; ++i,--k)
-				for(int j = p0.x, l=0; j < p1.x ; ++j,++l){
-					int offset = k*m_iBytesPerLine + l*1;
-					pDC->SetPixelSecured(j,i, m_bmpBackData[offset], m_bmpBackData[offset],m_bmpBackData[offset]);
-				}*/
+
+			//Get the number of pallete colors
+			DWORD bufferSize = sizeof(BITMAPINFOHEADER) + (256 * sizeof(RGBQUAD));
+			LPBITMAPINFO pBmi;
+			pBmi = (LPBITMAPINFO) new BYTE[bufferSize];
+			memset(pBmi, 0, bufferSize);
+			pBmi->bmiHeader.biSize = sizeof(pBmi->bmiHeader);
+
+			//Copy the image info
+			GetDIBits(GetDC(NULL), hBitmap, 0, 0, NULL, pBmi, DIB_RGB_COLORS);
+			//Copy the image color palette
+			GetDIBits(GetDC(NULL), hBitmap, 0, 0, NULL, pBmi, DIB_RGB_COLORS);
+
+			//The number of colors in the pal
+			UINT nColors = (pBmi->bmiHeader.biBitCount)? pBmi->bmiHeader.biBitCount : 1 << pBmi->bmiHeader.biBitCount;
+
+			//Get the palette colors
+			if( nColors <= 256 ) {
+				for(int i = 0, k=m_iHeight - 1; i < m_iHeight ; ++i,--k)
+					for(int j = 0; j < m_iWidth; ++j){
+						offset1 = k * m_iBytesPerLine + j;
+						offset1 = m_bmpBackData[offset1];
+						offset2 = i * m_iWidth * 3 + j * 3;
+
+						//Palette is stored in BGR
+						m_ImageData[offset2]			= (float)pBmi->bmiColors[offset1].rgbBlue;
+						m_ImageData[offset2 + 1]		= (float)pBmi->bmiColors[offset1].rgbGreen;
+						m_ImageData[offset2 + 2]		= (float)pBmi->bmiColors[offset1].rgbRed;
+					}
+			}		
+		}else{
+			AfxMessageBox("The program only support BMP with 8, 24 and 32 bits", MB_OK | MB_ICONSTOP);
+			return false;
 		}
+
+		DeleteObject(m_bmpBitmap);
+		// if we have a bitmap destroy
+		if (m_bmpBitmap.DeleteObject())
+			m_bmpBitmap.Detach(); // If there was a bitmap, detach it
+
+		return true;
+
+	}else{
+		AfxMessageBox("The image is not a BMP image.", MB_OK | MB_ICONSTOP);
+		return false;
 	}
 }
