@@ -157,7 +157,6 @@ void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	int dx = center.x - tangent.x;
 	int dy = center.y - tangent.y;
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
-	int draw;
 
 	CColor red(255,0,0);
 
@@ -167,7 +166,7 @@ void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p1.x = center.x - r;
 	p1.y = center.y + r;
 	
-	//Check if the figure is inside the drawing area
+	/*//Check if the figure is inside the drawing area
 	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
 	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
 	else draw = 1;
@@ -223,7 +222,7 @@ void CCircle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 	p0.x = center.x - r;
 	p0.y = center.y + r;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());*/
 
 
 	CColor other(255, 100, 0);

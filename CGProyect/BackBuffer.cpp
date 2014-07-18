@@ -7,6 +7,12 @@ void CBackBuffer::SetPixel(int x, int y, int r, int g, int b){
 	m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
 }
 
+void CBackBuffer::SetPixel(int x, int y, float r, float g, float b){
+	m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
+	m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
+	m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
+}
+
 void CBackBuffer::SetPixel(int x, int y, CColor c){
 	m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) c.b;
 	m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) c.g;
@@ -48,6 +54,14 @@ void CBackBuffer::Rectangle(int x0, int y0, int x1, int y1, COLORREF c){
 }
 
 void CBackBuffer::SetPixelSecured(int x, int y, int r, int g, int b){
+	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
+		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
+		m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
+		m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
+	}
+}
+
+void CBackBuffer::SetPixelSecured(int x, int y, float r, float g, float b){
 	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
 		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
 		m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
@@ -119,7 +133,7 @@ void CBackBuffer::ChangeSize(int x,int y, CDC* pdc){
 	m_BitmapInfo.bmiHeader.biWidth = m_iWidth;
 	m_BitmapInfo.bmiHeader.biPlanes = 1;
 	m_BitmapInfo.bmiHeader.biSize = sizeof (BITMAPINFOHEADER);
-
+	
 
 	// Create the DIB section with CreateDIBSection
 	m_hdcDestination = pdc->GetSafeHdc();

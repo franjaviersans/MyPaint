@@ -198,7 +198,7 @@ void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 	CColor green(0, 255, 0);
 
-	for(unsigned int i = 0;i< arr[0].size();++i){
+	/*for(unsigned int i = 0;i< arr[0].size();++i){
 		p0.x = (int)arr[0][i].x;
 		p0.y = (int)arr[0][i].y;
 
@@ -256,15 +256,38 @@ void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
 	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
 	else draw = 1;
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);*/
 
 
 	CColor other(255, 100, 0);
+	CColor red(255,0,0);
+
+	bool first = true;
+	int draw;
+
+	for(unsigned int i = 1;i< arr[0].size();++i){
+
+		if(first){
+			p1.x = (int)(arr[0][0].x  + 0.5);
+			p1.y = (int)(arr[0][0].y + 0.5);
+			first = false;
+		}
+
+		p0.x = p1.x;
+		p0.y = p1.y;
+		p1.x = (int)(arr[0][i].x + 0.5);
+		p1.y = (int)(arr[0][i].y + 0.5);
+
+		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+
+		CLine::DrawDottedLine(p1, p0, pDC, red.ToCOLORREF(), draw);
+	}
 
 	for(unsigned int i = 0;i< arr[0].size();++i){
-		p0.x = (int)arr[0][i].x;
-		p0.y = (int)arr[0][i].y;
-		
+		p0.x = (int)(arr[0][i].x + 0.5);
+		p0.y = (int)(arr[0][i].y + 0.5);
 		pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 	}
 }
