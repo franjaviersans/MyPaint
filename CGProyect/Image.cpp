@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Image.h"
 #include "Line.h"
+#include "Filters.h"
 #include <iostream>
 #include <fstream>
 
@@ -12,21 +13,22 @@ CMyImage::CMyImage()
 	m_bgcolor = 0;
 	m_linecolor = 0;
 	m_filled = false;
-	m_bmpBackData = NULL;
 	m_ImageData = NULL;
+	m_Original = NULL;
 }
 
 CMyImage::~CMyImage(){
 	if(m_ImageData != NULL) delete [] m_ImageData;
+	if(m_Original != NULL) delete [] m_Original;
 }
 
 void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 	POINT p0, p1;
-	p0.x = (int)min(m_p1.x, m_p2.x);
-	p0.y = (int)min(m_p1.y, m_p2.y);
-	p1.x = (int)max(m_p1.x, m_p2.x);
-	p1.y = (int)max(m_p1.y, m_p2.y);
+	p0.x = (int)min(m_p1.x, m_p3.x);
+	p0.y = (int)min(m_p1.y, m_p3.y);
+	p1.x = (int)max(m_p1.x, m_p3.x);
+	p1.y = (int)max(m_p1.y, m_p3.y);
 
 	
 	
@@ -38,7 +40,7 @@ void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	else draw = 1;
 
 	if(draw != 0){
-		if(m_bmpBackData == NULL){
+		if(m_ImageData == NULL){
 			for(int i = p0.y; i < p1.y ; ++i){
 				for(int j = p0.x; j < p1.x ; ++j){
 					pDC->SetPixelSecured(j,i,0,0,0);
@@ -89,8 +91,8 @@ void CMyImage::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	POINT pp0, pp1;
 	pp0.x = (int)m_p1.x;
 	pp0.y = (int)m_p1.y;
-	pp1.x = (int)m_p2.x;
-	pp1.y = (int)m_p2.y;
+	pp1.x = (int)m_p3.x;
+	pp1.y = (int)m_p3.y;
 
 	CColor red(255,0,0);
 
@@ -170,10 +172,19 @@ void CMyImage::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p0.x = (int)m_p2.x;
 	p0.y = (int)m_p2.y;
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
+
+	p0.x = (int)m_p3.x;
+	p0.y = (int)m_p3.y;
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
+
+	p0.x = (int)m_p4.x;
+	p0.y = (int)m_p4.y;
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 }
 
 bool CMyImage::Intersect(POINT p){
 
+	//TODO
 	POINT p0, p1;
 	p0.x = (int)min(m_p1.x, m_p2.x);
 	p0.y = (int)min(m_p1.y, m_p2.y);
@@ -193,6 +204,12 @@ CPOINT2F* CMyImage::IntersectControlPoint(POINT p){
 	if(abs((p.x - m_p2.x)) <= epsilon && abs((p.y - m_p2.y)) <= epsilon)
 		return &m_p2;
 
+	if(abs((p.x - m_p3.x)) <= epsilon && abs((p.y - m_p3.y)) <= epsilon)
+		return &m_p3;
+
+	if(abs((p.x - m_p4.x)) <= epsilon && abs((p.y - m_p4.y)) <= epsilon)
+		return &m_p4;
+
 	return NULL;
 }
 
@@ -201,6 +218,10 @@ void CMyImage::Translate(POINT p){
 	m_p1.y += p.y;
 	m_p2.x += p.x;
 	m_p2.y += p.y;
+	m_p3.x += p.x;
+	m_p3.y += p.y;
+	m_p4.x += p.x;
+	m_p4.y += p.y;
 }
 
 
@@ -216,10 +237,11 @@ void CMyImage::ChangeFilled(){
 
 bool CMyImage::SetBitmap(CString strBitmap)
 {
-	m_sBitmap = strBitmap;
-
+    CBitmap m_bmpBitmap;
+    BITMAP bm;
+	BYTE* m_bmpBackData;
 	HBITMAP hBitmap = (HBITMAP) ::LoadImage(AfxGetInstanceHandle(),
-						m_sBitmap, IMAGE_BITMAP, 0, 0, 
+						strBitmap, IMAGE_BITMAP, 0, 0, 
 						LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	
 	// Do we have a valid handle for the loaded image?
@@ -246,13 +268,18 @@ bool CMyImage::SetBitmap(CString strBitmap)
 		m_p1.x = 0;
 		m_p1.y = 0;
 		m_p2.x = (float)m_iWidth;
-		m_p2.y = (float)m_iHeight;
+		m_p2.y = (float)0;
+		m_p3.x = (float)m_iWidth;
+		m_p3.y = (float)m_iHeight;
+		m_p4.x = (float)0;
+		m_p4.y = (float)m_iHeight;
 
 		//Get a pointer to the information
 		m_bmpBackData    = (BYTE*) bm.bmBits;
 
 		//Transform the image
 		m_ImageData = new float[m_iWidth * m_iHeight * 3];
+		m_Original = new float[m_iWidth * m_iHeight * 3];
 
 
 		int offset1, offset2;
@@ -308,11 +335,25 @@ bool CMyImage::SetBitmap(CString strBitmap)
 						m_ImageData[offset2 + 1]		= (float)pBmi->bmiColors[offset1].rgbGreen;
 						m_ImageData[offset2 + 2]		= (float)pBmi->bmiColors[offset1].rgbRed;
 					}
+
+					
 			}		
 		}else{
 			AfxMessageBox("The program only support BMP with 8, 24 and 32 bits", MB_OK | MB_ICONSTOP);
+
+			if(m_ImageData != NULL) delete [] m_ImageData;
+			if(m_Original != NULL) delete [] m_Original;
+			m_ImageData = NULL;
+			m_Original = NULL;
 			return false;
 		}
+
+		memcpy(m_Original,m_ImageData, m_iWidth * m_iHeight * 3 * sizeof(float));
+		
+
+		CFilters f;
+		f.Min(m_Original, m_ImageData, m_iWidth, m_iHeight, 7);
+
 
 		DeleteObject(m_bmpBitmap);
 		// if we have a bitmap destroy
@@ -325,4 +366,26 @@ bool CMyImage::SetBitmap(CString strBitmap)
 		AfxMessageBox("The image is not a BMP image.", MB_OK | MB_ICONSTOP);
 		return false;
 	}
+}
+
+
+void CMyImage::ApplyFilter(int type, int dim = 3){
+
+	switch(type){
+		case(IM_MIN):
+		{
+			break;
+		}
+		case(IM_MAX):
+		{
+			break;			 
+		}
+		case(
+	IM_GAUSSIAN,
+	IM_MEDIAN,
+	IM_LAPLACE,
+	IM_SHARPEN
+	}
+
+
 }

@@ -65,6 +65,23 @@ ON_COMMAND(ID_DIVIDE_BEZIER, &CCGProyectView::OnDivideBezier)
 ON_COMMAND(ID_CHANGE_CHANGEPOINTCOLOR, &CCGProyectView::OnChangeChangepointcolor)
 ON_UPDATE_COMMAND_UI(ID_BUTTON_IMAGE, &CCGProyectView::OnUpdateButtonImage)
 ON_COMMAND(ID_BUTTON_IMAGE, &CCGProyectView::OnButtonImage)
+ON_COMMAND(ID_BOX_3X3FILTER, &CCGProyectView::OnBox3x3filter)
+ON_COMMAND(ID_BOX_5X5FILTER, &CCGProyectView::OnBox5x5filter)
+ON_COMMAND(ID_BOX_7X7FILTER, &CCGProyectView::OnBox7x7filter)
+ON_COMMAND(ID_GAUSSIAN_3X3, &CCGProyectView::OnGaussian3x3)
+ON_COMMAND(ID_GAUSSIAN_5X5FILTER, &CCGProyectView::OnGaussian5x5filter)
+ON_COMMAND(ID_GAUSSIAN_7X7FILTER, &CCGProyectView::OnGaussian7x7filter)
+ON_COMMAND(ID_MEDIAN_3X3FILTER, &CCGProyectView::OnMedian3x3filter)
+ON_COMMAND(ID_MEDIAN_5X5FILTER, &CCGProyectView::OnMedian5x5filter)
+ON_COMMAND(ID_MEDIAN_7X7FILTER, &CCGProyectView::OnMedian7x7filter)
+ON_COMMAND(ID_MIN_3X3FILTER, &CCGProyectView::OnMin3x3filter)
+ON_COMMAND(ID_MIN_5X5FILTER, &CCGProyectView::OnMin5x5filter)
+ON_COMMAND(ID_MIN_7X7FILTER, &CCGProyectView::OnMin7x7filter)
+ON_COMMAND(ID_MAX_3X3FILTER, &CCGProyectView::OnMax3x3filter)
+ON_COMMAND(ID_MAX_5X5FILTER, &CCGProyectView::OnMax5x5filter)
+ON_COMMAND(ID_MAX_7X7FILTER, &CCGProyectView::OnMax7x7filter)
+ON_COMMAND(ID_APLLYFILTER_LAPLACE, &CCGProyectView::OnApllyfilterLaplace)
+ON_COMMAND(ID_APLLYFILTER_SHARPEN, &CCGProyectView::OnApllyfilterSharpen)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -77,6 +94,7 @@ CCGProyectView::CCGProyectView()
 	// Add items to the menu
 	menu->AppendMenu(MF_STRING, 0, "Text");
 	bb = NULL;
+
 }
 
 CCGProyectView::~CCGProyectView()
@@ -814,3 +832,110 @@ void CCGProyectView::OnChangeChangepointcolor()
 
 
 
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnBox3x3filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CTriangle*)(*pDoc->position))->
+		}
+	}
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnBox5x5filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnBox7x7filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnGaussian3x3()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnGaussian5x5filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnGaussian7x7filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnMedian3x3filter()
+{
+	// TODO: Add your command handler code here
+}
+//Apply 3x3 box filter 
+
+void CCGProyectView::OnMedian5x5filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnMedian7x7filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnMin3x3filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnMin5x5filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnMin7x7filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnMax3x3filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnMax5x5filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnMax7x7filter()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnApllyfilterLaplace()
+{
+	// TODO: Add your command handler code here
+}
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnApllyfilterSharpen()
+{
+	// TODO: Add your command handler code here
+}
