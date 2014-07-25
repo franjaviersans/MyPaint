@@ -8,6 +8,7 @@ enum
 {
 	IM_MIN,
 	IM_MAX,
+	IM_BOX,
 	IM_GAUSSIAN,
 	IM_MEDIAN,
 	IM_LAPLACE,

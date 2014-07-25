@@ -470,6 +470,7 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 	CMenu menu;
 
 	if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_BEZIER)			menu.LoadMenu(IDR_MENU2);
+	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE)		menu.LoadMenu(IDR_MENU_IMAGE);
 	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_TRIANGLE){ 
 
 		CPoint q = point;
@@ -478,8 +479,8 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 		pDoc->m_selectedPoint = NULL;
 		pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(q);
 		
-		if(pDoc->m_selectedPoint != NULL)	menu.LoadMenu(IDR_MENU4);	
-		else								menu.LoadMenu(IDR_MENU2);
+		if(pDoc->m_selectedPoint != NULL)															menu.LoadMenu(IDR_MENU4);	
+		else																						menu.LoadMenu(IDR_MENU2);
 	}else																							menu.LoadMenu(IDR_MENU1);
 
     CMenu *pSub = menu.GetSubMenu(0);
@@ -830,112 +831,189 @@ void CCGProyectView::OnChangeChangepointcolor()
 }
 
 
-
-
-
 //Apply 3x3 box filter 
 void CCGProyectView::OnBox3x3filter()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
-			((CTriangle*)(*pDoc->position))->
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 3);
 		}
 	}
 }
 
-//Apply 3x3 box filter 
+//Apply 5x5 box filter 
 void CCGProyectView::OnBox5x5filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 5);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 7x7 box filter 
 void CCGProyectView::OnBox7x7filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 7);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 3x3 Gaussian filter 
 void CCGProyectView::OnGaussian3x3()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 3);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 5x5 Gaussian filter 
 void CCGProyectView::OnGaussian5x5filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 5);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 7x7 Gaussian filter 
 void CCGProyectView::OnGaussian7x7filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 7);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 3x3 media filter 
 void CCGProyectView::OnMedian3x3filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 3);
+		}
+	}
 }
-//Apply 3x3 box filter 
 
+//Apply 5x5 median filter 
 void CCGProyectView::OnMedian5x5filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 5);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 7x7 median filter 
 void CCGProyectView::OnMedian7x7filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 7);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 3x3 min filter 
 void CCGProyectView::OnMin3x3filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 3);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 5x5 min filter 
 void CCGProyectView::OnMin5x5filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 5);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 7x7 min filter 
 void CCGProyectView::OnMin7x7filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 7);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 3x3 max filter 
 void CCGProyectView::OnMax3x3filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 3);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 5x5 max filter 
 void CCGProyectView::OnMax5x5filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 5);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 7x7 max filter 
 void CCGProyectView::OnMax7x7filter()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 7);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 3x3 Laplace filter 
 void CCGProyectView::OnApllyfilterLaplace()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_LAPLACE);
+		}
+	}
 }
 
-//Apply 3x3 box filter 
+//Apply 3x3 sharpen filter 
 void CCGProyectView::OnApllyfilterSharpen()
 {
-	// TODO: Add your command handler code here
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_SHARPEN);
+		}
+	}
 }

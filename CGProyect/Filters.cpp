@@ -268,7 +268,7 @@ void CFilters::Sharpen(float *original, float *result, int w, int h){
 	float * filter = new float[total_dim];
 	filter[0 * total_dim + 0] = filter[2 * total_dim + 2] = filter[0 * total_dim + 2] = filter[2 * total_dim + 0] = 0;
 	filter[0 * total_dim + 1] = filter[1 * total_dim + 0] = filter[1 * total_dim + 2] = filter[2 * total_dim + 1] = 1;
-	filter[1 * total_dim + 1] = -4;
+	filter[1 * total_dim + 1] = -5;
 
 	float minred = 0.0, mingreen = 0.0, minblue = 0.0;	 
 

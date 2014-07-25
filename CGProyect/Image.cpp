@@ -349,11 +349,6 @@ bool CMyImage::SetBitmap(CString strBitmap)
 		}
 
 		memcpy(m_Original,m_ImageData, m_iWidth * m_iHeight * 3 * sizeof(float));
-		
-
-		CFilters f;
-		f.Min(m_Original, m_ImageData, m_iWidth, m_iHeight, 7);
-
 
 		DeleteObject(m_bmpBitmap);
 		// if we have a bitmap destroy
@@ -369,23 +364,47 @@ bool CMyImage::SetBitmap(CString strBitmap)
 }
 
 
-void CMyImage::ApplyFilter(int type, int dim = 3){
+void CMyImage::ApplyFilter(int type, int dim){
+
+	std::ofstream off("out.txt");
+    std::cout.rdbuf(off.rdbuf()); //redirect std::cout to out.txt!
+	std::cout<< type<<"   "<<dim<<std::endl;
+
+
+	/*CFilters f;
+		f.Min(m_Original, m_ImageData, m_iWidth, m_iHeight, 7);*/
 
 	switch(type){
 		case(IM_MIN):
 		{
+			m_Filter.Min(m_Original, m_ImageData, m_iWidth, m_iHeight, dim);
 			break;
 		}
 		case(IM_MAX):
 		{
+			m_Filter.Max(m_Original, m_ImageData, m_iWidth, m_iHeight, dim);
 			break;			 
 		}
-		case(
-	IM_GAUSSIAN,
-	IM_MEDIAN,
-	IM_LAPLACE,
-	IM_SHARPEN
-	}
-
-
+		case(IM_GAUSSIAN):
+		{
+			m_Filter.Gaussian(m_Original, m_ImageData, m_iWidth, m_iHeight, dim);
+			break;			 
+		}
+		case(IM_MEDIAN):
+		{
+			m_Filter.Median(m_Original, m_ImageData, m_iWidth, m_iHeight, dim);
+			break;			 
+		}
+		case(IM_LAPLACE):
+		{
+			m_Filter.Laplace(m_Original, m_ImageData, m_iWidth, m_iHeight);
+			break;			 
+		}
+		case(IM_SHARPEN):
+		{
+			m_Filter.Sharpen(m_Original, m_ImageData, m_iWidth, m_iHeight);
+			break;			 
+		}
+	
+}	
 }

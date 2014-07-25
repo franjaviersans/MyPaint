@@ -14,6 +14,7 @@
 #include "Triangle.h"
 #include "Bezier.h"
 #include "Image.h"
+#include  "Filters.h"
 #include "CGProyect.h"
 #include "MainFrm.h"
 
