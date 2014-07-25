@@ -26,33 +26,61 @@ void CTriangle::OnDraw(CBackBuffer *pDC,POINT WindowsSize)
 {
 
 	POINT p0, p1, p2;
-	p0.x = (int)(m_p0.x * WindowsSize.x);
-	p0.y = (int)(m_p0.y * WindowsSize.y);
-	p1.x = (int)(m_p1.x * WindowsSize.x);
-	p1.y = (int)(m_p1.y * WindowsSize.y);
-	p2.x = (int)(m_p2.x * WindowsSize.x);
-	p2.y = (int)(m_p2.y * WindowsSize.y);
+	p0.x = (int)m_p0.x;
+	p0.y = (int)m_p0.y;
+	p1.x = (int)m_p1.x;
+	p1.y = (int)m_p1.y;
+	p2.x = (int)m_p2.x;
+	p2.y = (int)m_p2.y;
 
+	POINT pp0, pp1;
+	pp0.x = min(p0.x, min(p1.x, p2.x));
+	pp0.y = min(p0.y, min(p1.y, p2.y));
+	pp1.x = max(p0.x, max(p1.x, p2.x));
+	pp1.y = max(p0.y, max(p1.y, p2.y));
 
-	//Draw filled figured
-	//TODO 
-	if(m_filled) ScanLine(pDC, WindowsSize);
+	int draw = 2;
 
-	CLine::DrawLine(p0, p1, pDC, m_linecolor);
-	CLine::DrawLine(p1, p2, pDC, m_linecolor);
-	CLine::DrawLine(p0, p2, pDC, m_linecolor);
+	if(pp1.x < 0 || pp0.x >= WindowsSize.x || pp1.y < 0 || pp0.y >= WindowsSize.y) draw = 0;
+
+	if(draw != 0){
+
+		if(0 <= pp0.x && pp1.x < WindowsSize.x && 0 <= pp0.y && pp1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+
+		if(m_filled) ScanLine(pDC, draw);
+
+		
+		//Check if the figure is inside the drawing area
+		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p0, p1, pDC, m_linecolor, draw);
+
+		//Check if the figure is inside the drawing area
+		if(max(p2.x, p1.x) < 0 || min(p2.x, p1.x) >= WindowsSize.x || max(p2.y, p1.y) < 0 || min(p2.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p2.x >= 0 && p2.x < WindowsSize.x && p2.y >= 0 && p2.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p1, p2, pDC, m_linecolor, draw);
+
+		//Check if the figure is inside the drawing area
+		if(max(p0.x, p2.x) < 0 || min(p0.x, p2.x) >= WindowsSize.x || max(p0.y, p2.y) < 0 || min(p0.y, p2.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p2.x >= 0 && p2.x < WindowsSize.x && p2.y >= 0 && p2.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+		CLine::DrawLine(p0, p2, pDC, m_linecolor, draw);
+	}
 }
 
-void CTriangle::ScanLine(CBackBuffer *pDC, POINT WindowsSize){
+void CTriangle::ScanLine(CBackBuffer *pDC, int draw){
 	POINT p0, p1, p2;
 
 	//Transform the coordinates to integers
-	p0.x = (int)(m_p0.x * WindowsSize.x);
-	p0.y = (int)(m_p0.y * WindowsSize.y);
-	p1.x = (int)(m_p1.x * WindowsSize.x);
-	p1.y = (int)(m_p1.y * WindowsSize.y);
-	p2.x = (int)(m_p2.x * WindowsSize.x);
-	p2.y = (int)(m_p2.y * WindowsSize.y);
+	p0.x = (int)m_p0.x;
+	p0.y = (int)m_p0.y;
+	p1.x = (int)m_p1.x;
+	p1.y = (int)m_p1.y;
+	p2.x = (int)m_p2.x;
+	p2.y = (int)m_p2.y;
 
 	int y, xmin, xmax, x;
 	float m1, m2, cy, cx;
@@ -114,8 +142,9 @@ void CTriangle::ScanLine(CBackBuffer *pDC, POINT WindowsSize){
 		cx = (xmax - xmin == 0)? 0.5f:(1.0f/(xmax - xmin));
 
 		//Go throught every x
-		for(x = xmin; x < xmax; ++x){
-			pDC->SetPixel(x, y, colorDif2.ToCOLORREF());
+		for(x = xmin; x <= xmax; ++x){
+			if(draw == 2)	pDC->SetPixel(x, y, colorDif2.ToCOLORREF());
+			else			pDC->SetPixelSecured(x, y, colorDif2.ToCOLORREF());
 			colorDif2 = colorDif2 + colorInc2 * cx;
 		}
 
@@ -158,8 +187,9 @@ void CTriangle::ScanLine(CBackBuffer *pDC, POINT WindowsSize){
 		cx = (xmax - xmin == 0)? 0.5f: (1.0f/(xmax - xmin));
 
 		//Go throught every x
-		for(x = xmin; x < xmax; ++x){
-			pDC->SetPixel(x, y, colorDif2.ToCOLORREF());
+		for(x = xmin; x <= xmax; ++x){
+			if(draw == 2)	pDC->SetPixel(x, y, colorDif2.ToCOLORREF());
+			else			pDC->SetPixelSecured(x, y, colorDif2.ToCOLORREF());
 
 			colorDif2 = colorDif2 + colorInc2 * cx;
 		}
@@ -207,12 +237,12 @@ void CTriangle::Serialize(CArchive& ar)
 
 void CTriangle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	POINT p0, p1, p2;
-	p0.x = (int)(m_p0.x * WindowsSize.x);
-	p0.y = (int)(m_p0.y * WindowsSize.y);
-	p1.x = (int)(m_p1.x * WindowsSize.x);
-	p1.y = (int)(m_p1.y * WindowsSize.y);
-	p2.x = (int)(m_p2.x * WindowsSize.x);
-	p2.y = (int)(m_p2.y * WindowsSize.y);
+	p0.x = (int)m_p0.x;
+	p0.y = (int)m_p0.y;
+	p1.x = (int)m_p1.x;
+	p1.y = (int)m_p1.y;
+	p2.x = (int)m_p2.x;
+	p2.y = (int)m_p2.y;
 
 	POINT pp0, pp1;
 	pp0.x = min(p0.x, min(p1.x, p2.x));
@@ -226,33 +256,51 @@ void CTriangle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	CColor red(255,0,0);
 
 	// draw a thick black rectangle filled with blue
-	p0.x = pp0.x;
+	/*p0.x = pp0.x;
 	p0.y = pp0.y;
 	p1.x = pp1.x;
 	p1.y = pp0.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());;
+	int draw;
+
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = pp0.x;
 	p0.y = pp0.y;
 	p1.x = pp0.x;
 	p1.y = pp1.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());;
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = pp0.x;
 	p0.y = pp1.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = pp1.x;
 	p0.y = pp0.y;
 	p1.x = pp1.x;
 	p1.y = pp1.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 
 	CColor green(0, 255, 0);
@@ -271,23 +319,23 @@ void CTriangle::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 	p0.x = pp1.x;
 	p0.y = pp0.y;
-	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
+	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());*/
 
 
 
 	CColor other(255, 100, 0);
 
 
-	p0.x = (int)(m_p0.x * WindowsSize.x);
-	p0.y = (int)(m_p0.y * WindowsSize.y);
+	p0.x = (int)m_p0.x;
+	p0.y = (int)m_p0.y;
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
-	p0.x = (int)(m_p1.x * WindowsSize.x);
-	p0.y = (int)(m_p1.y * WindowsSize.y);
+	p0.x = (int)m_p1.x;
+	p0.y = (int)m_p1.y;
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
-	p0.x = (int)(m_p2.x * WindowsSize.x);
-	p0.y = (int)(m_p2.y * WindowsSize.y);
+	p0.x = (int)m_p2.x;
+	p0.y = (int)m_p2.y;
 	pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 
 }
@@ -297,55 +345,63 @@ float CTriangle::sign(CPOINT2F p1,CPOINT2F p2,CPOINT2F p3){
 		return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y); 
 }
 
-bool CTriangle::Intersect(CPOINT2F p, POINT WindowsSize){
-	double epsilon = (WindowsSize.x > WindowsSize.y)? 2.0/WindowsSize.x : 2.0/WindowsSize.y;
-	
+bool CTriangle::Intersect(POINT p){
+	double epsilon = 4;
 	double	sign1, sign2, sign3;
 	
 	if(!m_filled){
-		sign1 = abs((p.x - m_p1.x) * (m_p2.y - m_p1.y)  - (p.y - m_p1.y) * (m_p2.x - m_p1.x));
-		sign2 = abs((p.x - m_p0.x) * (m_p1.y - m_p0.y)  - (p.y - m_p0.y) * (m_p1.x - m_p0.x));
-		sign3 = abs((p.x - m_p2.x) * (m_p0.y - m_p2.y)  - (p.y - m_p2.y) * (m_p0.x - m_p2.x));
+		float dx, dy;
+		CPOINT2F p0, p1;
 
 		//Intersect with first line
-		CPOINT2F p0, p1;
+		dx = m_p2.x - m_p1.x, dy = m_p2.y - m_p1.y;
+		sign1 = abs((p.x - m_p1.x) * dy  - (p.y - m_p1.y) * dx);
+		
 		p0.x = min(m_p1.x, m_p2.x);
 		p0.y = min(m_p1.y, m_p2.y);
 		p1.x = max(m_p1.x, m_p2.x);
 		p1.y = max(m_p1.y, m_p2.y);
 
-		if( sign1 <= epsilon 
-			&& ((p0.x <= p.x && p.x <= p1.x) || (p0.x <= p.x && p.x <= p1.x)) 
-			&& ((p0.y <= p.y && p.y <= p1.y) || (p0.y <= p.y && p.y <= p1.y)))
+		if(sign1 / sqrt(dx * dx + dy * dy) <= epsilon 
+			&& (p0.x <= p.x && p.x <= p1.x) 
+			&& (p0.y <= p.y && p.y <= p1.y))
 			return true;
-		
+
+
+		//Intersect with second line
+		dx = m_p1.x - m_p0.x, dy = m_p1.y - m_p0.y;
+		sign2 = abs((p.x - m_p0.x) * dy  - (p.y - m_p0.y) * dx);
+
 		p0.x = min(m_p1.x, m_p0.x);
 		p0.y = min(m_p1.y, m_p0.y);
 		p1.x = max(m_p1.x, m_p0.x);
 		p1.y = max(m_p1.y, m_p0.y);
 
-		//Intersect with second line
-		if( sign2 <= epsilon 
-			&& ((p0.x <= p.x && p.x <= p1.x) || (p0.x <= p.x && p.x <= p1.x)) 
-			&& ((p0.y <= p.y && p.y <= p1.y) || (p0.y <= p.y && p.y <= p1.y)))
+		if(sign2 / sqrt(dx * dx + dy * dy) <= epsilon 
+			&& (p0.x <= p.x && p.x <= p1.x) 
+			&& (p0.y <= p.y && p.y <= p1.y))
 			return true;
+
+		//Intersect with third line
+		dx = m_p0.x - m_p2.x, dy = m_p0.y - m_p2.y;
+		sign3 = abs((p.x - m_p2.x) * dy  - (p.y - m_p2.y) * dx);
 
 		p0.x = min(m_p0.x, m_p2.x);
 		p0.y = min(m_p0.y, m_p2.y);
 		p1.x = max(m_p0.x, m_p2.x);
 		p1.y = max(m_p0.y, m_p2.y);
 		
-		//Intersect with third line
-		if( sign3 <= epsilon 
-			&& ((p0.x <= p.x && p.x <= p1.x) || (p0.x <= p.x && p.x <= p1.x)) 
-			&& ((p0.y <= p.y && p.y <= p1.y) || (p0.y <= p.y && p.y <= p1.y)))
+		if(sign3 / sqrt(dx * dx + dy * dy) <= epsilon 
+			&& (p0.x <= p.x && p.x <= p1.x) 
+			&& (p0.y <= p.y && p.y <= p1.y))
 			return true;
 
 		return false;
 	}else {
-		sign1 = sign(p, m_p0, m_p1);
-		sign2 = sign(p, m_p1, m_p2);
-		sign3 = sign(p, m_p2, m_p0);
+		CPOINT2F pp(p);
+		sign1 = sign(pp, m_p0, m_p1);
+		sign2 = sign(pp, m_p1, m_p2);
+		sign3 = sign(pp, m_p2, m_p0);
 
 		//Check if the point is inside triangle
 		bool	b1 = sign1 < 0.0f,
@@ -355,8 +411,8 @@ bool CTriangle::Intersect(CPOINT2F p, POINT WindowsSize){
 	}
 }
 
-CPOINT2F* CTriangle::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
-	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
+CPOINT2F* CTriangle::IntersectControlPoint(POINT p){
+	double epsilon = 4;
 
 	if(abs((p.x - m_p0.x)) <= epsilon && abs((p.y - m_p0.y)) <= epsilon)
 		return &m_p0;
@@ -371,7 +427,7 @@ CPOINT2F* CTriangle::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
 }
 
 
-void CTriangle::Translate(CPOINT2F p){
+void CTriangle::Translate(POINT p){
 	m_p0.x += p.x;
 	m_p0.y += p.y;
 	m_p1.x += p.x;
@@ -381,7 +437,9 @@ void CTriangle::Translate(CPOINT2F p){
 }
 
 void CTriangle::ChangeFillColor(COLORREF c){
-	m_bgcolor = c;
+	m_c0 = c;
+	m_c1 = c;
+	m_c2 = c;
 }
 
 void CTriangle::ChangeLineColor(COLORREF c){
@@ -390,4 +448,12 @@ void CTriangle::ChangeLineColor(COLORREF c){
 
 void CTriangle::ChangeFilled(){
 	m_filled = !m_filled;
+}
+
+void CTriangle::setColor(CPOINT2F *p, COLORREF c){
+
+	if(p == &m_p0)	m_c0 = c;
+	if(p == &m_p1)	m_c1 = c;
+	if(p == &m_p2)	m_c2 = c;
+	
 }

@@ -100,7 +100,7 @@ BEGIN
     BUTTON      ID_BUTTON_ELLIPSE
     BUTTON      ID_BUTTON_BEZIER
     BUTTON      ID_BUTTON_TRIANGLE
-    BUTTON      ID_BUTTON_CANCEL
+    BUTTON      ID_BUTTON_IMAGE
 END
 
 
@@ -169,6 +169,7 @@ BEGIN
         MENUITEM "Delete Figure\tDELETE",       ID_CHANGE_DELETEFIGURE
         MENUITEM "Detele All Figures\tCtrl+DELETE", ID_CHANGE_DETELEALLFIGURES
         MENUITEM "Add Point to Bezier",         ID_CHANGE_NEWBEZIERCURVE
+        MENUITEM "Subdivide Bezier Curve",      ID_DIVIDE_BEZIER
     END
 END
 
@@ -177,6 +178,7 @@ BEGIN
     POPUP "Change"
     BEGIN
         MENUITEM "Change Background Color",     ID_CHANGE_BACKGROUNDCOLOR
+        MENUITEM "Change Point Color",          ID_CHANGE_CHANGEPOINTCOLOR
         MENUITEM "Change Border Color",         ID_CHANGE_CHANGEBORDERCOLOR
         MENUITEM "Fill Figure",                 ID_CHANGE_FILLFIGURE
         MENUITEM "Move to &Foreground\tF",      ID_CHANGE_MOVETOFOREGROUND
@@ -184,9 +186,53 @@ BEGIN
         MENUITEM "&Unselect Figure\tU",         ID_CHANGE_UNSELECTFIGURE
         MENUITEM "Delete Figure\tDELETE",       ID_CHANGE_DELETEFIGURE
         MENUITEM "Detele All Figures\tCtrl+DELETE", ID_CHANGE_DETELEALLFIGURES
-        MENUITEM "Change Triangle's Point 0 color", ID_CHAGECTP0
-        MENUITEM "Change Triangle's Point 1 color", ID_CHAGECTP1
-        MENUITEM "Change Triangle's Point 2 color", ID_CHAGECTP2
+    END
+END
+
+IDR_MENU_IMAGE MENU
+BEGIN
+    POPUP "Change"
+    BEGIN
+        MENUITEM "Move to &Foreground\tF",      ID_CHANGE_MOVETOFOREGROUND
+        MENUITEM "Move to &Background\tB",      ID_CHANGE_MOVETOBACKGROUND
+        MENUITEM "&Unselect Figure\tU",         ID_CHANGE_UNSELECTFIGURE
+        MENUITEM "Delete Figure\tDELETE",       ID_CHANGE_DELETEFIGURE
+        MENUITEM "Detele All Figures\tCtrl+DELETE", ID_CHANGE_DETELEALLFIGURES
+        POPUP "Apply Filter"
+        BEGIN
+            POPUP "Box"
+            BEGIN
+                MENUITEM "3x3 Filter",                  ID_BOX_3X3FILTER
+                MENUITEM "5x5 Filter",                  ID_BOX_5X5FILTER
+                MENUITEM "7x7 Filter",                  ID_BOX_7X7FILTER
+            END
+            POPUP "Gaussian"
+            BEGIN
+                MENUITEM "3x3 Filter",                  ID_GAUSSIAN_3X3
+                MENUITEM "5x5 Filter",                  ID_GAUSSIAN_5X5FILTER
+                MENUITEM "7x7 Filter",                  ID_GAUSSIAN_7X7FILTER
+            END
+            POPUP "Median"
+            BEGIN
+                MENUITEM "3x3 Filter",                  ID_MEDIAN_3X3FILTER
+                MENUITEM "5x5 Filter",                  ID_MEDIAN_5X5FILTER
+                MENUITEM "7x7 Filter",                  ID_MEDIAN_7X7FILTER
+            END
+            POPUP "Min"
+            BEGIN
+                MENUITEM "3x3 Filter",                  ID_MIN_3X3FILTER
+                MENUITEM "5x5 Filter",                  ID_MIN_5X5FILTER
+                MENUITEM "7x7 Filter",                  ID_MIN_7X7FILTER
+            END
+            POPUP "Max"
+            BEGIN
+                MENUITEM "3x3 Filter",                  ID_MAX_3X3FILTER
+                MENUITEM "5x5 Filter",                  ID_MAX_5X5FILTER32852
+                MENUITEM "7x7 Filter",                  ID_MAX_7X7FILTER
+            END
+            MENUITEM "Laplace",                     ID_APLLYFILTER_LAPLACE
+            MENUITEM "Sharpen",                     ID_APLLYFILTER_SHARPEN
+        END
     END
 END
 
@@ -417,6 +463,11 @@ BEGIN
     ID_BUTTON_CIRCLE        "Draw a Circle"
     ID_BUTTON_BEZIER        "Draw a Bezier Curve"
     ID_BUTTON_TRIANGLE      "Draw a Triangle"
+END
+
+STRINGTABLE
+BEGIN
+    ID_BUTTON_IMAGE         "Add an image"
 END
 
 #endif    // English (United States) resources

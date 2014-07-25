@@ -50,9 +50,6 @@ ON_COMMAND(ID_CHANGE_DETELEALLFIGURES, &CCGProyectView::OnChangeDeteleallfigures
 ON_COMMAND(ID_CHANGE_UNSELECTFIGURE, &CCGProyectView::OnChangeUnselectfigure)
 ON_COMMAND(ID_DELETE_ONE_KEY, &CCGProyectView::OnDeleteOneKey)
 ON_COMMAND(ID_CHANGE_NEWBEZIERCURVE, &CCGProyectView::OnChangeNewbeziercurve)
-ON_COMMAND(ID_CHAGECTP0, &CCGProyectView::OnChagectp0)
-ON_COMMAND(ID_CHAGECTP1, &CCGProyectView::OnChagectp1)
-ON_COMMAND(ID_CHAGECTP2, &CCGProyectView::OnChagectp2)
 ON_WM_ERASEBKGND()
 ON_WM_ACTIVATE()
 ON_WM_DESTROY()
@@ -64,6 +61,27 @@ ON_UPDATE_COMMAND_UI(ID_BUTTON_ELLIPSE, &CCGProyectView::OnUpdateButtonEllipse)
 ON_UPDATE_COMMAND_UI(ID_BUTTON_LINE, &CCGProyectView::OnUpdateButtonLine)
 ON_UPDATE_COMMAND_UI(ID_BUTTON_TRIANGLE, &CCGProyectView::OnUpdateButtonTriangle)
 ON_COMMAND(ID_BUTTON_CANCEL, &CCGProyectView::OnButtonCancel)
+ON_COMMAND(ID_DIVIDE_BEZIER, &CCGProyectView::OnDivideBezier)
+ON_COMMAND(ID_CHANGE_CHANGEPOINTCOLOR, &CCGProyectView::OnChangeChangepointcolor)
+ON_UPDATE_COMMAND_UI(ID_BUTTON_IMAGE, &CCGProyectView::OnUpdateButtonImage)
+ON_COMMAND(ID_BUTTON_IMAGE, &CCGProyectView::OnButtonImage)
+ON_COMMAND(ID_BOX_3X3FILTER, &CCGProyectView::OnBox3x3filter)
+ON_COMMAND(ID_BOX_5X5FILTER, &CCGProyectView::OnBox5x5filter)
+ON_COMMAND(ID_BOX_7X7FILTER, &CCGProyectView::OnBox7x7filter)
+ON_COMMAND(ID_GAUSSIAN_3X3, &CCGProyectView::OnGaussian3x3)
+ON_COMMAND(ID_GAUSSIAN_5X5FILTER, &CCGProyectView::OnGaussian5x5filter)
+ON_COMMAND(ID_GAUSSIAN_7X7FILTER, &CCGProyectView::OnGaussian7x7filter)
+ON_COMMAND(ID_MEDIAN_3X3FILTER, &CCGProyectView::OnMedian3x3filter)
+ON_COMMAND(ID_MEDIAN_5X5FILTER, &CCGProyectView::OnMedian5x5filter)
+ON_COMMAND(ID_MEDIAN_7X7FILTER, &CCGProyectView::OnMedian7x7filter)
+ON_COMMAND(ID_MIN_3X3FILTER, &CCGProyectView::OnMin3x3filter)
+ON_COMMAND(ID_MIN_5X5FILTER, &CCGProyectView::OnMin5x5filter)
+ON_COMMAND(ID_MIN_7X7FILTER, &CCGProyectView::OnMin7x7filter)
+ON_COMMAND(ID_MAX_3X3FILTER, &CCGProyectView::OnMax3x3filter)
+ON_COMMAND(ID_MAX_5X5FILTER, &CCGProyectView::OnMax5x5filter)
+ON_COMMAND(ID_MAX_7X7FILTER, &CCGProyectView::OnMax7x7filter)
+ON_COMMAND(ID_APLLYFILTER_LAPLACE, &CCGProyectView::OnApllyfilterLaplace)
+ON_COMMAND(ID_APLLYFILTER_SHARPEN, &CCGProyectView::OnApllyfilterSharpen)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -76,6 +94,7 @@ CCGProyectView::CCGProyectView()
 	// Add items to the menu
 	menu->AppendMenu(MF_STRING, 0, "Text");
 	bb = NULL;
+
 }
 
 CCGProyectView::~CCGProyectView()
@@ -157,24 +176,24 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		case IM_CIRCLE:	  {
 			CCircle *C = new CCircle;
-			C->m_center.x  = C->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
-			C->m_center.y  = C->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
+			C->m_center = point;
+			C->m_tangente = point;
 			pDoc->m_figures.push_back(C);
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
 		}
 		case IM_LINE:	  {
 			CLine *L = new CLine;
-			L->m_p1.x = L->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-			L->m_p1.y = L->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+			L->m_p1 = point;
+			L->m_p2 = point;
 			pDoc->m_figures.push_back(L);
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
 		}
 		case IM_ELLIPSE:  {
 			CEllipse *E = new CEllipse;
-			E->m_p1.x = E->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-			E->m_p1.y = E->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+			E->m_p1 = point;
+			E->m_p2 = point;
 			pDoc->m_figures.push_back(E);
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
@@ -182,26 +201,25 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 		case IM_TRIANGLE:{
 			if(pDoc->m_triangle == 1){
 				std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
-				((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CTriangle *)(*i))->m_p2 = point;
 				pDoc->m_triangle = 0;
-
+				pDoc->m_current = -1;
 			}else{
 				CTriangle *T = new CTriangle;
-				T->m_p0.x = T->m_p1.x = T->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				T->m_p0.y = T->m_p1.y = T->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				T->m_p0 = point;
+				T->m_p1 = point;
+				T->m_p2 = point;
 				++pDoc->m_triangle;
 				pDoc->m_figures.push_back(T);
 				pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 
-				
 			}
 			break;
 		}
 		case IM_BEZIER:  {
 			CBezier *B = new CBezier;
-			B->arr[0][0].x = B->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
-			B->arr[0][0].y = B->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+			B->arr[0][0] = point;
+			B->arr[0][1] = point;
 			pDoc->m_figures.push_back(B);
 			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
 			break;
@@ -214,27 +232,18 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			 
 			}else if ((nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end()){
 			
-
-				CPOINT2F p;
-				p.x = (float)point.x / pDoc->m_WindosSize.x;
-				p.y = (float)point.y / pDoc->m_WindosSize.y;
-
+				//Select a control point of the selected figure
 				pDoc->m_selectedPoint = NULL;
-
-				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
-					pDoc->m_selectedPoint = (*i)->IntersectControlPoint(p,pDoc->m_WindosSize);
-					if(pDoc->m_selectedPoint != NULL){
-						::SetCursor(::LoadCursor(0, IDC_SIZEALL));
-						break;
-					}
+				pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(point);
+				if(pDoc->m_selectedPoint != NULL){
+					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
+					break;
 				}
 			}else{
-				CPOINT2F p;
-				p.x = (float)point.x / pDoc->m_WindosSize.x;
-				p.y = (float)point.y / pDoc->m_WindosSize.y;
+				pDoc->position = pDoc->m_figures.end();
 
 				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
-					if((*i)->Intersect(p,pDoc->m_WindosSize)){
+					if((*i)->Intersect(point)){
 						pDoc->position = i;
 					}
 				}
@@ -261,50 +270,49 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 		switch (pDoc->m_current)
 		{
 			case IM_CIRCLE:	{
-				((CCircle*)(*i))->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CCircle*)(*i))->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
-			
+				((CCircle*)(*i))->m_tangente = point;
+				//((CButton*)GetDlgItem(ID_BUTTON_CIRCLE))->SetCheck(false);
+			//	((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.CheckDlgButton(ID_BUTTON_CIRCLE,false);
+				pDoc->m_current = -1;
 				break;
 			}
 			case IM_LINE:	{
-				((CLine *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CLine *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-				
+				((CLine *)(*i))->m_p2 = point;
+				pDoc->m_current = -1;
 				break;
 			}
 			case IM_ELLIPSE:{
-				((CEllipse *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CEllipse *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
-
+				((CEllipse *)(*i))->m_p2 = point;
+				pDoc->m_current = -1;
 				break;
 			}
 			case IM_TRIANGLE:{
 				if(pDoc->m_triangle == 1){
-					((CTriangle *)(*i))->m_p1.x = ((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-					((CTriangle *)(*i))->m_p1.y = ((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					((CTriangle *)(*i))->m_p1 = point;
+					((CTriangle *)(*i))->m_p2 = point;
 				}
 				break;
 			}
 			case IM_BEZIER:  {
-				((CBezier *)(*i))->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
-				((CBezier *)(*i))->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+				((CBezier *)(*i))->arr[0][1] = point;
+				pDoc->m_current = -1;
 
 				break;
 			}
 			default:{
 				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					//::SetCursor(::LoadCursor(0, IDC_ARROW));
-					CPOINT2F p;
+					POINT p;
 
-					p.x = (float)(point.x - pDoc->m_initialPoint.x) / pDoc->m_WindosSize.x;
-					p.y = (float)(point.y - pDoc->m_initialPoint.y) / pDoc->m_WindosSize.y;
+					p.x = (point.x - pDoc->m_initialPoint.x) ;
+					p.y = (point.y - pDoc->m_initialPoint.y) ;
 
 					(*pDoc->position)->Translate(p);
 
 					pDoc->m_initialPoint = point;
 				}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
-					pDoc->m_selectedPoint->x = (float)point.x / pDoc->m_WindosSize.x;
-					pDoc->m_selectedPoint->y = (float)point.y / pDoc->m_WindosSize.y;
+					pDoc->m_selectedPoint->x = (float)point.x ;
+					pDoc->m_selectedPoint->y = (float)point.y ;
 				}
 			break;
 			}
@@ -334,50 +342,45 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 		switch (pDoc->m_current)
 		{
 			case IM_CIRCLE:	{
-				((CCircle*)(*i))->m_tangente.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CCircle*)(*i))->m_tangente.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CCircle*)(*i))->m_tangente = point;
 				break;
 			}
 			case IM_LINE:	{
-				((CLine *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CLine *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CLine *)(*i))->m_p2 = point;
 				break;
 			}
 			case IM_ELLIPSE:{
-				((CEllipse *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-				((CEllipse *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+				((CEllipse *)(*i))->m_p2 = point;
 				break;
 			}
 			case IM_TRIANGLE:{
 				if(pDoc->m_triangle == 1){
-					((CTriangle *)(*i))->m_p1.x = ((CTriangle *)(*i))->m_p2.x = (float)point.x / pDoc->m_WindosSize.x;
-					((CTriangle *)(*i))->m_p1.y = ((CTriangle *)(*i))->m_p2.y = (float)point.y / pDoc->m_WindosSize.y;
+					((CTriangle *)(*i))->m_p1 = point;
 				}
 				break;
 			}
 			case IM_BEZIER:  {
-				((CBezier *)(*i))->arr[0][1].x = (float)point.x / pDoc->m_WindosSize.x;
-				((CBezier *)(*i))->arr[0][1].y = (float)point.y / pDoc->m_WindosSize.y;
+				((CBezier *)(*i))->arr[0][1] = point;
 				break;
-			}
+			}		 
 			default:{
 				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					::SetCursor(::LoadCursor(0, IDC_HAND));
 
-					CPOINT2F p;
+					POINT p;
 
-						p.x = (float)(point.x - pDoc->m_initialPoint.x) / pDoc->m_WindosSize.x;
-						p.y = (float)(point.y - pDoc->m_initialPoint.y) / pDoc->m_WindosSize.y;
+					p.x = (point.x - pDoc->m_initialPoint.x) ;
+					p.y = (point.y - pDoc->m_initialPoint.y) ;
 
-						(*pDoc->position)->Translate(p);
+					(*pDoc->position)->Translate(p);
 
 						pDoc->m_initialPoint = point;
 						Invalidate();
 				}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
 					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
 
-					pDoc->m_selectedPoint->x = (float)point.x / pDoc->m_WindosSize.x;
-					pDoc->m_selectedPoint->y = (float)point.y / pDoc->m_WindosSize.y;
+					pDoc->m_selectedPoint->x = (float)point.x ;
+					pDoc->m_selectedPoint->y = (float)point.y ;
 					Invalidate();
 				}
 				break;
@@ -390,40 +393,73 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 
 }
 
-
+//Create a Bezier Curve
 void CCGProyectView::OnButtonBezier()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_BEZIER;
 }
 
-
+//Create a Circle
 void CCGProyectView::OnButtonCircle()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_CIRCLE;
 }
 
-
+//Create an Ellipse
 void CCGProyectView::OnButtonEllipse()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_ELLIPSE;
 }
 
-
+//Create a Line
 void CCGProyectView::OnButtonLine()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = IM_LINE;
 }
 
-
+//Create a Trinagle
 void CCGProyectView::OnButtonTriangle()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_triangle = 0;
 	pDoc->m_current = IM_TRIANGLE;
+}
+
+//Create a canvas for an image
+void CCGProyectView::OnButtonImage()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->m_current = IM_IMAGE;
+
+	
+	//Create a Dialog to search for an image
+	CFileDialog dlg(true,NULL,NULL,NULL,_T("BMP Files (*.bmp)|*.bmp||"));
+
+	if(dlg.DoModal() == IDOK)
+	{
+		//Create an image
+		CMyImage *I = new CMyImage;
+		CString filename;
+
+		filename = dlg.GetPathName(); // return full path and filename
+		
+		//Set the image to the  class
+		if(I->SetBitmap(filename)){
+
+			//Put it in the vector of figures
+			pDoc->m_figures.push_back(I);
+			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+			Invalidate();
+		}else {
+			delete I;
+		}
+	}
+
+	pDoc->m_current = -1;
 }
 
 
@@ -434,8 +470,18 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 	CMenu menu;
 
 	if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_BEZIER)			menu.LoadMenu(IDR_MENU2);
-	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_TRIANGLE)	menu.LoadMenu(IDR_MENU4);	
-	else																							menu.LoadMenu(IDR_MENU1);
+	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE)		menu.LoadMenu(IDR_MENU_IMAGE);
+	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_TRIANGLE){ 
+
+		CPoint q = point;
+		ScreenToClient(&q);
+
+		pDoc->m_selectedPoint = NULL;
+		pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(q);
+		
+		if(pDoc->m_selectedPoint != NULL)															menu.LoadMenu(IDR_MENU4);	
+		else																						menu.LoadMenu(IDR_MENU2);
+	}else																							menu.LoadMenu(IDR_MENU1);
 
     CMenu *pSub = menu.GetSubMenu(0);
     // Modify menu items here if necessary (e.g. gray out items)
@@ -621,63 +667,13 @@ void CCGProyectView::OnChangeNewbeziercurve()
 	}
 }
 
-void CCGProyectView::OnChagectp0()
-{
-	CCGProyectDoc* pDoc = GetDocument();
-	if(pDoc->position != pDoc->m_figures.end()){
-		if((*pDoc->position)->GetID() == IM_TRIANGLE){
-			COLORREF color;
-			CColorDialog dlg; 
-			if (dlg.DoModal() == IDOK){
-				color = dlg.GetColor(); 
-				((CTriangle*)(*pDoc->position))->m_c0 = color;
-				Invalidate();
-			}	
-		}
-	}
-}
-
-
-void CCGProyectView::OnChagectp1()
-{
-	CCGProyectDoc* pDoc = GetDocument();
-	if(pDoc->position != pDoc->m_figures.end()){
-		if((*pDoc->position)->GetID() == IM_TRIANGLE){
-			COLORREF color;
-			CColorDialog dlg; 
-			if (dlg.DoModal() == IDOK){
-				color = dlg.GetColor(); 
-				((CTriangle*)(*pDoc->position))->m_c1 = color;
-				Invalidate();
-			}	
-		}
-	}
-}
-
-
-void CCGProyectView::OnChagectp2()
-{
-	CCGProyectDoc* pDoc = GetDocument();
-	if(pDoc->position != pDoc->m_figures.end()){
-		if((*pDoc->position)->GetID() == IM_TRIANGLE){
-			COLORREF color;
-			CColorDialog dlg; 
-			if (dlg.DoModal() == IDOK){
-				color = dlg.GetColor(); 
-				((CTriangle*)(*pDoc->position))->m_c2 = color;
-				Invalidate();
-			}	
-		}
-	}
-}
-
-
 BOOL CCGProyectView::OnEraseBkgnd(CDC* pDC)
 {
 
 	return true;//CView::OnEraseBkgnd(pDC);
 }
 
+//On window resize
 void CCGProyectView::OnSize(UINT nType, int cx, int cy)
 {
 	CView::OnSize(nType, cx, cy);
@@ -773,9 +769,251 @@ void CCGProyectView::OnUpdateButtonTriangle(CCmdUI *pCmdUI)
 	}
 }
 
+//Set the Image button checked
+void CCGProyectView::OnUpdateButtonImage(CCmdUI *pCmdUI)
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->m_current == IM_IMAGE){
+		pCmdUI->SetCheck(true);
+	}else{
+		pCmdUI->SetCheck(false);
+	}
+}
+
+
 //Cancel the insertion of buttons
 void CCGProyectView::OnButtonCancel()
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	pDoc->m_current = -1;
+}
+
+//Subdivide Bezier Curve
+void CCGProyectView::OnDivideBezier()
+{
+
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_BEZIER){
+			std::vector< CPOINT2F > firsthalf, secondhalf;
+			((CBezier*)(*pDoc->position))->Divide(firsthalf, secondhalf, 0.5);
+
+
+			CBezier *B = new CBezier(firsthalf);
+			pDoc->m_figures.push_back(B);
+
+			B = new CBezier(secondhalf);
+			pDoc->m_figures.push_back(B);
+			
+
+			firsthalf.clear();
+			secondhalf.clear();	
+			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+		}
+	}
+}
+
+//Change the color of a point in a triangle
+void CCGProyectView::OnChangeChangepointcolor()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_TRIANGLE && pDoc->m_selectedPoint != NULL){
+			COLORREF color;
+			CColorDialog dlg; 
+			if (dlg.DoModal() == IDOK){
+				color = dlg.GetColor(); 
+				((CTriangle*)(*pDoc->position))->setColor(pDoc->m_selectedPoint, color);
+				Invalidate();
+			}
+		}
+	}		
+}
+
+
+//Apply 3x3 box filter 
+void CCGProyectView::OnBox3x3filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 3);
+		}
+	}
+}
+
+//Apply 5x5 box filter 
+void CCGProyectView::OnBox5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 5);
+		}
+	}
+}
+
+//Apply 7x7 box filter 
+void CCGProyectView::OnBox7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 7);
+		}
+	}
+}
+
+//Apply 3x3 Gaussian filter 
+void CCGProyectView::OnGaussian3x3()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 3);
+		}
+	}
+}
+
+//Apply 5x5 Gaussian filter 
+void CCGProyectView::OnGaussian5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 5);
+		}
+	}
+}
+
+//Apply 7x7 Gaussian filter 
+void CCGProyectView::OnGaussian7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 7);
+		}
+	}
+}
+
+//Apply 3x3 media filter 
+void CCGProyectView::OnMedian3x3filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 3);
+		}
+	}
+}
+
+//Apply 5x5 median filter 
+void CCGProyectView::OnMedian5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 5);
+		}
+	}
+}
+
+//Apply 7x7 median filter 
+void CCGProyectView::OnMedian7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 7);
+		}
+	}
+}
+
+//Apply 3x3 min filter 
+void CCGProyectView::OnMin3x3filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 3);
+		}
+	}
+}
+
+//Apply 5x5 min filter 
+void CCGProyectView::OnMin5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 5);
+		}
+	}
+}
+
+//Apply 7x7 min filter 
+void CCGProyectView::OnMin7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 7);
+		}
+	}
+}
+
+//Apply 3x3 max filter 
+void CCGProyectView::OnMax3x3filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 3);
+		}
+	}
+}
+
+//Apply 5x5 max filter 
+void CCGProyectView::OnMax5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 5);
+		}
+	}
+}
+
+//Apply 7x7 max filter 
+void CCGProyectView::OnMax7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 7);
+		}
+	}
+}
+
+//Apply 3x3 Laplace filter 
+void CCGProyectView::OnApllyfilterLaplace()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_LAPLACE);
+		}
+	}
+}
+
+//Apply 3x3 sharpen filter 
+void CCGProyectView::OnApllyfilterSharpen()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_SHARPEN);
+		}
+	}
 }

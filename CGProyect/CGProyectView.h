@@ -86,6 +86,27 @@ public:
 	afx_msg void OnUpdateButtonLine(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateButtonTriangle(CCmdUI *pCmdUI);
 	afx_msg void OnButtonCancel();
+	afx_msg void OnDivideBezier();
+	afx_msg void OnChangeChangepointcolor();
+	afx_msg void OnUpdateButtonImage(CCmdUI *pCmdUI);
+	afx_msg void OnButtonImage();
+	afx_msg void OnBox3x3filter();
+	afx_msg void OnBox5x5filter();
+	afx_msg void OnBox7x7filter();
+	afx_msg void OnGaussian3x3();
+	afx_msg void OnGaussian5x5filter();
+	afx_msg void OnGaussian7x7filter();
+	afx_msg void OnMedian3x3filter();
+	afx_msg void OnMedian5x5filter();
+	afx_msg void OnMedian7x7filter();
+	afx_msg void OnMin3x3filter();
+	afx_msg void OnMin5x5filter();
+	afx_msg void OnMin7x7filter();
+	afx_msg void OnMax3x3filter();
+	afx_msg void OnMax5x5filter();
+	afx_msg void OnMax7x7filter();
+	afx_msg void OnApllyfilterLaplace();
+	afx_msg void OnApllyfilterSharpen();
 };
 
 #ifndef _DEBUG  // debug version in CGProyectView.cpp

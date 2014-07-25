@@ -6,8 +6,8 @@
 
 CBezier::CBezier()
 {
-
-	arr.push_back(*(new std::vector<CPOINT2F>));
+	std::vector< CPOINT2F > va;
+	arr.push_back(va);
 	addPoint(0,0);
 	addPoint(0,0);
 	/*arr[0].resize(2);
@@ -23,6 +23,49 @@ CBezier::CBezier()
 	m_filled = false;
 }
 
+CBezier::CBezier(std::vector< CPOINT2F > &copy){
+	std::vector< CPOINT2F > va;
+	arr.push_back(va);
+	addPoint(0,0);
+	addPoint(0,0);
+
+	//Allocate the space
+	arr[0].resize(copy.size());
+
+
+	unsigned int n = copy.size();
+	unsigned int i;
+
+	//Copy the data
+	for(i=0;i<n;++i)
+		arr[0][i] = copy[i];
+
+	//Create Matrix
+	while(n > arr.size()){
+		arr.push_back(va);
+	}
+
+	for(i=1; i<n ;++i)
+		while(arr[i].size() <= n-i){
+			CPOINT2F a(0,0);
+			arr[i].push_back(a);
+		}
+
+	m_id = IM_BEZIER;
+	m_bgcolor = 0;
+	m_linecolor = 0;
+	m_filled = false;
+}
+
+CBezier::~CBezier(){
+	unsigned int n=arr[0].size();
+	unsigned int r;
+	for(r=0;r<n;++r){
+		arr[r].clear();
+	}
+	arr.clear();
+}
+
 void CBezier::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 	POINT last;
@@ -34,31 +77,29 @@ void CBezier::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	bool first = true;
 
 
-	for(t=0;t<=5;t+=0.01){
+	for(t=0;t<=1.1;t+=0.01){
 
 		if(t >= 1) t = 1;
 		for(r=1;r<n;++r){
 			for(j=0;j<n-r;++j){
-				arr[r][j].x = (float)((float) (1 - t) * arr[r-1][j].x + (float)t * arr[r-1][j+1].x);
-				arr[r][j].y = (float)((float) (1 - t) * arr[r-1][j].y + (float)t * arr[r-1][j+1].y);
+				arr[r][j].x = ((float) (1 - t) * arr[r-1][j].x + (float)t * arr[r-1][j+1].x);
+				arr[r][j].y = ((float) (1 - t) * arr[r-1][j].y + (float)t * arr[r-1][j+1].y);
 			}
 		}
 
 		if(n-1>0){
 			POINT p0;
 			if(first){
-				last.x = (int)(arr[n-1][0].x * WindowsSize.x);
-				last.y = (int)(arr[n-1][0].y * WindowsSize.y);
+				last.x = (int)(arr[n-1][0].x  + 0.5);
+				last.y = (int)(arr[n-1][0].y + 0.5);
 				first = false;
 			}
 			p0.x = last.x;
 			p0.y = last.y;
-			last.x = (int)(arr[n-1][0].x * WindowsSize.x);
-			last.y = (int)(arr[n-1][0].y * WindowsSize.y);
+			last.x = (int)(arr[n-1][0].x + 0.5);
+			last.y = (int)(arr[n-1][0].y + 0.5);
 
-			//pDC->MoveTo(p0);
-			//pDC->LineTo(last);
-			CLine::DrawLine(p0, last, pDC, m_linecolor);
+			CLine::DrawLine(p0, last, pDC, m_linecolor, 1);
 		}
 
 		if(t == 1) break;
@@ -82,14 +123,14 @@ void CBezier::Serialize(CArchive& ar)
 	}
 	else
 	{
-		int n;
-		float x,y;
+		int n,x,y;
 		ar >> m_bgcolor;
 		ar >> m_linecolor;
 		ar >> m_filled;
 		ar >> n;
 		arr.clear();
-		arr.push_back(*(new std::vector<CPOINT2F>));
+		std::vector<CPOINT2F> va;
+		arr.push_back(va);
 		for(int i = 0; i < n;++i){
 			ar >> x;
 			ar >> y;
@@ -98,25 +139,22 @@ void CBezier::Serialize(CArchive& ar)
 	}
 }
 
-void CBezier::addPoint(float x, float y){
-	CPOINT2F a;
-	a.x = x;
-	a.y = y;
+void CBezier::addPoint(int x, int y){
+	CPOINT2F a(x,y);
 
 	arr[0].push_back(a);
 
 	unsigned int n = arr[0].size();
 	unsigned int i;
 
+	std::vector<CPOINT2F> va;
 	while(n > arr.size()){
-		arr.push_back(*(new std::vector<CPOINT2F>));
+		arr.push_back(va);
 	}
 
 	for(i=1; i<n ;++i)
 		while(arr[i].size() <= n-i){
-			CPOINT2F a;
-			a.x = 0;
-			a.y = 0;
+			CPOINT2F a(0,0);
 			arr[i].push_back(a);
 		}
 }
@@ -125,34 +163,25 @@ void CBezier::addControlpoint(){
 	unsigned int i;
 	unsigned int n = arr[0].size();
 
-	/*
-	std::ofstream off("out.txt");
-	std::cout.rdbuf(off.rdbuf()); //redirect std::cout to out.txt!
-    std::cout<<i<<"   "<< j<<"  "<<arr[0].size()<<std::endl;*/
-
-	CPOINT2F a;
-	a.x = 100;
-	a.y = 100;
-
+	CPOINT2F a(100,100);
+	
 	n = arr[0].size();
 	arr[0].push_back(a);
 
 	for(i = n; i > 0 ; --i){
-		arr[0][i].x = arr[0][i - 1].x * ((float)i / n) + arr[0][i].x * (1.0f - ((float)i / n));
-		arr[0][i].y = arr[0][i - 1].y * ((float)i / n) + arr[0][i].y * (1.0f - ((float)i / n));
+		arr[0][i].x = (arr[0][i - 1].x * ((float)i / n) + arr[0][i].x * (1.0f - ((float)i / n)));
+		arr[0][i].y = (arr[0][i - 1].y * ((float)i / n) + arr[0][i].y * (1.0f - ((float)i / n)));
 	}
 
-	
 	n = arr[0].size();
+	std::vector<CPOINT2F> va;
 
 	while(n > arr.size())
-		arr.push_back(*(new std::vector<CPOINT2F>));
+		arr.push_back(va);
 
 	for(i=1; i<n ;++i)
 		while(arr[i].size() <= n-i){
-			CPOINT2F a;
-			a.x = 0;
-			a.y = 0;
+			CPOINT2F a(0,0);
 			arr[i].push_back(a);
 		}
 }
@@ -169,9 +198,9 @@ void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 	CColor green(0, 255, 0);
 
-	for(unsigned int i = 0;i< arr[0].size();++i){
-		p0.x = (int)(arr[0][i].x * WindowsSize.x);
-		p0.y = (int)(arr[0][i].y * WindowsSize.y);
+	/*for(unsigned int i = 0;i< arr[0].size();++i){
+		p0.x = (int)arr[0][i].x;
+		p0.y = (int)arr[0][i].y;
 
 		minp.x = min(p0.x, minp.x);
 		minp.y = min(p0.y, minp.y);
@@ -181,6 +210,7 @@ void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 		pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,green.ToCOLORREF());
 	}
 
+	int draw;
 
 	CColor red(255,0,0);
 
@@ -188,43 +218,82 @@ void CBezier::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 	p0.y = minp.y;
 	p1.x = maxp.x;
 	p1.y = minp.y;
-
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = minp.x;
 	p0.y = minp.y;
 	p1.x = minp.x;
 	p1.y = maxp.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = maxp.x;
 	p0.y = minp.y;
 	p1.x = maxp.x;
 	p1.y = maxp.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);
 
 	p0.x = minp.x;
 	p0.y = maxp.y;
 	p1.x = maxp.x;
 	p1.y = maxp.y;
 
-	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF());
+	//Check if the figure is inside the drawing area
+	if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+	else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+	else draw = 1;
+	CLine::DrawDottedLine(p0, p1, pDC, red.ToCOLORREF(), draw);*/
 
 
 	CColor other(255, 100, 0);
+	CColor red(255,0,0);
+
+	bool first = true;
+	int draw;
+
+	for(unsigned int i = 1;i< arr[0].size();++i){
+
+		if(first){
+			p1.x = (int)(arr[0][0].x  + 0.5);
+			p1.y = (int)(arr[0][0].y + 0.5);
+			first = false;
+		}
+
+		p0.x = p1.x;
+		p0.y = p1.y;
+		p1.x = (int)(arr[0][i].x + 0.5);
+		p1.y = (int)(arr[0][i].y + 0.5);
+
+		if(max(p0.x, p1.x) < 0 || min(p0.x, p1.x) >= WindowsSize.x || max(p0.y, p1.y) < 0 || min(p0.y, p1.y) >= WindowsSize.y) draw = 0;
+		else if(p0.x >= 0 && p0.x < WindowsSize.x && p0.y >= 0 && p0.y < WindowsSize.y && p1.x >= 0 && p1.x < WindowsSize.x && p1.y >= 0 && p1.y < WindowsSize.y) draw = 2;
+		else draw = 1;
+
+		CLine::DrawDottedLine(p1, p0, pDC, red.ToCOLORREF(), draw);
+	}
 
 	for(unsigned int i = 0;i< arr[0].size();++i){
-		p0.x = (int)(arr[0][i].x * WindowsSize.x);
-		p0.y = (int)(arr[0][i].y * WindowsSize.y);
-		
+		p0.x = (int)(arr[0][i].x + 0.5);
+		p0.y = (int)(arr[0][i].y + 0.5);
 		pDC->Rectangle(p0.x - 5, p0.y - 5, p0.x + 5, p0.y + 5,other.ToCOLORREF());
 	}
 }
 
-bool CBezier::Intersect(CPOINT2F p, POINT WindowsSize){
-	double epsilon = (WindowsSize.x > WindowsSize.y)? 2.0/WindowsSize.x : 2.0/WindowsSize.y;
+bool CBezier::Intersect(POINT p){
+	/*double epsilon = 4;
 	//TODO: Interseccion super compleja
 	CPOINT2F p0, p1;
 
@@ -244,11 +313,72 @@ bool CBezier::Intersect(CPOINT2F p, POINT WindowsSize){
 		(p0.y <= p.y && p.y <= p1.y))
 		return true;
 	else 
-		return false;
+		return false;*/
+
+	float ep = 4;
+
+	return IntersectBezier(&arr[0],&p,ep);
+
 }
 
-CPOINT2F* CBezier::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
-	double epsilon = (WindowsSize.x > WindowsSize.y)? 4.0/WindowsSize.x : 4.0/WindowsSize.y;
+bool CBezier::IntersectBezier(std::vector< CPOINT2F > *controlPoints, POINT *p, float epsilon){
+	
+   	if(controlPoints->size() == 0) return false;
+
+	std::vector<CPOINT2F> *f = new std::vector<CPOINT2F>(),*s = new std::vector<CPOINT2F>();
+
+	//Obtain the two halves
+	Divide(controlPoints,f,s,0.5);
+
+	//Check with the first half
+	CPOINT2F p0(9999999, 9999999), p1(-9999999,-9999999);
+
+	bool result = false;
+	
+	for(unsigned int i = 0;i< f->size();++i){
+		p0.x = min(p0.x, (*f)[i].x);
+		p0.y = min(p0.y, (*f)[i].y);
+		p1.x = max(p1.x, (*f)[i].x);
+		p1.y = max(p1.y, (*f)[i].y);
+	}
+	
+	if(p0.x - epsilon <= p->x && p->x <= p1.x + epsilon && p0.y - epsilon <= p->y && p->y <= p1.y + epsilon){
+		if(p1.x - p0.x <= epsilon && p1.y - p0.y <= epsilon) result = true;
+		if(!result && IntersectBezier(f, p, epsilon)) result = true;
+	}
+
+	if(!result){
+		//Check with the first half
+		p0.x = 9999999;
+		p0.y = 9999999;
+		p1.x = -9999999;
+		p1.y = -9999999;
+
+		for(unsigned int i = 0;i< s->size();++i){
+			p0.x = min(p0.x, (*s)[i].x);
+			p0.y = min(p0.y, (*s)[i].y);
+			p1.x = max(p1.x, (*s)[i].x);
+			p1.y = max(p1.y, (*s)[i].y);
+		}
+
+		//Check with the second half
+		if(p0.x - epsilon <= p->x && p->x <= p1.x + epsilon && p0.y - epsilon <= p->y && p->y <= p1.y + epsilon){
+			if(p1.x - p0.x <= epsilon && p1.y - p0.y <= epsilon) result = true;
+			if(IntersectBezier(s, p, epsilon)) result =  true;
+		}	
+	}
+
+	f->clear();
+	s->clear();
+
+	delete s;
+	delete f;
+
+	return result;
+}
+
+CPOINT2F* CBezier::IntersectControlPoint(POINT p){
+	double epsilon = 4;
 
 	for(unsigned int i = 0;i< arr[0].size();++i){
 		if(abs((p.x - arr[0][i].x)) <= epsilon && abs((p.y - arr[0][i].y)) <= epsilon)
@@ -258,7 +388,7 @@ CPOINT2F* CBezier::IntersectControlPoint(CPOINT2F p, POINT WindowsSize){
 	return NULL;
 }
 
-void CBezier::Translate(CPOINT2F p){
+void CBezier::Translate(POINT p){
 
 	for(unsigned int i = 0;i< arr[0].size();++i){
 		arr[0][i].x += p.x;
@@ -276,4 +406,78 @@ void CBezier::ChangeLineColor(COLORREF c){
 
 void CBezier::ChangeFilled(){
 	m_filled = !m_filled;
+}
+
+
+/**
+* Function to subdivide a bezier curve
+*
+*/
+void CBezier::Divide(std::vector< CPOINT2F > &firsthalf, std::vector< CPOINT2F > &secondhalf, float t){
+
+	int n = arr[0].size(), r, j;
+
+	//Form the poligon
+	for(r=1;r<n;++r){
+		for(j=0;j<n-r;++j){
+			arr[r][j].x = ((float) (1 - t) * arr[r-1][j].x + (float) t * arr[r-1][j+1].x);
+			arr[r][j].y = ((float) (1 - t) * arr[r-1][j].y + (float) t * arr[r-1][j+1].y);
+		}
+	}
+
+	//Form first half
+	for(r=0;r<n;++r) firsthalf.push_back(arr[r][0]);
+		
+	for(r=n-1;r>=0;--r) secondhalf.push_back(arr[r][n-1-r]);
+
+}
+
+
+/**
+* Function to subdivide a bezier curve from a given vector of points
+*
+*/
+void CBezier::Divide(std::vector< CPOINT2F > *arr, std::vector< CPOINT2F > *firsthalf, std::vector< CPOINT2F > *secondhalf, float t){
+
+	//Create an array to store all the control points
+	std::vector< std::vector< CPOINT2F > > auxiliar;
+	std::vector< CPOINT2F > half, va;
+
+	int n = (int)arr->size(), j;
+	int r;
+
+	auxiliar.push_back(va);
+
+	for(unsigned int k=0;k<arr->size();++k)
+		auxiliar[0].push_back((*arr)[k]);
+
+	//Create the array
+	while(n > (int)auxiliar.size())
+		auxiliar.push_back(va);
+
+	for(r=1; r<n ;++r)
+		while((int)auxiliar[r].size() <= n-r){
+			CPOINT2F a(0,0);
+			auxiliar[r].push_back(a);
+		}
+
+	//Form the poligon
+	for(r=1;r<n;++r){
+		for(j=0;j<n-r;++j){
+			auxiliar[r][j].x = ((float) (1 - t) * auxiliar[r-1][j].x + (float) t * auxiliar[r-1][j+1].x);
+			auxiliar[r][j].y = ((float) (1 - t) * auxiliar[r-1][j].y + (float) t * auxiliar[r-1][j+1].y);
+		}
+	}
+
+	//Form first half
+	for(r=0;r<n;++r) firsthalf->push_back(auxiliar[r][0]);
+		
+	for(r=n-1;r>=0;--r) secondhalf->push_back(auxiliar[r][n-1-r]);
+
+	//Clear memory
+	for(r=0; r<n ;++r)
+		auxiliar[r].clear();
+
+	auxiliar.clear();
+
 }

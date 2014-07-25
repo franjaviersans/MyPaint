@@ -15,7 +15,8 @@ enum
 	IM_CIRCLE,
 	IM_ELLIPSE,
 	IM_BEZIER,
-	IM_TRIANGLE
+	IM_TRIANGLE,
+	IM_IMAGE
 };
 
 class CPOINT2F
@@ -23,6 +24,9 @@ class CPOINT2F
 public:
 	float x;
 	float y;
+	CPOINT2F(): x(0), y(0){};
+	CPOINT2F(POINT p): x((float)p.x), y((float)p.y){};
+	CPOINT2F(int xx, int yy): x((float)xx), y((float)yy){};
 };
 
 	/*std::ofstream off("out.txt");
@@ -44,9 +48,9 @@ public:
 	virtual void OnDraw(CBackBuffer *, POINT) = 0;
     virtual void Serialize(CArchive& ar) = 0;
 	virtual void DrawSelected(CBackBuffer *, POINT) = 0;
-	virtual bool Intersect(CPOINT2F, POINT) = 0;
-	virtual CPOINT2F* IntersectControlPoint(CPOINT2F, POINT) = 0; 
-	virtual void Translate(CPOINT2F) = 0;
+	virtual bool Intersect(POINT) = 0;
+	virtual CPOINT2F* IntersectControlPoint(POINT) = 0; 
+	virtual void Translate(POINT) = 0;
 	virtual void ChangeFillColor(COLORREF) = 0;
 	virtual void ChangeLineColor(COLORREF) = 0;
 	virtual void ChangeFilled() = 0;
