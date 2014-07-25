@@ -9,6 +9,8 @@
 #define IDR_MENU1                       312
 #define IDR_MENU2                       313
 #define IDR_MENU4                       315
+#define IDR_MENU5                       322
+#define IDR_MENU_IMAGE                  322
 #define ID_BUTTON_LINE                  32771
 #define ID_BUTTON_CIRCLE                32772
 #define ID_BUTTON_ELLIPSE               32773
@@ -47,13 +49,41 @@
 #define ID_CHANGE_CHANGEPOINTCOLOR      32831
 #define ID_BUTTON_IMAGE                 32834
 #define ID_BUTTON32834                  32834
+#define ID_CHANGE_APLLYFILTER           32835
+#define ID_APLLYFILTER_BOX              32836
+#define ID_BOX_3X3FILTER                32837
+#define ID_BOX_5X5FILTER                32838
+#define ID_BOX_7X7FILTER                32839
+#define ID_APLLYFILTER_GAUSSIAN         32840
+#define ID_APLLYFILTER_MEDIAN           32841
+#define ID_APLLYFILTER_MIN              32842
+#define ID_APLLYFILTER_MAX              32843
+#define ID_APLLYFILTER_LAPLACE          32844
+#define ID_APLLYFILTER_SHARPEN          32845
+#define ID_APPLYFILTER_GAUSSIAN         32846
+#define ID_APPLYFILTER_MEDIAN           32847
+#define ID_APPLYFILTER_MIN              32848
+#define ID_MAX_3X3FILTER                32849
+#define ID_MAX_5X5FILTER                32850
+#define ID_MAX_7                        32851
+#define ID_MAX_5X5FILTER32852           32852
+#define ID_MAX_7X7FILTER                32853
+#define ID_MIN_3X3FILTER                32854
+#define ID_MIN_5X5FILTER                32855
+#define ID_MIN_7X7FILTER                32856
+#define ID_MEDIAN_3X3FILTER             32857
+#define ID_MEDIAN_5X5FILTER             32858
+#define ID_MEDIAN_7X7FILTER             32859
+#define ID_GAUSSIAN_3X3                 32860
+#define ID_GAUSSIAN_5X5FILTER           32861
+#define ID_GAUSSIAN_7X7FILTER           32862
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        321
-#define _APS_NEXT_COMMAND_VALUE         32835
+#define _APS_NEXT_RESOURCE_VALUE        322
+#define _APS_NEXT_COMMAND_VALUE         32863
 #define _APS_NEXT_CONTROL_VALUE         1004
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

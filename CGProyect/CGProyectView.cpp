@@ -65,6 +65,23 @@ ON_COMMAND(ID_DIVIDE_BEZIER, &CCGProyectView::OnDivideBezier)
 ON_COMMAND(ID_CHANGE_CHANGEPOINTCOLOR, &CCGProyectView::OnChangeChangepointcolor)
 ON_UPDATE_COMMAND_UI(ID_BUTTON_IMAGE, &CCGProyectView::OnUpdateButtonImage)
 ON_COMMAND(ID_BUTTON_IMAGE, &CCGProyectView::OnButtonImage)
+ON_COMMAND(ID_BOX_3X3FILTER, &CCGProyectView::OnBox3x3filter)
+ON_COMMAND(ID_BOX_5X5FILTER, &CCGProyectView::OnBox5x5filter)
+ON_COMMAND(ID_BOX_7X7FILTER, &CCGProyectView::OnBox7x7filter)
+ON_COMMAND(ID_GAUSSIAN_3X3, &CCGProyectView::OnGaussian3x3)
+ON_COMMAND(ID_GAUSSIAN_5X5FILTER, &CCGProyectView::OnGaussian5x5filter)
+ON_COMMAND(ID_GAUSSIAN_7X7FILTER, &CCGProyectView::OnGaussian7x7filter)
+ON_COMMAND(ID_MEDIAN_3X3FILTER, &CCGProyectView::OnMedian3x3filter)
+ON_COMMAND(ID_MEDIAN_5X5FILTER, &CCGProyectView::OnMedian5x5filter)
+ON_COMMAND(ID_MEDIAN_7X7FILTER, &CCGProyectView::OnMedian7x7filter)
+ON_COMMAND(ID_MIN_3X3FILTER, &CCGProyectView::OnMin3x3filter)
+ON_COMMAND(ID_MIN_5X5FILTER, &CCGProyectView::OnMin5x5filter)
+ON_COMMAND(ID_MIN_7X7FILTER, &CCGProyectView::OnMin7x7filter)
+ON_COMMAND(ID_MAX_3X3FILTER, &CCGProyectView::OnMax3x3filter)
+ON_COMMAND(ID_MAX_5X5FILTER, &CCGProyectView::OnMax5x5filter)
+ON_COMMAND(ID_MAX_7X7FILTER, &CCGProyectView::OnMax7x7filter)
+ON_COMMAND(ID_APLLYFILTER_LAPLACE, &CCGProyectView::OnApllyfilterLaplace)
+ON_COMMAND(ID_APLLYFILTER_SHARPEN, &CCGProyectView::OnApllyfilterSharpen)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -77,6 +94,7 @@ CCGProyectView::CCGProyectView()
 	// Add items to the menu
 	menu->AppendMenu(MF_STRING, 0, "Text");
 	bb = NULL;
+
 }
 
 CCGProyectView::~CCGProyectView()
@@ -452,6 +470,7 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 	CMenu menu;
 
 	if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_BEZIER)			menu.LoadMenu(IDR_MENU2);
+	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE)		menu.LoadMenu(IDR_MENU_IMAGE);
 	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_TRIANGLE){ 
 
 		CPoint q = point;
@@ -460,8 +479,8 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 		pDoc->m_selectedPoint = NULL;
 		pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(q);
 		
-		if(pDoc->m_selectedPoint != NULL)	menu.LoadMenu(IDR_MENU4);	
-		else								menu.LoadMenu(IDR_MENU2);
+		if(pDoc->m_selectedPoint != NULL)															menu.LoadMenu(IDR_MENU4);	
+		else																						menu.LoadMenu(IDR_MENU2);
 	}else																							menu.LoadMenu(IDR_MENU1);
 
     CMenu *pSub = menu.GetSubMenu(0);
@@ -812,5 +831,189 @@ void CCGProyectView::OnChangeChangepointcolor()
 }
 
 
+//Apply 3x3 box filter 
+void CCGProyectView::OnBox3x3filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 3);
+		}
+	}
+}
 
+//Apply 5x5 box filter 
+void CCGProyectView::OnBox5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 5);
+		}
+	}
+}
 
+//Apply 7x7 box filter 
+void CCGProyectView::OnBox7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 7);
+		}
+	}
+}
+
+//Apply 3x3 Gaussian filter 
+void CCGProyectView::OnGaussian3x3()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 3);
+		}
+	}
+}
+
+//Apply 5x5 Gaussian filter 
+void CCGProyectView::OnGaussian5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 5);
+		}
+	}
+}
+
+//Apply 7x7 Gaussian filter 
+void CCGProyectView::OnGaussian7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 7);
+		}
+	}
+}
+
+//Apply 3x3 media filter 
+void CCGProyectView::OnMedian3x3filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 3);
+		}
+	}
+}
+
+//Apply 5x5 median filter 
+void CCGProyectView::OnMedian5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 5);
+		}
+	}
+}
+
+//Apply 7x7 median filter 
+void CCGProyectView::OnMedian7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 7);
+		}
+	}
+}
+
+//Apply 3x3 min filter 
+void CCGProyectView::OnMin3x3filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 3);
+		}
+	}
+}
+
+//Apply 5x5 min filter 
+void CCGProyectView::OnMin5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 5);
+		}
+	}
+}
+
+//Apply 7x7 min filter 
+void CCGProyectView::OnMin7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 7);
+		}
+	}
+}
+
+//Apply 3x3 max filter 
+void CCGProyectView::OnMax3x3filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 3);
+		}
+	}
+}
+
+//Apply 5x5 max filter 
+void CCGProyectView::OnMax5x5filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 5);
+		}
+	}
+}
+
+//Apply 7x7 max filter 
+void CCGProyectView::OnMax7x7filter()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 7);
+		}
+	}
+}
+
+//Apply 3x3 Laplace filter 
+void CCGProyectView::OnApllyfilterLaplace()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_LAPLACE);
+		}
+	}
+}
+
+//Apply 3x3 sharpen filter 
+void CCGProyectView::OnApllyfilterSharpen()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_SHARPEN);
+		}
+	}
+}
