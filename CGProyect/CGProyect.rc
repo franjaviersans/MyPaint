@@ -227,7 +227,7 @@ BEGIN
             POPUP "Max"
             BEGIN
                 MENUITEM "3x3 Filter",                  ID_MAX_3X3FILTER
-                MENUITEM "5x5 Filter",                  ID_MAX_5X5FILTER32852
+                MENUITEM "5x5 Filter",                  ID_MAX_5X5FILTER
                 MENUITEM "7x7 Filter",                  ID_MAX_7X7FILTER
             END
             MENUITEM "Laplace",                     ID_APLLYFILTER_LAPLACE

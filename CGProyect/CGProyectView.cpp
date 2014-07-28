@@ -838,6 +838,7 @@ void CCGProyectView::OnBox3x3filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 3);
+			Invalidate();
 		}
 	}
 }
@@ -849,6 +850,7 @@ void CCGProyectView::OnBox5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 5);
+			Invalidate();
 		}
 	}
 }
@@ -860,6 +862,7 @@ void CCGProyectView::OnBox7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 7);
+			Invalidate();
 		}
 	}
 }
@@ -871,6 +874,7 @@ void CCGProyectView::OnGaussian3x3()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 3);
+			Invalidate();
 		}
 	}
 }
@@ -882,6 +886,7 @@ void CCGProyectView::OnGaussian5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 5);
+			Invalidate();
 		}
 	}
 }
@@ -893,6 +898,7 @@ void CCGProyectView::OnGaussian7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 7);
+			Invalidate();
 		}
 	}
 }
@@ -904,6 +910,7 @@ void CCGProyectView::OnMedian3x3filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 3);
+			Invalidate();
 		}
 	}
 }
@@ -915,6 +922,7 @@ void CCGProyectView::OnMedian5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 5);
+			Invalidate();
 		}
 	}
 }
@@ -926,6 +934,7 @@ void CCGProyectView::OnMedian7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 7);
+			Invalidate();
 		}
 	}
 }
@@ -937,6 +946,7 @@ void CCGProyectView::OnMin3x3filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 3);
+			Invalidate();
 		}
 	}
 }
@@ -948,6 +958,7 @@ void CCGProyectView::OnMin5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 5);
+			Invalidate();
 		}
 	}
 }
@@ -959,6 +970,7 @@ void CCGProyectView::OnMin7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 7);
+			Invalidate();
 		}
 	}
 }
@@ -970,6 +982,7 @@ void CCGProyectView::OnMax3x3filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 3);
+			Invalidate();
 		}
 	}
 }
@@ -981,6 +994,7 @@ void CCGProyectView::OnMax5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 5);
+			Invalidate();
 		}
 	}
 }
@@ -992,6 +1006,7 @@ void CCGProyectView::OnMax7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 7);
+			Invalidate();
 		}
 	}
 }
@@ -1003,6 +1018,7 @@ void CCGProyectView::OnApllyfilterLaplace()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_LAPLACE);
+			Invalidate();
 		}
 	}
 }
@@ -1014,6 +1030,7 @@ void CCGProyectView::OnApllyfilterSharpen()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_SHARPEN);
+			Invalidate();
 		}
 	}
 }

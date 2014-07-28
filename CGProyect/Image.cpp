@@ -375,6 +375,11 @@ void CMyImage::ApplyFilter(int type, int dim){
 		f.Min(m_Original, m_ImageData, m_iWidth, m_iHeight, 7);*/
 
 	switch(type){
+		case(IM_BOX):
+		{
+			m_Filter.Box(m_Original, m_ImageData, m_iWidth, m_iHeight, dim);
+			break;
+		}
 		case(IM_MIN):
 		{
 			m_Filter.Min(m_Original, m_ImageData, m_iWidth, m_iHeight, dim);
