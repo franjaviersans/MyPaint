@@ -11,6 +11,10 @@ class CMyImage : public CShape
 private:
 	CMatrix3 m_Model;
 	CMatrix3 m_View;
+	CMatrix3 m_Base;
+	CMatrix3 m_Traslate;
+	CMatrix3 m_Rotate;
+	CMatrix3 m_Scale;
 	CFilters m_Filter;
 	float *m_ImageData;
 	float *m_Original;
@@ -38,6 +42,10 @@ public:
 	virtual void ChangeFilled();
 	bool SetBitmap(CString strBitmap);
 	void ApplyFilter(int type, int dim = 3);
+	void ModifyPoint(POINT, CPOINT2F *);
+
+private:
+	void ScanLine(CBackBuffer *pDC, int draw, CPOINT2F pp0, CPOINT2F pp1, CPOINT2F pp2, CMatrix3 inv);
 };
 
 #endif

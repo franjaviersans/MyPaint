@@ -83,7 +83,7 @@ void CTriangle::ScanLine(CBackBuffer *pDC, int draw){
 	p2.y = (int)m_p2.y;
 
 	int y, xmin, xmax, x;
-	float m1, m2, cy, cx;
+	float m1, m2, cy, cx, epsilon = 0.000001;;
 	CColor colorPoint0(m_c0), colorPoint1(m_c1), colorPoint2(m_c2), colorAux(0,0,0),
 			colorDif0, colorDif1, colorDif2, colorInc0, colorInc1, colorInc2;
 	bool mb1 = false, mb2 = false;
@@ -117,18 +117,18 @@ void CTriangle::ScanLine(CBackBuffer *pDC, int draw){
 
 	//Paint first half
 	//Calculate the slope of p0 and p1
-	if(p0.x - p1.x == 0) mb1 = true;
-	else m1 = (float) (p0.y - p1.y)/(p0.x - p1.x);
+	if(abs(p0.x - p1.x) <= epsilon) mb1 = true;
+	else m1 = float(p0.y - p1.y)/(p0.x - p1.x);
 
 	//Calculate the slope of p0 and p2
-	if(p0.x - p2.x == 0) mb2 = true;
-	else m2 = (float)  (p0.y - p2.y)/(p0.x - p2.x);
+	if(abs(p0.x - p2.x) <= epsilon) mb2 = true;
+	else m2 = float(p0.y - p2.y)/(p0.x - p2.x);
 	
 
 	//Go throught every y
 	for(y = p0.y; y < p1.y; ++y){
-		xmin = (int)((!mb1?((float) (y - p0.y) / m1):0) + p0.x);
-		xmax = (int)((!mb2?((float) (y - p0.y) / m2):0) + p0.x);
+		xmin = (int)((!mb1 && abs(m1) >= epsilon?( float(y - p0.y) / m1):0) + p0.x);
+		xmax = (int)((!mb2 && abs(m2) >= epsilon?( float(y - p0.y) / m2):0) + p0.x);
 
 		if(xmax < xmin){
 			std::swap(xmin, xmax);
@@ -163,17 +163,17 @@ void CTriangle::ScanLine(CBackBuffer *pDC, int draw){
 	colorInc1 = colorPoint2 - colorAux;
 
 	//Calculate the slope of p0 and p1
-	if(p2.x - p1.x == 0) mb1 = true;
+	if(abs(p2.x - p1.x) <= epsilon) mb1 = true;
 	else m1 = (float) (p2.y - p1.y)/(p2.x - p1.x);
 
 	//Calculate the slope of p0 and p2
-	if(p2.x - p0.x == 0) mb2 = true;
+	if(abs(p2.x - p0.x) <= epsilon) mb2 = true;
 	else m2 = (float)  (p2.y - p0.y)/(p2.x - p0.x);
 
 	//Go throught every y
 	for(y = p1.y; y < p2.y; ++y){
-		xmin = (int)((!mb1?((float) (y - p2.y) / m1):0) + p2.x);
-		xmax = (int)((!mb2?((float) (y - p2.y) / m2):0) + p2.x);
+		xmin = (int)((!mb1 && abs(m1) >= epsilon?( float(y - p2.y) / m1):0) + p2.x);
+		xmax = (int)((!mb2 && abs(m2) >= epsilon?( float(y - p2.y) / m2):0) + p2.x);
 
 		if(xmax < xmin){
 			std::swap(xmin, xmax);

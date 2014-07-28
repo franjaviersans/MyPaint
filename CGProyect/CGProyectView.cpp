@@ -230,7 +230,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				pDoc->m_initialPoint = point;
 			 
-			}else if ((nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end()){
+			}else if (pDoc->position != pDoc->m_figures.end()){
 			
 				//Select a control point of the selected figure
 				pDoc->m_selectedPoint = NULL;
@@ -271,8 +271,6 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 		{
 			case IM_CIRCLE:	{
 				((CCircle*)(*i))->m_tangente = point;
-				//((CButton*)GetDlgItem(ID_BUTTON_CIRCLE))->SetCheck(false);
-			//	((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.CheckDlgButton(ID_BUTTON_CIRCLE,false);
 				pDoc->m_current = -1;
 				break;
 			}
@@ -303,18 +301,21 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					//::SetCursor(::LoadCursor(0, IDC_ARROW));
 					POINT p;
-
 					p.x = (point.x - pDoc->m_initialPoint.x) ;
 					p.y = (point.y - pDoc->m_initialPoint.y) ;
 
 					(*pDoc->position)->Translate(p);
 
 					pDoc->m_initialPoint = point;
-				}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
-					pDoc->m_selectedPoint->x = (float)point.x ;
-					pDoc->m_selectedPoint->y = (float)point.y ;
+				}else if (pDoc->m_selectedPoint != NULL){
+					if((*pDoc->position)->GetID() == IM_IMAGE){
+						((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint);
+					}else{
+						pDoc->m_selectedPoint->x = (float)point.x ;
+						pDoc->m_selectedPoint->y = (float)point.y ;
+					}
 				}
-			break;
+				break;
 			}
 		}
 		Invalidate();
@@ -375,13 +376,16 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 					(*pDoc->position)->Translate(p);
 
 						pDoc->m_initialPoint = point;
-						Invalidate();
-				}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
+
+				}else if (pDoc->m_selectedPoint != NULL){
 					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
 
-					pDoc->m_selectedPoint->x = (float)point.x ;
-					pDoc->m_selectedPoint->y = (float)point.y ;
-					Invalidate();
+					if((*pDoc->position)->GetID() == IM_IMAGE){
+						((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint);
+					}else{
+						pDoc->m_selectedPoint->x = (float)point.x ;
+						pDoc->m_selectedPoint->y = (float)point.y ;
+					}
 				}
 				break;
 			}
