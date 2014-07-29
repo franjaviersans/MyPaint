@@ -51,14 +51,40 @@ CMatrix3 Transpose(const CMatrix3 &b){
 
 CMatrix3 Zeros(){
 	return CMatrix3(	0, 0, 0,
-					0, 0, 0,
-					0, 0, 0);
+						0, 0, 0,
+						0, 0, 0);
 }
 
 CMatrix3 Eyes(){
 	return CMatrix3(	1, 0, 0,
-					0, 1, 0,
-					0, 0, 1);
+						0, 1, 0,
+						0, 0, 1);
+}
+
+CMatrix3 Translate2D(float dx,float dy){
+	CMatrix3 traslate = Eyes();
+	traslate.mat[0][2] = dx; 
+	traslate.mat[1][2] = dy;
+
+	return traslate;
+}
+
+CMatrix3 Rotate2D(float ang){
+	CMatrix3 rot = Eyes();
+	rot.mat[0][0] = cos(ang); 
+	rot.mat[0][1] = -sin(ang);
+	rot.mat[1][0] = sin(ang); 
+	rot.mat[1][1] = cos(ang);
+
+	return rot;
+}
+
+CMatrix3 Scale2D(float sx,float sy){
+	CMatrix3 s = Eyes();
+	s.mat[0][0] = sx; 
+	s.mat[1][1] = sy;
+
+	return s;
 }
 
 CMatrix3 operator +(const CMatrix3 &a,const CMatrix3 &b){
@@ -89,6 +115,11 @@ CMatrix3 operator *(const CMatrix3 &a,const float &b){
 	return CMatrix3( a.mat[0][0] * b, a.mat[0][1] * b, a.mat[0][2] * b,
 					a.mat[1][0] * b, a.mat[1][1] * b, a.mat[1][2] * b,
 					a.mat[2][0] * b, a.mat[2][1] * b, a.mat[2][2] * b);
+}
+
+CPOINT2F operator *(const CMatrix3 &a,const CPOINT2F &p){
+	return CPOINT2F(a.mat[0][0] * p.x + a.mat[0][1] * p.y + a.mat[0][2] * 1.0f,
+					a.mat[1][0] * p.x + a.mat[1][1] * p.y + a.mat[1][2] * 1.0f);
 }
 
 bool operator ==(const CMatrix3 &a,const CMatrix3 &b){

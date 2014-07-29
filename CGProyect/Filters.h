@@ -6,13 +6,13 @@
 
 enum
 {
-	IM_MIN,
-	IM_MAX,
-	IM_BOX,
-	IM_GAUSSIAN,
-	IM_MEDIAN,
-	IM_LAPLACE,
-	IM_SHARPEN
+	IM_MIN = 0,
+	IM_MAX = 1,
+	IM_BOX = 2,
+	IM_GAUSSIAN = 3,
+	IM_MEDIAN = 4,
+	IM_LAPLACE = 5,
+	IM_SHARPEN = 6
 };
 
 class CFilters

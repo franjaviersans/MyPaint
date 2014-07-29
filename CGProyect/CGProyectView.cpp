@@ -225,20 +225,20 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		}
 		default:{
+			pDoc->m_transform = 0;
 			if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
 				::SetCursor(::LoadCursor(0, IDC_HAND));
-
+				pDoc->m_transform = 1;
 				pDoc->m_initialPoint = point;
 			 
-			}else if ((nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end()){
-			
+			}else if (pDoc->position != pDoc->m_figures.end()){
+				pDoc->m_transform = 2;
 				//Select a control point of the selected figure
 				pDoc->m_selectedPoint = NULL;
 				pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(point);
-				if(pDoc->m_selectedPoint != NULL){
-					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
-					break;
-				}
+				if(pDoc->m_selectedPoint != NULL) ::SetCursor(::LoadCursor(0, IDC_SIZEALL));
+				if((*pDoc->position)->GetID() == IM_IMAGE) pDoc->m_initialPoint = point;
+		
 			}else{
 				pDoc->position = pDoc->m_figures.end();
 
@@ -271,8 +271,6 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 		{
 			case IM_CIRCLE:	{
 				((CCircle*)(*i))->m_tangente = point;
-				//((CButton*)GetDlgItem(ID_BUTTON_CIRCLE))->SetCheck(false);
-			//	((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.CheckDlgButton(ID_BUTTON_CIRCLE,false);
 				pDoc->m_current = -1;
 				break;
 			}
@@ -300,21 +298,24 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				break;
 			}
 			default:{
-				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
+				if (pDoc->m_transform == 1 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					//::SetCursor(::LoadCursor(0, IDC_ARROW));
 					POINT p;
-
 					p.x = (point.x - pDoc->m_initialPoint.x) ;
 					p.y = (point.y - pDoc->m_initialPoint.y) ;
 
 					(*pDoc->position)->Translate(p);
 
 					pDoc->m_initialPoint = point;
-				}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
-					pDoc->m_selectedPoint->x = (float)point.x ;
-					pDoc->m_selectedPoint->y = (float)point.y ;
+				}else if (pDoc->m_selectedPoint != NULL){
+					if((*pDoc->position)->GetID() == IM_IMAGE){
+						if(pDoc->m_transform != 1) ((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
+					}else{
+						pDoc->m_selectedPoint->x = (float)point.x ;
+						pDoc->m_selectedPoint->y = (float)point.y ;
+					}
 				}
-			break;
+				break;
 			}
 		}
 		Invalidate();
@@ -364,7 +365,7 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 				break;
 			}		 
 			default:{
-				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
+				if (pDoc->m_transform == 1 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					::SetCursor(::LoadCursor(0, IDC_HAND));
 
 					POINT p;
@@ -375,13 +376,16 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 					(*pDoc->position)->Translate(p);
 
 						pDoc->m_initialPoint = point;
-						Invalidate();
-				}else if ((nFlags & MK_SHIFT) && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
+
+				}else if (pDoc->m_selectedPoint != NULL){
 					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
 
-					pDoc->m_selectedPoint->x = (float)point.x ;
-					pDoc->m_selectedPoint->y = (float)point.y ;
-					Invalidate();
+					if((*pDoc->position)->GetID() == IM_IMAGE){
+						if(pDoc->m_transform != 1) ((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
+					}else{
+						pDoc->m_selectedPoint->x = (float)point.x ;
+						pDoc->m_selectedPoint->y = (float)point.y ;
+					}
 				}
 				break;
 			}
@@ -838,6 +842,7 @@ void CCGProyectView::OnBox3x3filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 3);
+			Invalidate();
 		}
 	}
 }
@@ -849,6 +854,7 @@ void CCGProyectView::OnBox5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 5);
+			Invalidate();
 		}
 	}
 }
@@ -860,6 +866,7 @@ void CCGProyectView::OnBox7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_BOX, 7);
+			Invalidate();
 		}
 	}
 }
@@ -871,6 +878,7 @@ void CCGProyectView::OnGaussian3x3()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 3);
+			Invalidate();
 		}
 	}
 }
@@ -882,6 +890,7 @@ void CCGProyectView::OnGaussian5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 5);
+			Invalidate();
 		}
 	}
 }
@@ -893,6 +902,7 @@ void CCGProyectView::OnGaussian7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_GAUSSIAN, 7);
+			Invalidate();
 		}
 	}
 }
@@ -904,6 +914,7 @@ void CCGProyectView::OnMedian3x3filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 3);
+			Invalidate();
 		}
 	}
 }
@@ -915,6 +926,7 @@ void CCGProyectView::OnMedian5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 5);
+			Invalidate();
 		}
 	}
 }
@@ -926,6 +938,7 @@ void CCGProyectView::OnMedian7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MEDIAN, 7);
+			Invalidate();
 		}
 	}
 }
@@ -937,6 +950,7 @@ void CCGProyectView::OnMin3x3filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 3);
+			Invalidate();
 		}
 	}
 }
@@ -948,6 +962,7 @@ void CCGProyectView::OnMin5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 5);
+			Invalidate();
 		}
 	}
 }
@@ -959,6 +974,7 @@ void CCGProyectView::OnMin7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MIN, 7);
+			Invalidate();
 		}
 	}
 }
@@ -970,6 +986,7 @@ void CCGProyectView::OnMax3x3filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 3);
+			Invalidate();
 		}
 	}
 }
@@ -981,6 +998,7 @@ void CCGProyectView::OnMax5x5filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 5);
+			Invalidate();
 		}
 	}
 }
@@ -992,6 +1010,7 @@ void CCGProyectView::OnMax7x7filter()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_MAX, 7);
+			Invalidate();
 		}
 	}
 }
@@ -1003,6 +1022,7 @@ void CCGProyectView::OnApllyfilterLaplace()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_LAPLACE);
+			Invalidate();
 		}
 	}
 }
@@ -1014,6 +1034,7 @@ void CCGProyectView::OnApllyfilterSharpen()
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 			((CMyImage*)(*pDoc->position))->ApplyFilter(IM_SHARPEN);
+			Invalidate();
 		}
 	}
 }

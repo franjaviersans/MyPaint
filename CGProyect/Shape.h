@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "BackBuffer.h"
+#include "POINT2F.h"
 
 enum
 {
@@ -17,16 +18,6 @@ enum
 	IM_BEZIER,
 	IM_TRIANGLE,
 	IM_IMAGE
-};
-
-class CPOINT2F
-{
-public:
-	float x;
-	float y;
-	CPOINT2F(): x(0), y(0){};
-	CPOINT2F(POINT p): x((float)p.x), y((float)p.y){};
-	CPOINT2F(int xx, int yy): x((float)xx), y((float)yy){};
 };
 
 	/*std::ofstream off("out.txt");
