@@ -30,7 +30,7 @@ public:
 // Operations
 public:
 	std::vector<CShape *> m_figures;
-	int m_current;
+	int m_current, m_transform;
 	POINT m_WindosSize, m_initialPoint;
 	bool m_pressed, m_bezier;
 	CPOINT2F* m_selectedPoint;

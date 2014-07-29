@@ -19,9 +19,9 @@ public:
 	friend CMatrix3 Transpose(const CMatrix3 &);
 	friend CMatrix3 Zeros();
 	friend CMatrix3 Eyes();
-	friend CMatrix3 Traslate(float,float);
-	friend CMatrix3 Rotate(float);
-	friend CMatrix3 Scale(float,float);
+	friend CMatrix3 Translate2D(float,float);
+	friend CMatrix3 Rotate2D(float);
+	friend CMatrix3 Scale2D(float,float);
 	friend CMatrix3 operator +(const CMatrix3 &,const CMatrix3 &);
 	friend CMatrix3 operator -(const CMatrix3 &,const CMatrix3 &);
 	friend CMatrix3 operator *(const CMatrix3 &,const CMatrix3 &);

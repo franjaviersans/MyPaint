@@ -225,20 +225,20 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		}
 		default:{
+			pDoc->m_transform = 0;
 			if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
 				::SetCursor(::LoadCursor(0, IDC_HAND));
-
+				pDoc->m_transform = 1;
 				pDoc->m_initialPoint = point;
 			 
 			}else if (pDoc->position != pDoc->m_figures.end()){
-			
+				pDoc->m_transform = 2;
 				//Select a control point of the selected figure
 				pDoc->m_selectedPoint = NULL;
 				pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(point);
-				if(pDoc->m_selectedPoint != NULL){
-					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
-					break;
-				}
+				if(pDoc->m_selectedPoint != NULL) ::SetCursor(::LoadCursor(0, IDC_SIZEALL));
+				if((*pDoc->position)->GetID() == IM_IMAGE) pDoc->m_initialPoint = point;
+		
 			}else{
 				pDoc->position = pDoc->m_figures.end();
 
@@ -298,7 +298,7 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				break;
 			}
 			default:{
-				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
+				if (pDoc->m_transform == 1 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					//::SetCursor(::LoadCursor(0, IDC_ARROW));
 					POINT p;
 					p.x = (point.x - pDoc->m_initialPoint.x) ;
@@ -309,7 +309,7 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 					pDoc->m_initialPoint = point;
 				}else if (pDoc->m_selectedPoint != NULL){
 					if((*pDoc->position)->GetID() == IM_IMAGE){
-						((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint);
+						if(pDoc->m_transform != 1) ((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
 					}else{
 						pDoc->m_selectedPoint->x = (float)point.x ;
 						pDoc->m_selectedPoint->y = (float)point.y ;
@@ -365,7 +365,7 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 				break;
 			}		 
 			default:{
-				if ((nFlags & MK_CONTROL) && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
+				if (pDoc->m_transform == 1 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
 					::SetCursor(::LoadCursor(0, IDC_HAND));
 
 					POINT p;
@@ -381,7 +381,7 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
 
 					if((*pDoc->position)->GetID() == IM_IMAGE){
-						((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint);
+						if(pDoc->m_transform != 1) ((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
 					}else{
 						pDoc->m_selectedPoint->x = (float)point.x ;
 						pDoc->m_selectedPoint->y = (float)point.y ;

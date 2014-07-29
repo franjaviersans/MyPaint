@@ -61,7 +61,7 @@ CMatrix3 Eyes(){
 						0, 0, 1);
 }
 
-CMatrix3 Traslate(float dx,float dy){
+CMatrix3 Translate2D(float dx,float dy){
 	CMatrix3 traslate = Eyes();
 	traslate.mat[0][2] = dx; 
 	traslate.mat[1][2] = dy;
@@ -69,7 +69,7 @@ CMatrix3 Traslate(float dx,float dy){
 	return traslate;
 }
 
-CMatrix3 Rotate(float ang){
+CMatrix3 Rotate2D(float ang){
 	CMatrix3 rot = Eyes();
 	rot.mat[0][0] = cos(ang); 
 	rot.mat[0][1] = -sin(ang);
@@ -79,7 +79,7 @@ CMatrix3 Rotate(float ang){
 	return rot;
 }
 
-CMatrix3 Scale(float sx,float sy){
+CMatrix3 Scale2D(float sx,float sy){
 	CMatrix3 s = Eyes();
 	s.mat[0][0] = sx; 
 	s.mat[1][1] = sy;

@@ -23,7 +23,9 @@ CMyImage::~CMyImage(){
 	if(m_Original != NULL) delete [] m_Original;
 }
 
-
+CMatrix3 CMyImage::GetModelView(){
+	return m_Traslate * m_Rotate * m_Scale * m_Base;
+}
 
 /*
 	p1-----p2
@@ -35,7 +37,7 @@ CMyImage::~CMyImage(){
 void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 	//Transform points
-	m_Model = m_Traslate * m_Rotate * m_Scale * m_Base;
+	m_Model = GetModelView();
 	CPOINT2F	p0 = m_Model * m_p1,
 				p1 = m_Model * m_p2,
 				p2 = m_Model * m_p3,
@@ -62,12 +64,8 @@ void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 void CMyImage::ScanLine(CBackBuffer *pDC, int draw, CPOINT2F p0, CPOINT2F p1, CPOINT2F p2, CMatrix3 inv){
 	CPOINT2F sampl;
 
-
-	
-
-
 	int y, xmin, xmax, x, coord00, coord01, coord10, coord11, r, g, b;
-	float tx, ty, epsilon = 0.000001;
+	float tx, ty, epsilon = 0.000001f;
 	float m1 = 0.0f, m2 = 0.0f, cy, cx;
 	bool mb1 = false, mb2 = false;
 
@@ -102,7 +100,7 @@ void CMyImage::ScanLine(CBackBuffer *pDC, int draw, CPOINT2F p0, CPOINT2F p1, CP
 		cx = (xmax - xmin == 0)? 0.5f:(1.0f/(xmax - xmin));
 
 		//Go throught every x
-		for(x = xmin; x < xmax; ++x){
+		for(x = xmin; x <= xmax; ++x){
 			//Bilinear interpolation
 			sampl = inv * CPOINT2F(x,y);
 			if(0 <= sampl.x && sampl.x < m_iWidth && 0 <= sampl.y && sampl.y < m_iHeight ){
@@ -203,7 +201,7 @@ void CMyImage::Serialize(CArchive& ar)
 
 void CMyImage::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
-	m_Model = m_Traslate * m_Rotate * m_Scale * m_Base;
+	m_Model = GetModelView();
 	CPOINT2F	pp1 = m_Model * m_p1,
 				pp2 = m_Model * m_p2,
 				pp3 = m_Model * m_p3,
@@ -267,7 +265,7 @@ void CMyImage::DrawSelected(CBackBuffer *pDC, POINT WindowsSize){
 
 bool CMyImage::Intersect(POINT p){
 
-	m_Model = m_Traslate * m_Rotate * m_Scale * m_Base;
+	m_Model = GetModelView();
 	CPOINT2F pp = p;
 	pp = Invert(m_Model) *pp;
 
@@ -283,65 +281,65 @@ bool CMyImage::Intersect(POINT p){
 
 CPOINT2F* CMyImage::IntersectControlPoint(POINT p){
 	double epsilon = 4;
-	m_Model = m_Traslate * m_Rotate * m_Scale * m_Base;
-	CPOINT2F pp = p;
-	pp = Invert(m_Model) *pp;
+	m_Model = GetModelView();
+	CPOINT2F	pp1 = m_Model * m_p1,
+				pp2 = m_Model * m_p2,
+				pp3 = m_Model * m_p3,
+				pp4 = m_Model * m_p4;
 
 
-	if(abs((pp.x - m_p1.x)) <= epsilon && abs((pp.y - m_p1.y)) <= epsilon)
+
+	if(abs((p.x - pp1.x)) <= epsilon && abs((p.y - pp1.y)) <= epsilon)
 		return &m_p1;
 
-	if(abs((pp.x - m_p2.x)) <= epsilon && abs((pp.y - m_p2.y)) <= epsilon)
+	if(abs((p.x - pp2.x)) <= epsilon && abs((p.y - pp2.y)) <= epsilon)
 		return &m_p2;
 
-	if(abs((pp.x - m_p3.x)) <= epsilon && abs((pp.y - m_p3.y)) <= epsilon)
+	if(abs((p.x - pp3.x)) <= epsilon && abs((p.y - pp3.y)) <= epsilon)
 		return &m_p3;
 
-	if(abs((pp.x - m_p4.x)) <= epsilon && abs((pp.y - m_p4.y)) <= epsilon)
+	if(abs((p.x - pp4.x)) <= epsilon && abs((p.y - pp4.y)) <= epsilon)
 		return &m_p4;
 
 	return NULL;
 }
 
-void CMyImage::ModifyPoint(POINT p, CPOINT2F * mod){
+
+//Scale the mage
+void CMyImage::ModifyPoint(POINT p, CPOINT2F * initial, bool shift){
 	
-	std::ofstream off("out.txt");
-    std::cout.rdbuf(off.rdbuf()); //redirect std::cout to out.txt!
-	std::cout<< std::endl;
+	m_Model = GetModelView();
 
-	if(m_Scale.mat[0][0] >= 0.1f && m_Scale.mat[1][1] >= 0.1f){
-		m_Model = m_Traslate * m_Rotate * m_Scale * m_Base;
-		CPOINT2F pp = p;
-		CMatrix3 scal;
-		pp = Invert(m_Model) *pp;
+	CMatrix3 scal;
+	CPOINT2F pp1, pp3, proyected;
+	pp1 = m_Model * m_p1;
+	pp3 = m_Model * m_p3;
+	proyected = m_Model * (*initial);
 
-		float factor = 0.0001, midx, midy;
-		midx = abs((m_p1.x - m_p2.x)/2.0f);
-		midy = abs((m_p1.y - m_p4.y)/2.0f);
-		
-		
-		/*
-		if(&m_p1 == mod){ 
-			scal = Scale(((midx - pp.x)/2.0f)/((midx - m_p1.x)/2.0f), ((midy - pp.y)/2.0f)/((midy - m_p1.y)/2.0f));
-		}else if(&m_p2 == mod){
-			scal = Scale(((midx - pp.x)/2.0f)/((midx - m_p2.x)/2.0f), ((midy - pp.y)/2.0f)/((midy - m_p2.y)/2.0f));
-		}else if(&m_p3 == mod){
-			scal = Scale(((midx - pp.x)/2.0f)/((midx - m_p3.x)/2.0f), ((midy - pp.y)/2.0f)/((midy - m_p3.y)/2.0f));
-		}else if(&m_p4 == mod){
-			scal = Scale(((midx - pp.x)/2.0f)/((midx - m_p4.x)/2.0f), ((midy - pp.y)/2.0f)/((midy - m_p4.y)/2.0f));
-		}*/
+	//Calculate the midpoint
+	float factor = 0.0001f, midx, midy;
+	midx = abs((pp1.x + pp3.x)/2.0f);
+	midy = abs((pp1.y + pp3.y)/2.0f);
 
-
-		scal = scal * m_Scale;
-
-		std::cout<<scal<<std::endl;
-		if(scal.mat[0][0] >= 0.1f && scal.mat[1][1] >= 0.1f && scal.mat[0][0] <= 2.0f && scal.mat[1][1] <= 2.0f)
-			m_Scale = scal * m_Scale; 
+	scal = Scale2D(abs(midx - p.x)/abs(midx - proyected.x), abs(midy - p.y)/abs(midy - proyected.y));
+	
+	//Shift to maintain the aspect ratio
+	if(shift){
+		float ma = max(scal.mat[0][0], scal.mat[1][1]);
+		scal.mat[0][0] = scal.mat[1][1] = ma;
 	}
+	
+	scal = scal * m_Scale;
+
+	//Set limits to the scale factor
+	scal.mat[0][0] = min(2.0f, max(0.1f, scal.mat[0][0]));
+	scal.mat[1][1] = min(2.0f, max(0.1f, scal.mat[1][1]));
+
+	m_Scale = scal;
 }
 
 void CMyImage::Translate(POINT p){
-	m_Traslate = Traslate(float(p.x), float(p.y)) * m_Traslate;
+	m_Traslate = Translate2D(float(p.x), float(p.y)) * m_Traslate;
 }
 
 
@@ -395,10 +393,10 @@ bool CMyImage::SetBitmap(CString strBitmap)
 		m_p4.y = (float)m_iHeight;
 
 		m_Base = Eyes();
-		m_Base = Traslate(-float(m_iWidth)/2.0f,-float(m_iHeight)/2.0f) * m_Base;
-		m_Rotate = Rotate(0);
-		m_Scale = Scale(1,1);
-		m_Traslate = Traslate(float(m_iWidth)/2.0f,float(m_iHeight)/2.0f);
+		m_Base = Translate2D(-float(m_iWidth)/2.0f,-float(m_iHeight)/2.0f) * m_Base;
+		m_Rotate = Rotate2D(0);
+		m_Scale = Scale2D(1,1);
+		m_Traslate = Translate2D(float(m_iWidth)/2.0f,float(m_iHeight)/2.0f);
 
 
 		//Get a pointer to the information

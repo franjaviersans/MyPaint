@@ -15,6 +15,7 @@ private:
 	CMatrix3 m_Traslate;
 	CMatrix3 m_Rotate;
 	CMatrix3 m_Scale;
+	CMatrix3 m_Center;
 	CFilters m_Filter;
 	float *m_ImageData;
 	float *m_Original;
@@ -42,10 +43,11 @@ public:
 	virtual void ChangeFilled();
 	bool SetBitmap(CString strBitmap);
 	void ApplyFilter(int type, int dim = 3);
-	void ModifyPoint(POINT, CPOINT2F *);
+	void ModifyPoint(POINT, CPOINT2F *, bool shift = false);
 
 private:
 	void ScanLine(CBackBuffer *pDC, int draw, CPOINT2F pp0, CPOINT2F pp1, CPOINT2F pp2, CMatrix3 inv);
+	CMatrix3 GetModelView();
 };
 
 #endif

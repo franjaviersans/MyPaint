@@ -83,7 +83,7 @@ void CTriangle::ScanLine(CBackBuffer *pDC, int draw){
 	p2.y = (int)m_p2.y;
 
 	int y, xmin, xmax, x;
-	float m1, m2, cy, cx, epsilon = 0.000001;;
+	float m1, m2, cy, cx, epsilon = 0.000001f;
 	CColor colorPoint0(m_c0), colorPoint1(m_c1), colorPoint2(m_c2), colorAux(0,0,0),
 			colorDif0, colorDif1, colorDif2, colorInc0, colorInc1, colorInc2;
 	bool mb1 = false, mb2 = false;
