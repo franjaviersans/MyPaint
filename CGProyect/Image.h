@@ -44,6 +44,7 @@ public:
 	bool SetBitmap(CString strBitmap);
 	void ApplyFilter(int type, int dim = 3);
 	void ModifyPoint(POINT, CPOINT2F *, bool shift = false);
+	void RotateFigure(POINT, POINT);
 
 private:
 	void ScanLine(CBackBuffer *pDC, int draw, CPOINT2F pp0, CPOINT2F pp1, CPOINT2F pp2, CMatrix3 inv);

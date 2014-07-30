@@ -226,19 +226,22 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 		default:{
 			pDoc->m_transform = 0;
-			if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
+			if ((nFlags & MK_CONTROL) && (nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE){
+				//Rotate
+				pDoc->m_transform = 3;
+				pDoc->m_initialPoint = point;
+			}else if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
+				//Translate
 				::SetCursor(::LoadCursor(0, IDC_HAND));
 				pDoc->m_transform = 1;
 				pDoc->m_initialPoint = point;
-			 
-			}else if (pDoc->position != pDoc->m_figures.end()){
+			}else if ((nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end()){
+				//Scale
 				pDoc->m_transform = 2;
 				//Select a control point of the selected figure
 				pDoc->m_selectedPoint = NULL;
 				pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(point);
 				if(pDoc->m_selectedPoint != NULL) ::SetCursor(::LoadCursor(0, IDC_SIZEALL));
-				if((*pDoc->position)->GetID() == IM_IMAGE) pDoc->m_initialPoint = point;
-		
 			}else{
 				pDoc->position = pDoc->m_figures.end();
 
@@ -298,8 +301,8 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				break;
 			}
 			default:{
-				if (pDoc->m_transform == 1 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
-					//::SetCursor(::LoadCursor(0, IDC_ARROW));
+				if (pDoc->m_transform == 1 && pDoc->position != pDoc->m_figures.end()){
+					//Translate
 					POINT p;
 					p.x = (point.x - pDoc->m_initialPoint.x) ;
 					p.y = (point.y - pDoc->m_initialPoint.y) ;
@@ -307,9 +310,15 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 					(*pDoc->position)->Translate(p);
 
 					pDoc->m_initialPoint = point;
-				}else if (pDoc->m_selectedPoint != NULL){
+				}else if (pDoc->m_transform == 3 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE){
+					//Rotate
+					pDoc->m_transform = 3;
+					((CMyImage*)*pDoc->position)->RotateFigure(point, pDoc->m_initialPoint);
+					pDoc->m_initialPoint = point;
+				}else if (pDoc->m_transform == 2 && pDoc->m_selectedPoint != NULL){
+					//Scale
 					if((*pDoc->position)->GetID() == IM_IMAGE){
-						if(pDoc->m_transform != 1) ((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
+						((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
 					}else{
 						pDoc->m_selectedPoint->x = (float)point.x ;
 						pDoc->m_selectedPoint->y = (float)point.y ;
@@ -365,7 +374,9 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 				break;
 			}		 
 			default:{
+				
 				if (pDoc->m_transform == 1 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
+					//Translate
 					::SetCursor(::LoadCursor(0, IDC_HAND));
 
 					POINT p;
@@ -375,13 +386,19 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 
 					(*pDoc->position)->Translate(p);
 
-						pDoc->m_initialPoint = point;
+					pDoc->m_initialPoint = point;
 
-				}else if (pDoc->m_selectedPoint != NULL){
+				}else if (pDoc->m_transform == 3 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE){
+					//Rotate
+					pDoc->m_transform = 3;
+					((CMyImage*)*pDoc->position)->RotateFigure(point, pDoc->m_initialPoint);
+					pDoc->m_initialPoint = point;
+				}else if (pDoc->m_transform == 2 && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL ){
+					//Scale
 					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
 
 					if((*pDoc->position)->GetID() == IM_IMAGE){
-						if(pDoc->m_transform != 1) ((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
+						((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
 					}else{
 						pDoc->m_selectedPoint->x = (float)point.x ;
 						pDoc->m_selectedPoint->y = (float)point.y ;
