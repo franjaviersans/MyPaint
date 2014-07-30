@@ -307,19 +307,17 @@ CPOINT2F* CMyImage::IntersectControlPoint(POINT p){
 void CMyImage::ModifyPoint(POINT p, CPOINT2F * initial, bool shift){
 	
 	m_Model = GetModelView();
+	m_Model = Invert(m_Model);
 
 	CMatrix3 scal;
-	CPOINT2F mid, proyected;
+	CPOINT2F mid, proyected, pp;
 	mid.x = abs((m_p1.x + m_p3.x)/2.0f);
 	mid.y = abs((m_p1.y + m_p3.y)/2.0f);
-	mid = m_Model * mid;
-	proyected = m_Model * (*initial);
+	proyected = *initial;
+	pp = p;
+	pp = m_Model * (pp);
 
-	//Calculate the midpoint
-	float factor = 0.0001f;
-	
-
-	scal = Scale2D(abs(mid.x - p.x)/abs(mid.x - proyected.x), abs(mid.y - p.y)/abs(mid.y - proyected.y));
+	scal = Scale2D(abs(mid.x - pp.x)/abs(mid.x - proyected.x), abs(mid.y - pp.y)/abs(mid.y - proyected.y));
 	
 	//Shift to maintain the aspect ratio
 	if(shift){
@@ -350,7 +348,7 @@ void CMyImage::RotateFigure(POINT p1, POINT p2){
 	midx = abs((pp1.x + pp3.x)/2.0f);
 	midy = abs((pp1.y + pp3.y)/2.0f);
 
-	double	alpha1 = atan2(p1.x - midx, p1.y - midy),
+	float	alpha1 = atan2(p1.x - midx, p1.y - midy),
 			alpha2 = atan2(p2.x - midx, p2.y - midy);
 	rot = Rotate2D(alpha2 - alpha1);
 	
