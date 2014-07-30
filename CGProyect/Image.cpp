@@ -309,17 +309,17 @@ void CMyImage::ModifyPoint(POINT p, CPOINT2F * initial, bool shift){
 	m_Model = GetModelView();
 
 	CMatrix3 scal;
-	CPOINT2F pp1, pp3, proyected;
-	pp1 = m_Model * m_p1;
-	pp3 = m_Model * m_p3;
+	CPOINT2F mid, proyected;
+	mid.x = abs((m_p1.x + m_p3.x)/2.0f);
+	mid.y = abs((m_p1.y + m_p3.y)/2.0f);
+	mid = m_Model * mid;
 	proyected = m_Model * (*initial);
 
 	//Calculate the midpoint
-	float factor = 0.0001f, midx, midy;
-	midx = abs((pp1.x + pp3.x)/2.0f);
-	midy = abs((pp1.y + pp3.y)/2.0f);
+	float factor = 0.0001f;
+	
 
-	scal = Scale2D(abs(midx - p.x)/abs(midx - proyected.x), abs(midy - p.y)/abs(midy - proyected.y));
+	scal = Scale2D(abs(mid.x - p.x)/abs(mid.x - proyected.x), abs(mid.y - p.y)/abs(mid.y - proyected.y));
 	
 	//Shift to maintain the aspect ratio
 	if(shift){
