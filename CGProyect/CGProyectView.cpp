@@ -94,7 +94,7 @@ CCGProyectView::CCGProyectView()
 	// Add items to the menu
 	menu->AppendMenu(MF_STRING, 0, "Text");
 	bb = NULL;
-
+	srand(unsigned int(time(NULL)));
 }
 
 CCGProyectView::~CCGProyectView()
@@ -175,6 +175,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 	switch (pDoc->m_current)
 	{
 		case IM_CIRCLE:	  {
+			pDoc->m_transform = 0;
 			CCircle *C = new CCircle;
 			C->m_center = point;
 			C->m_tangente = point;
@@ -183,6 +184,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		}
 		case IM_LINE:	  {
+			pDoc->m_transform = 0;
 			CLine *L = new CLine;
 			L->m_p1 = point;
 			L->m_p2 = point;
@@ -191,6 +193,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		}
 		case IM_ELLIPSE:  {
+			pDoc->m_transform = 0;
 			CEllipse *E = new CEllipse;
 			E->m_p1 = point;
 			E->m_p2 = point;
@@ -199,11 +202,13 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		}
 		case IM_TRIANGLE:{
+			pDoc->m_transform = 0;
 			if(pDoc->m_triangle == 1){
 				std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
 				((CTriangle *)(*i))->m_p2 = point;
 				pDoc->m_triangle = 0;
 				pDoc->m_current = -1;
+
 			}else{
 				CTriangle *T = new CTriangle;
 				T->m_p0 = point;
@@ -217,6 +222,7 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		}
 		case IM_BEZIER:  {
+			pDoc->m_transform = 0;
 			CBezier *B = new CBezier;
 			B->arr[0][0] = point;
 			B->arr[0][1] = point;
@@ -816,20 +822,32 @@ void CCGProyectView::OnDivideBezier()
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_BEZIER){
-			std::vector< CPOINT2F > firsthalf, secondhalf;
-			((CBezier*)(*pDoc->position))->Divide(firsthalf, secondhalf, 0.5);
-
-
-			CBezier *B = new CBezier(firsthalf);
-			pDoc->m_figures.push_back(B);
-
-			B = new CBezier(secondhalf);
-			pDoc->m_figures.push_back(B);
 			
+			CDialogBezier db;
+			if(db.DoModal() == IDOK){
+				std::vector< CPOINT2F > firsthalf, secondhalf;
+				((CBezier*)(*pDoc->position))->Divide(firsthalf, secondhalf, db.m_k);
 
-			firsthalf.clear();
-			secondhalf.clear();	
-			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+				CColor c = CColor(float(rand()%255),float(rand()%255),float(rand()%255));
+
+				//Calculate first half
+				CBezier *B = new CBezier(firsthalf);
+				B ->ChangeLineColor(c.ToCOLORREF());
+				pDoc->m_figures.push_back(B);
+
+				c.setColor(float(rand()%255),float(rand()%255),float(rand()%255));
+
+				//Calculate second half
+				B = new CBezier(secondhalf);
+				B ->ChangeLineColor(c.ToCOLORREF());
+				pDoc->m_figures.push_back(B);
+			
+				//Clear auxiliar vectors
+				firsthalf.clear();
+				secondhalf.clear();	
+				pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+			}
+			Invalidate();
 		}
 	}
 }
