@@ -54,8 +54,6 @@ void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 
 	int draw = 2;
 
-
-
 	CMatrix3 inv = Invert(m_Model);
 	ScanLine(pDC,1,p0, p1, p2, inv);
 	ScanLine(pDC,1,p0, p2, p3, inv);
@@ -338,6 +336,28 @@ void CMyImage::ModifyPoint(POINT p, CPOINT2F * initial, bool shift){
 	m_Scale = scal;
 }
 
+//Rotate the image
+void CMyImage::RotateFigure(POINT p1, POINT p2){
+	m_Model = GetModelView();
+
+	CMatrix3 rot;
+	CPOINT2F pp1, pp3, proyected;
+	pp1 = m_Model * m_p1;
+	pp3 = m_Model * m_p3;
+
+	//Calculate the midpoint
+	float factor = 0.0001f, midx, midy;
+	midx = abs((pp1.x + pp3.x)/2.0f);
+	midy = abs((pp1.y + pp3.y)/2.0f);
+
+	double	alpha1 = atan2(p1.x - midx, p1.y - midy),
+			alpha2 = atan2(p2.x - midx, p2.y - midy);
+	rot = Rotate2D(alpha2 - alpha1);
+	
+	m_Rotate = rot * m_Rotate;
+}
+
+//Trasnlate the image
 void CMyImage::Translate(POINT p){
 	m_Traslate = Translate2D(float(p.x), float(p.y)) * m_Traslate;
 }

@@ -1,6 +1,8 @@
 #ifndef MYMATRIX3_H
 #define MYMATRIX3_H
 
+#define PI 3.14159265
+
 #include <math.h>
 #include <iostream>
 #include "POINT2F.h"
