@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 // CDialogBright dialog
@@ -18,4 +19,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
+public:
+	CStatic m_drawingArea;
+	afx_msg void OnPaint();
 };

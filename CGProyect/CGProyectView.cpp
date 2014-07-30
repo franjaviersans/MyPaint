@@ -82,6 +82,8 @@ ON_COMMAND(ID_MAX_5X5FILTER, &CCGProyectView::OnMax5x5filter)
 ON_COMMAND(ID_MAX_7X7FILTER, &CCGProyectView::OnMax7x7filter)
 ON_COMMAND(ID_APLLYFILTER_LAPLACE, &CCGProyectView::OnApllyfilterLaplace)
 ON_COMMAND(ID_APLLYFILTER_SHARPEN, &CCGProyectView::OnApllyfilterSharpen)
+ON_COMMAND(ID_CHANGE_CHANGELIGHTING, &CCGProyectView::OnChangeChangelighting)
+ON_COMMAND(ID_CHANGE_SEGMENTIMAGE, &CCGProyectView::OnChangeSegmentimage)
 END_MESSAGE_MAP()
 
 // CCGProyectView construction/destruction
@@ -1072,4 +1074,34 @@ void CCGProyectView::OnApllyfilterSharpen()
 			Invalidate();
 		}
 	}
+}
+
+//Change Lighting/Contrast
+void CCGProyectView::OnChangeChangelighting()
+{
+	CDialogBright db;
+
+	if(db.DoModal() == IDOK){
+
+	}
+}
+
+//Segment the image
+void CCGProyectView::OnChangeSegmentimage()
+{
+
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+
+			CDialogSegment ds(((CMyImage*)(*pDoc->position))->getHistogram());
+
+			if(ds.DoModal() == IDOK){
+
+			}
+			Invalidate();
+		}
+	}
+
+	
 }

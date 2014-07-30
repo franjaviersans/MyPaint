@@ -110,6 +110,7 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="DialogBezier.h" />
     <ClInclude Include="DialogBright.h" />
+    <ClInclude Include="DialogSegment.h" />
     <ClInclude Include="Filters.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Line.h" />
@@ -132,6 +133,7 @@
     <ClCompile Include="CGProyectView.cpp" />
     <ClCompile Include="DialogBezier.cpp" />
     <ClCompile Include="DialogBright.cpp" />
+    <ClCompile Include="DialogSegment.cpp" />
     <ClCompile Include="Filters.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Line.cpp" />

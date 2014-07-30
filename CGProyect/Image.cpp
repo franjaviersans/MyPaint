@@ -16,6 +16,8 @@ CMyImage::CMyImage()
 	m_ImageData = NULL;
 	m_Original = NULL;
 	m_Base = Eyes();
+	m_iMin = -100;
+	m_iMax = 300;
 }
 
 CMyImage::~CMyImage(){
@@ -434,16 +436,18 @@ bool CMyImage::SetBitmap(CString strBitmap)
 					for(int j = 0; j < m_iWidth; ++j){
 						offset1 = k * m_iBytesPerLine + j * 4;
 						offset2 = i * m_iWidth * 3 + j * 3;
-						
+
 						m_ImageData[offset2]			= (float)m_bmpBackData[offset1];
 						m_ImageData[offset2 + 1]		= (float)m_bmpBackData[offset1 + 1];
 						m_ImageData[offset2 + 2]		= (float)m_bmpBackData[offset1 + 2];
+
 					}
 		}else if(bm.bmBitsPixel == 24){
 			for(int i = 0, k=m_iHeight - 1; i < m_iHeight ; ++i,--k)
 				for(int j = 0; j < m_iWidth; ++j){
 					offset1 = k * m_iBytesPerLine + j * 3;
 					offset2 = i * m_iWidth * 3 + j * 3;
+
 					m_ImageData[offset2]			= (float)m_bmpBackData[offset1];
 					m_ImageData[offset2 + 1]		= (float)m_bmpBackData[offset1 + 1];
 					m_ImageData[offset2 + 2]		= (float)m_bmpBackData[offset1 + 2];
@@ -553,6 +557,39 @@ void CMyImage::ApplyFilter(int type, int dim){
 		}
 	
 	}	
+}
+
+int CMyImage::getMin(){
+	return m_iMin;
+}
+
+int CMyImage::getMax(){
+	return m_iMax;
+}
+
+
+std::vector<float> CMyImage::getHistogram(){
+	int offset;
+	float grey;
+	std::vector<float> vec;
+	vec.resize(256);
+
+	for(unsigned int i=0;i<vec.size();++i){
+		vec[i] = 0;
+	}
+
+	for(int i =0;i<m_iHeight;++i){
+		for(int j=0;j<m_iHeight;++j){
+
+			offset = i * m_iWidth * 3 + j * 3;
+
+			grey = float(m_ImageData[offset]) * 0.299f + float(m_ImageData[offset+ 1]) * 0.587f + float(m_ImageData[offset + 2]) * 0.114f;
+			vec[int(grey + 0.5f)] += 1.f;
+
+		}
+	}
+
+	return vec;
 }
 
 

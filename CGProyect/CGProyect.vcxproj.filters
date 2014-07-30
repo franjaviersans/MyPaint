@@ -99,6 +99,9 @@
     <ClInclude Include="DialogBright.h">
       <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
+    <ClInclude Include="DialogSegment.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CGProyect.cpp">
@@ -153,6 +156,9 @@
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="DialogBright.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogSegment.cpp">
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>

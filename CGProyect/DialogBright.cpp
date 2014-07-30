@@ -24,11 +24,23 @@ CDialogBright::~CDialogBright()
 void CDialogBright::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_STATIC_BRIGHT, m_drawingArea);
 }
 
 
 BEGIN_MESSAGE_MAP(CDialogBright, CDialogEx)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
 // CDialogBright message handlers
+
+
+void CDialogBright::OnPaint()
+{
+
+	CDC *myDC = GetDlgItem(IDC_STATIC_BRIGHT)->GetDC();
+	myDC->Rectangle(10, 10, 20, 20);
+
+
+}

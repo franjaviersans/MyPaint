@@ -2,6 +2,7 @@
 #define IMAGE_H
 
 #include <math.h>
+#include <vector>
 #include "Shape.h"
 #include "Matrix3.h"
 #include "Filters.h"
@@ -21,6 +22,8 @@ private:
 	float *m_Original;
 	int m_iWidth;
 	int m_iHeight;
+	int m_iMin;
+	int m_iMax;
 	int m_iBytesPerLine;
 
 
@@ -45,6 +48,9 @@ public:
 	void ApplyFilter(int type, int dim = 3);
 	void ModifyPoint(POINT, CPOINT2F *, bool shift = false);
 	void RotateFigure(POINT, POINT);
+	int getMin();
+	int getMax();
+	std::vector<float> getHistogram();
 
 private:
 	void ScanLine(CBackBuffer *pDC, int draw, CPOINT2F pp0, CPOINT2F pp1, CPOINT2F pp2, CMatrix3 inv);

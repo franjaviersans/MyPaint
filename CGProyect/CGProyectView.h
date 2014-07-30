@@ -107,6 +107,8 @@ public:
 	afx_msg void OnMax7x7filter();
 	afx_msg void OnApllyfilterLaplace();
 	afx_msg void OnApllyfilterSharpen();
+	afx_msg void OnChangeChangelighting();
+	afx_msg void OnChangeSegmentimage();
 };
 
 #ifndef _DEBUG  // debug version in CGProyectView.cpp
