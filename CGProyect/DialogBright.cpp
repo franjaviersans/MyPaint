@@ -66,11 +66,22 @@ void CDialogBright::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		if(m_bb == NULL)	m_bb = new CBackBuffer();
 		else			m_bb->Destroy();
 	
-		m_WindosSize.x = m_iScreenWidth;
-		m_WindosSize.y = m_iScreenHeight;
+		m_WindowSize.x = m_iScreenWidth;
+		m_WindowSize.y = m_iScreenHeight;
 		m_bb->ChangeSize(m_iScreenWidth, m_iScreenHeight, GetDC());
 
-		m_mTransform = Translate2D(m_iScreenWidth/2.0f, m_iScreenHeight/2.0f);
+
+		//Translation
+		float a, fat1, fat2;
+
+		fat1 = (m_WindowSize.x * 3.f/4.f)/ (m_WindowSize.y * 3.f/4.f);
+		fat2 = float(m_image->getWidth()) / m_image->getHeight();
+
+		if(fat2 >= fat1)	a = (m_WindowSize.x * 3.f/4.f) / m_image->getWidth();
+		else				a = (m_WindowSize.y * 3.f/4.f) / m_image->getHeight();
+
+
+		m_mTransform = Translate2D(m_WindowSize.x/2.0f, m_WindowSize.y/2.0f) * Scale2D(a, a);
 
 		m_bFirstTime = false;
 	}
@@ -83,7 +94,7 @@ void CDialogBright::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		//Draw bars!!!!!
 		CColor c(0,0,0);
 
-		m_image->OnDraw(m_bb, m_WindosSize, m_mTransform);
+		m_image->OnDraw(m_bb, m_WindowSize, m_mTransform);
 
 		//Display backbuffer
 		m_bb->Display(m_myCDC);

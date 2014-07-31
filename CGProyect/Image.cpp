@@ -669,3 +669,11 @@ void CMyImage::changeLight(int alpha){
 void CMyImage::changeContrast(int){
 
 }
+
+int CMyImage::getWidth(){
+	return m_iWidth;
+}
+
+int CMyImage::getHeight(){
+	return m_iHeight;
+}

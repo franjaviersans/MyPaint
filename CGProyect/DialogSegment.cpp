@@ -154,7 +154,17 @@ void CDialogSegment::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 	
 		m_bbMini->ChangeSize(m_WindowSize.x, m_WindowSize.y, GetDC());
 		
-		m_mTransform = Translate2D(m_WindowSize.x/2.0f, m_WindowSize.y/2.0f);
+
+		//Translation
+		float a, fat1, fat2;
+
+		fat1 = (m_WindowSize.x * 3.f/4.f)/ (m_WindowSize.y * 3.f/4.f);
+		fat2 = float(m_image->getWidth()) / m_image->getHeight();
+
+		if(fat2 >= fat1)	a = (m_WindowSize.x * 3.f/4.f) / m_image->getWidth();
+		else				a = (m_WindowSize.y * 3.f/4.f) / m_image->getHeight();
+
+		m_mTransform = Translate2D(m_WindowSize.x/2.0f, m_WindowSize.y/2.0f) * Scale2D(a, a);
 		
 		m_bFirstTime = false;
 	}

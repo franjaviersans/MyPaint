@@ -51,6 +51,8 @@ public:
 	void RotateFigure(POINT, POINT);
 	int getMin();
 	int getMax();
+	int getWidth();
+	int getHeight();
 	std::vector<float> getHistogram();
 	void segmentImage(int);
 	void reset();
