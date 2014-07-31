@@ -17,6 +17,9 @@
 #include  "Filters.h"
 #include "CGProyect.h"
 #include "MainFrm.h"
+#include "DialogBezier.h"
+#include "DialogBright.h"
+#include "DialogSegment.h"
 
 class CCGProyectDoc : public CDocument
 {

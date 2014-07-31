@@ -25,6 +25,18 @@
     <Filter Include="Source Files\Shapes">
       <UniqueIdentifier>{aa2e9dde-e602-4b08-ac0e-9f34726ae18e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Dialogs">
+      <UniqueIdentifier>{3c00db57-0679-4ce7-8bf6-f4c2da24dfce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Dialogs">
+      <UniqueIdentifier>{4e4b102f-345a-4ed9-bef4-a1c5c5afe41a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CustomControls">
+      <UniqueIdentifier>{95676869-d30f-4849-8d38-4c814cdc6ee6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CustomControls">
+      <UniqueIdentifier>{fdb388ca-f245-4b9e-860b-9036cebca836}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -87,6 +99,21 @@
     <ClInclude Include="Color.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="DialogBezier.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogBright.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogSegment.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ThresholdDraw.h">
+      <Filter>Header Files\CustomControls</Filter>
+    </ClInclude>
+    <ClInclude Include="ContrastDraw.h">
+      <Filter>Header Files\CustomControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CGProyect.cpp">
@@ -136,6 +163,21 @@
     </ClCompile>
     <ClCompile Include="Triangle.cpp">
       <Filter>Source Files\Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogBezier.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogBright.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogSegment.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ThresholdDraw.cpp">
+      <Filter>Source Files\CustomControls</Filter>
+    </ClCompile>
+    <ClCompile Include="ContrastDraw.cpp">
+      <Filter>Source Files\CustomControls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
