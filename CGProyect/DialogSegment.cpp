@@ -64,7 +64,6 @@ void CDialogSegment::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CDialogSegment, CDialogEx)
 	ON_WM_HSCROLL()
-//ON_WM_NCPAINT()
 ON_WM_DRAWITEM()
 END_MESSAGE_MAP()
 
