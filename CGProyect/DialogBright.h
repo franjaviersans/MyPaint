@@ -24,7 +24,7 @@ private:
 	int m_iScreenWidth, m_iScreenHeight;
 	CBackBuffer *m_bb;
 	CMyImage *m_image;
-	POINT m_WindosSize;
+	POINT m_WindowSize;
 	CMatrix3 m_mTransform;
 
 protected:

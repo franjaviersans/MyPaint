@@ -548,12 +548,6 @@ bool CMyImage::SetBitmap(CString strBitmap)
 
 void CMyImage::ApplyFilter(int type, int dim){
 
-	
-
-
-	/*CFilters f;
-		f.Min(m_Original, m_ImageData, m_iWidth, m_iHeight, 7);*/
-
 	switch(type){
 		case(IM_BOX):
 		{
@@ -594,15 +588,7 @@ void CMyImage::ApplyFilter(int type, int dim){
 	}	
 }
 
-int CMyImage::getMin(){
-	return m_iMin;
-}
-
-int CMyImage::getMax(){
-	return m_iMax;
-}
-
-
+//Get histogram of the image
 std::vector<float> CMyImage::getHistogram(){
 	int offset;
 	float grey;
@@ -628,7 +614,8 @@ std::vector<float> CMyImage::getHistogram(){
 }
 
 
-void CMyImage::segmentImage(int threshold){
+//Segment image
+void CMyImage::segmentImage(int threshold_min, int threshold_max){
 
 	float grey;
 	int offset;
@@ -639,7 +626,7 @@ void CMyImage::segmentImage(int threshold){
 			offset = i * m_iWidth * 3 + j * 3;
 
 			grey = float(m_Original[offset]) * 0.299f + float(m_Original[offset+ 1]) * 0.587f + float(m_Original[offset + 2]) * 0.114f;
-			if(grey > threshold)
+			if(threshold_min < grey && grey < threshold_max)
 				m_ImageData[offset] = m_ImageData[offset + 1] = m_ImageData[offset + 2] = 255;
 			else 
 				m_ImageData[offset] = m_ImageData[offset + 1] = m_ImageData[offset + 2] = 0;
@@ -647,11 +634,13 @@ void CMyImage::segmentImage(int threshold){
 	}
 }
 
+//Reset image
 void CMyImage::reset(){
 	memcpy(m_ImageData,m_Original, m_iWidth * m_iHeight * 3 * sizeof(float));
 }
 
-void CMyImage::changeLight(int alpha){
+//Change Brightness
+void CMyImage::changeBrightness(int alpha){
 
 	int offset;
 	for(int i =0;i<m_iHeight;++i){
@@ -668,4 +657,12 @@ void CMyImage::changeLight(int alpha){
 
 void CMyImage::changeContrast(int){
 
+}
+
+int CMyImage::getWidth(){
+	return m_iWidth;
+}
+
+int CMyImage::getHeight(){
+	return m_iHeight;
 }

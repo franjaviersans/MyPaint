@@ -15,10 +15,10 @@
 #define IDD_DIALOG_BEZIER               322
 #define IDD_DIALOG_Bright               323
 #define IDD_DIALOG_BRIGHT               323
-#define IDD_DIALOG_Bright               323
 #define IDD_DIALOG_SEGMENT              324
 #define IDC_SLIDER1                     1004
 #define IDC_SLIDER_BEZIER               1004
+#define IDC_SLIDER_THRESHOLD_MAX        1004
 #define IDC_SLIDER_CONTRAST             1005
 #define IDC_EDIT2                       1006
 #define IDC_STATIC_BRIGHT               1007
@@ -28,6 +28,7 @@
 #define IDC_TEXT_THRESHOLD              1010
 #define IDC_SLIDER_LIGHT                1012
 #define IDC_EDIT1                       1014
+#define IDC_TEXT_THRESHOLD_MAX          1014
 #define IDC_STATIC_MINI_IMAGE           1015
 #define ID_BUTTON_LINE                  32771
 #define ID_BUTTON_CIRCLE                32772

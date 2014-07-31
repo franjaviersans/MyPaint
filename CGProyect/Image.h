@@ -49,12 +49,12 @@ public:
 	void ApplyFilter(int type, int dim = 3);
 	void ModifyPoint(POINT, CPOINT2F *, bool shift = false);
 	void RotateFigure(POINT, POINT);
-	int getMin();
-	int getMax();
+	int getWidth();
+	int getHeight();
 	std::vector<float> getHistogram();
-	void segmentImage(int);
+	void segmentImage(int, int);
 	void reset();
-	void changeLight(int);
+	void changeBrightness(int);
 	void changeContrast(int);
 
 private:
