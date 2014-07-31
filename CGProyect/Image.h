@@ -36,6 +36,7 @@ public:
 	CMyImage();
 	~CMyImage();
 	virtual void OnDraw(CBackBuffer *, POINT);
+	void OnDraw(CBackBuffer *, POINT, CMatrix3);
 	virtual void Serialize(CArchive& );
 	virtual void DrawSelected(CBackBuffer *, POINT);
 	virtual bool Intersect(POINT);
@@ -51,6 +52,10 @@ public:
 	int getMin();
 	int getMax();
 	std::vector<float> getHistogram();
+	void segmentImage(int);
+	void reset();
+	void changeLight(int);
+	void changeContrast(int);
 
 private:
 	void ScanLine(CBackBuffer *pDC, int draw, CPOINT2F pp0, CPOINT2F pp1, CPOINT2F pp2, CMatrix3 inv);

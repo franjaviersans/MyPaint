@@ -36,6 +36,35 @@ CMatrix3 CMyImage::GetModelView(){
 	p4_____p3
 
 */
+void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize, CMatrix3 Model)
+{
+	//Transform points
+	Model =  Model * m_Base;
+	CPOINT2F	p0 = Model * m_p1,
+				p1 = Model * m_p2,
+				p2 = Model * m_p3,
+				p3 = Model * m_p4;
+			
+	POINT pp0, pp1;
+	pp0.x = int(p0.x + 0.5);
+	pp0.y = int(p0.y + 0.5);
+	pp1.x = int(p2.x + 0.5);
+	pp1.y = int(p2.y + 0.5);
+	
+
+	int draw = 1;
+
+	if(	0 <= p0.x && p0.x < WindowsSize.x && 0 <= p0.y && p0.y < WindowsSize.y &&
+		0 <= p1.x && p1.x < WindowsSize.x && 0 <= p1.y && p1.y < WindowsSize.y &&
+		0 <= p2.x && p2.x < WindowsSize.x && 0 <= p2.y && p2.y < WindowsSize.y &&
+		0 <= p3.x && p3.x < WindowsSize.x && 0 <= p3.y && p3.y < WindowsSize.y)
+		draw = 2;
+
+	CMatrix3 inv = Invert(Model);
+	ScanLine(pDC,draw,p0, p1, p2, inv);
+	ScanLine(pDC,draw,p0, p2, p3, inv);
+}
+
 void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
 	//Transform points
@@ -44,6 +73,7 @@ void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 				p1 = m_Model * m_p2,
 				p2 = m_Model * m_p3,
 				p3 = m_Model * m_p4;
+				
 
 	
 
@@ -54,11 +84,17 @@ void CMyImage::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	pp1.y = int(p2.y + 0.5);
 	
 
-	int draw = 2;
+	int draw = 1;
+
+	if(	0 <= p0.x && p0.x < WindowsSize.x && 0 <= p0.y && p0.y < WindowsSize.y &&
+		0 <= p1.x && p1.x < WindowsSize.x && 0 <= p1.y && p1.y < WindowsSize.y &&
+		0 <= p2.x && p2.x < WindowsSize.x && 0 <= p2.y && p2.y < WindowsSize.y &&
+		0 <= p3.x && p3.x < WindowsSize.x && 0 <= p3.y && p3.y < WindowsSize.y)
+		draw = 2;
 
 	CMatrix3 inv = Invert(m_Model);
-	ScanLine(pDC,1,p0, p1, p2, inv);
-	ScanLine(pDC,1,p0, p2, p3, inv);
+	ScanLine(pDC,draw,p0, p1, p2, inv);
+	ScanLine(pDC,draw,p0, p2, p3, inv);
 }
 
 void CMyImage::ScanLine(CBackBuffer *pDC, int draw, CPOINT2F p0, CPOINT2F p1, CPOINT2F p2, CMatrix3 inv){
@@ -103,20 +139,20 @@ void CMyImage::ScanLine(CBackBuffer *pDC, int draw, CPOINT2F p0, CPOINT2F p1, CP
 		for(x = xmin; x <= xmax; ++x){
 			//Bilinear interpolation
 			sampl = inv * CPOINT2F(x,y);
-			if(0 <= sampl.x && sampl.x < m_iWidth && 0 <= sampl.y && sampl.y < m_iHeight ){
+			if(0 <= sampl.x && sampl.x < m_iWidth && 0 <= sampl.y && sampl.y < m_iHeight){
 				sampl.x = min(sampl.x, m_iWidth - 2);
 				sampl.y = min(sampl.y, m_iHeight - 2);
 				coord00 = int(sampl.y) * m_iWidth * 3 + int(sampl.x) * 3;
-				coord01 = int(sampl.y + 0.5) * m_iWidth * 3 + int(sampl.x) * 3;
-				coord10 = int(sampl.y) * m_iWidth * 3 + int(sampl.x + 0.5) * 3;
-				coord11 = int(sampl.y + 0.5) * m_iWidth * 3 + int(sampl.x + 0.5) * 3;
+				coord01 = int(sampl.y + 1.f) * m_iWidth * 3 + int(sampl.x) * 3;
+				coord10 = int(sampl.y) * m_iWidth * 3 + int(sampl.x + 1.f) * 3;
+				coord11 = int(sampl.y + 1.f) * m_iWidth * 3 + int(sampl.x + 1.f) * 3;
 
 				tx = sampl.x - int(sampl.x);
 				ty = sampl.y - int(sampl.y);
 
-				r = int(((m_ImageData[coord00]) * (1.0f - tx) + (m_ImageData[coord10]) * tx) * (1.0f - ty) + ((m_ImageData[01]) * (1.0f - tx) + (m_ImageData[coord11]) * tx) * ty);
-				g = int(((m_ImageData[coord00 + 1]) * (1.0f - tx) + (m_ImageData[coord10 + 1]) * tx) * (1.0f - ty) + ((m_ImageData[coord01 + 1]) * (1.0f - tx) + (m_ImageData[coord11 + 1]) * tx) * ty);
-				b = int(((m_ImageData[coord00 + 2]) * (1.0f - tx) + (m_ImageData[coord10 + 2]) * tx) * (1.0f - ty) + ((m_ImageData[coord01 + 2]) * (1.0f - tx) + (m_ImageData[coord11 + 2]) * tx) * ty);
+				r = int((((m_ImageData[coord00]) * (1.0f - tx) + (m_ImageData[coord10]) * tx) * (1.0f - ty)) + (((m_ImageData[coord01]) * (1.0f - tx) + (m_ImageData[coord11]) * tx) * ty));
+				g = int((((m_ImageData[coord00 + 1]) * (1.0f - tx) + (m_ImageData[coord10 + 1]) * tx) * (1.0f - ty)) + (((m_ImageData[coord01 + 1]) * (1.0f - tx) + (m_ImageData[coord11 + 1]) * tx) * ty));
+				b = int((((m_ImageData[coord00 + 2]) * (1.0f - tx) + (m_ImageData[coord10 + 2]) * tx) * (1.0f - ty)) + (((m_ImageData[coord01 + 2]) * (1.0f - tx) + (m_ImageData[coord11 + 2]) * tx) * ty));
 
 				//Interpolamos los pixeles
 				if(draw == 2)	pDC->SetPixel(x, y, r, g, b);
@@ -154,17 +190,16 @@ void CMyImage::ScanLine(CBackBuffer *pDC, int draw, CPOINT2F p0, CPOINT2F p1, CP
 				sampl.x = min(sampl.x, m_iWidth - 2);
 				sampl.y = min(sampl.y, m_iHeight - 2);
 				coord00 = int(sampl.y) * m_iWidth * 3 + int(sampl.x) * 3;
-				coord01 = int(sampl.y + 0.5) * m_iWidth * 3 + int(sampl.x) * 3;
-				coord10 = int(sampl.y) * m_iWidth * 3 + int(sampl.x + 0.5) * 3;
-				coord11 = int(sampl.y + 0.5) * m_iWidth * 3 + int(sampl.x + 0.5) * 3;
-
+				coord01 = int(sampl.y + 1.f) * m_iWidth * 3 + int(sampl.x) * 3;
+				coord10 = int(sampl.y) * m_iWidth * 3 + int(sampl.x + 1.f) * 3;
+				coord11 = int(sampl.y + 1.f) * m_iWidth * 3 + int(sampl.x + 1.f) * 3;
 
 				tx = sampl.x - int(sampl.x);
 				ty = sampl.y - int(sampl.y);
 
-				r = int(((m_ImageData[coord00]) * (1.0f - tx) + (m_ImageData[coord10]) * tx) * (1.0f - ty) + ((m_ImageData[01]) * (1.0f - tx) + (m_ImageData[coord11]) * tx) * ty);
-				g = int(((m_ImageData[coord00 + 1]) * (1.0f - tx) + (m_ImageData[coord10 + 1]) * tx) * (1.0f - ty) + ((m_ImageData[coord01 + 1]) * (1.0f - tx) + (m_ImageData[coord11 + 1]) * tx) * ty);
-				b = int(((m_ImageData[coord00 + 2]) * (1.0f - tx) + (m_ImageData[coord10 + 2]) * tx) * (1.0f - ty) + ((m_ImageData[coord01 + 2]) * (1.0f - tx) + (m_ImageData[coord11 + 2]) * tx) * ty);
+				r = int((((m_ImageData[coord00]) * (1.0f - tx) + (m_ImageData[coord10]) * tx) * (1.0f - ty)) + (((m_ImageData[coord01]) * (1.0f - tx) + (m_ImageData[coord11]) * tx) * ty));
+				g = int((((m_ImageData[coord00 + 1]) * (1.0f - tx) + (m_ImageData[coord10 + 1]) * tx) * (1.0f - ty)) + (((m_ImageData[coord01 + 1]) * (1.0f - tx) + (m_ImageData[coord11 + 1]) * tx) * ty));
+				b = int((((m_ImageData[coord00 + 2]) * (1.0f - tx) + (m_ImageData[coord10 + 2]) * tx) * (1.0f - ty)) + (((m_ImageData[coord01 + 2]) * (1.0f - tx) + (m_ImageData[coord11 + 2]) * tx) * ty));
 
 				//Interpolamos los pixeles
 				if(draw == 2)	pDC->SetPixel(x, y, r, g, b);
@@ -437,9 +472,9 @@ bool CMyImage::SetBitmap(CString strBitmap)
 						offset1 = k * m_iBytesPerLine + j * 4;
 						offset2 = i * m_iWidth * 3 + j * 3;
 
-						m_ImageData[offset2]			= (float)m_bmpBackData[offset1];
+						m_ImageData[offset2]			= (float)m_bmpBackData[offset1 + 2];
 						m_ImageData[offset2 + 1]		= (float)m_bmpBackData[offset1 + 1];
-						m_ImageData[offset2 + 2]		= (float)m_bmpBackData[offset1 + 2];
+						m_ImageData[offset2 + 2]		= (float)m_bmpBackData[offset1];
 
 					}
 		}else if(bm.bmBitsPixel == 24){
@@ -448,9 +483,9 @@ bool CMyImage::SetBitmap(CString strBitmap)
 					offset1 = k * m_iBytesPerLine + j * 3;
 					offset2 = i * m_iWidth * 3 + j * 3;
 
-					m_ImageData[offset2]			= (float)m_bmpBackData[offset1];
+					m_ImageData[offset2]			= (float)m_bmpBackData[offset1 + 2];
 					m_ImageData[offset2 + 1]		= (float)m_bmpBackData[offset1 + 1];
-					m_ImageData[offset2 + 2]		= (float)m_bmpBackData[offset1 + 2];
+					m_ImageData[offset2 + 2]		= (float)m_bmpBackData[offset1];
 				}
 		}else if(bm.bmBitsPixel == 8){
 
@@ -478,9 +513,9 @@ bool CMyImage::SetBitmap(CString strBitmap)
 						offset2 = i * m_iWidth * 3 + j * 3;
 
 						//Palette is stored in BGR
-						m_ImageData[offset2]			= (float)pBmi->bmiColors[offset1].rgbBlue;
+						m_ImageData[offset2]			= (float)pBmi->bmiColors[offset1].rgbRed;
 						m_ImageData[offset2 + 1]		= (float)pBmi->bmiColors[offset1].rgbGreen;
-						m_ImageData[offset2 + 2]		= (float)pBmi->bmiColors[offset1].rgbRed;
+						m_ImageData[offset2 + 2]		= (float)pBmi->bmiColors[offset1].rgbBlue;
 					}
 
 					
@@ -579,11 +614,11 @@ std::vector<float> CMyImage::getHistogram(){
 	}
 
 	for(int i =0;i<m_iHeight;++i){
-		for(int j=0;j<m_iHeight;++j){
+		for(int j=0;j<m_iWidth;++j){
 
 			offset = i * m_iWidth * 3 + j * 3;
 
-			grey = float(m_ImageData[offset]) * 0.299f + float(m_ImageData[offset+ 1]) * 0.587f + float(m_ImageData[offset + 2]) * 0.114f;
+			grey = float(m_Original[offset]) * 0.299f + float(m_Original[offset+ 1]) * 0.587f + float(m_Original[offset + 2]) * 0.114f;
 			vec[int(grey + 0.5f)] += 1.f;
 
 		}
@@ -593,3 +628,44 @@ std::vector<float> CMyImage::getHistogram(){
 }
 
 
+void CMyImage::segmentImage(int threshold){
+
+	float grey;
+	int offset;
+
+	for(int i =0;i<m_iHeight;++i){
+		for(int j=0;j<m_iHeight;++j){
+
+			offset = i * m_iWidth * 3 + j * 3;
+
+			grey = float(m_Original[offset]) * 0.299f + float(m_Original[offset+ 1]) * 0.587f + float(m_Original[offset + 2]) * 0.114f;
+			if(grey > threshold)
+				m_ImageData[offset] = m_ImageData[offset + 1] = m_ImageData[offset + 2] = 255;
+			else 
+				m_ImageData[offset] = m_ImageData[offset + 1] = m_ImageData[offset + 2] = 0;
+		}
+	}
+}
+
+void CMyImage::reset(){
+	memcpy(m_ImageData,m_Original, m_iWidth * m_iHeight * 3 * sizeof(float));
+}
+
+void CMyImage::changeLight(int alpha){
+
+	int offset;
+	for(int i =0;i<m_iHeight;++i){
+		for(int j=0;j<m_iHeight;++j){
+
+			offset = i * m_iWidth * 3 + j * 3;
+
+			m_ImageData[offset] = max(min(m_Original[offset] + alpha, 255), 0);
+			m_ImageData[offset + 1] = max(min(m_Original[offset + 1] + alpha, 255), 0);
+			m_ImageData[offset + 2] = max(min(m_Original[offset + 2] + alpha, 255), 0);
+		}
+	}
+}
+
+void CMyImage::changeContrast(int){
+
+}

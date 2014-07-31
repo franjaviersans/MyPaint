@@ -19,14 +19,16 @@
 #define IDD_DIALOG_SEGMENT              324
 #define IDC_SLIDER1                     1004
 #define IDC_SLIDER_BEZIER               1004
-#define IDC_SLIDER_BEZIER2              1005
+#define IDC_SLIDER_CONTRAST             1005
 #define IDC_EDIT2                       1006
 #define IDC_STATIC_BRIGHT               1007
 #define IDC_STATIC_THRESHOLD            1008
 #define IDC_EDIT3                       1008
 #define IDC_SLIDER_THRESHOLD            1009
-#define IDC_IDC_SLIDER_THRESHOLD        1010
 #define IDC_TEXT_THRESHOLD              1010
+#define IDC_SLIDER_LIGHT                1012
+#define IDC_EDIT1                       1014
+#define IDC_STATIC_MINI_IMAGE           1015
 #define ID_BUTTON_LINE                  32771
 #define ID_BUTTON_CIRCLE                32772
 #define ID_BUTTON_ELLIPSE               32773
@@ -102,7 +104,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        323
 #define _APS_NEXT_COMMAND_VALUE         32865
-#define _APS_NEXT_CONTROL_VALUE         1012
+#define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

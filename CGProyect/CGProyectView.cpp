@@ -1079,29 +1079,37 @@ void CCGProyectView::OnApllyfilterSharpen()
 //Change Lighting/Contrast
 void CCGProyectView::OnChangeChangelighting()
 {
-	CDialogBright db;
-
-	if(db.DoModal() == IDOK){
-
-	}
-}
-
-//Segment the image
-void CCGProyectView::OnChangeSegmentimage()
-{
 
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_IMAGE){
 
-			CDialogSegment ds(((CMyImage*)(*pDoc->position))->getHistogram());
+			CDialogBright db((CMyImage*)(*pDoc->position));
 
-			if(ds.DoModal() == IDOK){
-
+			if(db.DoModal() == IDCANCEL){
+				((CMyImage*)(*pDoc->position))->reset();
 			}
 			Invalidate();
 		}
 	}
+	
 
 	
+}
+
+//Segment the image
+void CCGProyectView::OnChangeSegmentimage()
+{
+	CCGProyectDoc* pDoc = GetDocument();
+	if(pDoc->position != pDoc->m_figures.end()){
+		if((*pDoc->position)->GetID() == IM_IMAGE){
+
+			CDialogSegment ds((CMyImage*)(*pDoc->position));
+
+			if(ds.DoModal() == IDCANCEL){
+				((CMyImage*)(*pDoc->position))->reset();
+			}
+			Invalidate();
+		}
+	}	
 }
