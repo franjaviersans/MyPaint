@@ -71,7 +71,7 @@ void CDialogBright::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		m_bb->ChangeSize(m_iScreenWidth, m_iScreenHeight, GetDC());
 
 
-		//Translation
+		//Scale
 		float a, fat1, fat2;
 
 		fat1 = (m_WindowSize.x * 3.f/4.f)/ (m_WindowSize.y * 3.f/4.f);
@@ -147,7 +147,7 @@ void CDialogBright::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		m_iBright = Slide->GetPos() - 255;
         text.Format("%d",m_iBright);
 		m_brightValue.SetWindowTextA(text);
-		m_image->changeLight(m_iBright);
+		m_image->changeBrightness(m_iBright);
 	}
     Invalidate(false);
 

@@ -47,4 +47,6 @@ public:
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	
 	
+	CEdit m_maxValue;
+	int m_iValueMaxSlider;
 };

@@ -17,6 +17,7 @@ IMPLEMENT_DYNAMIC(CDialogSegment, CDialogEx)
 CDialogSegment::CDialogSegment(CMyImage * image, CWnd* pParent /*=NULL*/)
 	: CDialogEx(CDialogSegment::IDD, pParent)
 	, m_sliderValue(0)
+	, m_iValueMaxSlider(0)
 {
 
 	float mmax = -1;
@@ -59,6 +60,9 @@ void CDialogSegment::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TEXT_THRESHOLD, m_textValue);
 	DDX_Control(pDX, IDC_STATIC_THRESHOLD, m_drawingThreshold);
 	DDX_Control(pDX, IDC_STATIC_MINI_IMAGE, m_dMiniImage);
+	DDX_Control(pDX, IDC_TEXT_THRESHOLD_MAX, m_maxValue);
+	DDX_Slider(pDX, IDC_SLIDER_THRESHOLD_MAX, m_iValueMaxSlider);
+	DDV_MinMaxInt(pDX, m_iValueMaxSlider, 0, 255);
 }
 
 
@@ -79,12 +83,25 @@ void CDialogSegment::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     {
 		
 		m_iThreshold = Slide->GetPos();
-        text.Format("%d",m_iThreshold);
+        CString text;
+		text.Format("%d",m_iThreshold);
 		m_textValue.SetWindowTextA(text);
-		m_textValue.Invalidate();
 
-		m_image->segmentImage(m_iThreshold);
-    }
+		text.Format("%d",m_iValueMaxSlider);
+		m_maxValue.SetWindowTextA(text);
+
+		m_image->segmentImage(m_iThreshold, m_iValueMaxSlider);
+    }else if(Slide->GetDlgCtrlID() == IDC_SLIDER_THRESHOLD_MAX){
+		m_iValueMaxSlider = Slide->GetPos();
+        CString text;
+		text.Format("%d",m_iThreshold);
+		m_textValue.SetWindowTextA(text);
+
+		text.Format("%d",m_iValueMaxSlider);
+		m_maxValue.SetWindowTextA(text);
+
+		m_image->segmentImage(m_iThreshold, m_iValueMaxSlider);
+	}
     Invalidate(false);
 
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
@@ -97,13 +114,22 @@ BOOL CDialogSegment::OnInitDialog()
 
 	CSliderCtrl* Slider = (CSliderCtrl*)GetDlgItem(IDC_SLIDER_THRESHOLD);
     Slider->SetRange(0,255);
-	Slider->SetPos(127);
-	m_iThreshold = 127;
+	Slider->SetPos(65);
+	m_iThreshold = 65;
+
+	CSliderCtrl* Slider2 = (CSliderCtrl*)GetDlgItem(IDC_SLIDER_THRESHOLD_MAX);
+    Slider2->SetRange(0,255);
+	Slider2->SetPos(191);
+	m_iValueMaxSlider = 191;
+
 	CString text;
 	text.Format("%d",m_iThreshold);
     m_textValue.SetWindowTextA(text);
 
-	m_image->segmentImage(127);
+	text.Format("%d",m_iValueMaxSlider);
+    m_maxValue.SetWindowTextA(text);
+
+	m_image->segmentImage(65, 191);
 
     Invalidate();
 
@@ -155,7 +181,7 @@ void CDialogSegment::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		m_bbMini->ChangeSize(m_WindowSize.x, m_WindowSize.y, GetDC());
 		
 
-		//Translation
+		//Scale
 		float a, fat1, fat2;
 
 		fat1 = (m_WindowSize.x * 3.f/4.f)/ (m_WindowSize.y * 3.f/4.f);
@@ -183,6 +209,7 @@ void CDialogSegment::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		c.setColor(255,0,0);
 
 		m_bb->Rectangle(int((m_fOffset) * m_iThreshold), 0, int((m_fOffset) * (m_iThreshold + 1)), m_iScreenHeight, c.ToCOLORREF());
+		m_bb->Rectangle(int((m_fOffset) * m_iValueMaxSlider), 0, int((m_fOffset) * (m_iValueMaxSlider + 1)), m_iScreenHeight, c.ToCOLORREF());
 
 		//Display backbuffer
 		m_bb->Display(m_myCDC);
