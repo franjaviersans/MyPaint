@@ -110,11 +110,11 @@ BOOL CDialogBright::OnInitDialog()
 
 	CSliderCtrl* Slider1 = (CSliderCtrl*)GetDlgItem(IDC_SLIDER_CONTRAST);
 	CSliderCtrl* Slider2 = (CSliderCtrl*)GetDlgItem(IDC_SLIDER_LIGHT);
-    Slider1->SetRange(0,510);
-	Slider1->SetPos(510/2);
+    Slider1->SetRange(0,100);
+	Slider1->SetPos(50);
+	m_iContrast = 50;
 	Slider2->SetRange(0,510);
 	Slider2->SetPos(510/2);
-	m_iContrast = 0;
 	m_iBright = 0;
 	CString text;
 
@@ -136,10 +136,11 @@ void CDialogBright::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
     if(Slide->GetDlgCtrlID() == IDC_SLIDER_CONTRAST)
     {	
-		m_iContrast = Slide->GetPos() - 255;
+		m_iContrast = Slide->GetPos();
         text.Format("%d",m_iContrast);
 		m_contrastValue.SetWindowTextA(text);
-		m_image->changeContrast(m_iContrast);
+		m_image->changeContrast(m_iContrast/100.f * 2.0f);
+		m_image->changeBrightness(m_iBright);
     }
 
 	if(Slide->GetDlgCtrlID() == IDC_SLIDER_LIGHT)
@@ -147,6 +148,7 @@ void CDialogBright::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		m_iBright = Slide->GetPos() - 255;
         text.Format("%d",m_iBright);
 		m_brightValue.SetWindowTextA(text);
+		m_image->changeContrast(m_iContrast/100.f * 2.0f);
 		m_image->changeBrightness(m_iBright);
 	}
     Invalidate(false);

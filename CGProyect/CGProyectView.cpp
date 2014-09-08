@@ -1086,15 +1086,12 @@ void CCGProyectView::OnChangeChangelighting()
 
 			CDialogBright db((CMyImage*)(*pDoc->position));
 
-			if(db.DoModal() == IDCANCEL){
-				((CMyImage*)(*pDoc->position))->reset();
-			}
+			if(db.DoModal() == IDOK) ((CMyImage*)(*pDoc->position))->saveImage();
+			else ((CMyImage*)(*pDoc->position))->reset();
+
 			Invalidate();
 		}
-	}
-	
-
-	
+	}	
 }
 
 //Segment the image
@@ -1106,9 +1103,9 @@ void CCGProyectView::OnChangeSegmentimage()
 
 			CDialogSegment ds((CMyImage*)(*pDoc->position));
 
-			if(ds.DoModal() == IDCANCEL){
-				((CMyImage*)(*pDoc->position))->reset();
-			}
+			if(ds.DoModal() == IDOK) ((CMyImage*)(*pDoc->position))->saveImage();
+			else ((CMyImage*)(*pDoc->position))->reset();
+
 			Invalidate();
 		}
 	}	
