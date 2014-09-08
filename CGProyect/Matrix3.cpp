@@ -32,6 +32,36 @@ void CMatrix3::PostMult(const CMatrix3 &b){
 	*this = *this * b;
 }
 
+void CMatrix3::Serialize(CArchive& ar){
+
+	
+	if (ar.IsStoring())
+	{
+
+		ar << mat[0][0];
+		ar << mat[0][1];
+		ar << mat[0][2];
+		ar << mat[1][0];
+		ar << mat[1][1];
+		ar << mat[1][2];
+		ar << mat[2][0];
+		ar << mat[2][1];
+		ar << mat[2][2];
+	}
+	else
+	{
+		ar >> mat[0][0];
+		ar >> mat[0][1];
+		ar >> mat[0][2];
+		ar >> mat[1][0];
+		ar >> mat[1][1];
+		ar >> mat[1][2];
+		ar >> mat[2][0];
+		ar >> mat[2][1];
+		ar >> mat[2][2];
+	}
+}
+
 CMatrix3 Invert(const CMatrix3 &b){
 	float d1 = (b.mat[1][1] * b.mat[2][2]  - b.mat[1][2] * b.mat[2][1]),d2 = (b.mat[1][0] * b.mat[2][2]  - b.mat[1][2] * b.mat[2][0]), d3 = (b.mat[1][0] * b.mat[2][1]  - b.mat[1][1] * b.mat[2][0]);
 	float d =	b.mat[0][0] * d1 - b.mat[0][1] * d2 + b.mat[0][2] * d3;

@@ -18,6 +18,7 @@ private:
 	CMatrix3 m_Scale;
 	CMatrix3 m_Center;
 	CFilters m_Filter;
+	CString m_Path;
 	float *m_ImageData;
 	float *m_Original;
 	int m_iWidth;
@@ -55,7 +56,8 @@ public:
 	void segmentImage(int, int);
 	void reset();
 	void changeBrightness(int);
-	void changeContrast(int);
+	void changeContrast(float);
+	void saveImage();
 
 private:
 	void ScanLine(CBackBuffer *pDC, int draw, CPOINT2F pp0, CPOINT2F pp1, CPOINT2F pp2, CMatrix3 inv);

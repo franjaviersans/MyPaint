@@ -77,8 +77,12 @@ void CCGProyectDoc::Serialize(CArchive& ar)
 		int n, id;
 		ar >> n;
 
+
 		for(int i=0; i < n; ++i){
+
+
 			ar >> id;
+
 			switch (id)
 			{
 				case IM_CIRCLE:{
@@ -109,6 +113,13 @@ void CCGProyectDoc::Serialize(CArchive& ar)
 					CBezier *B = new CBezier;
 					B->Serialize(ar);
 					m_figures.push_back(B);
+					break;
+				}
+				case IM_IMAGE:{
+					
+					CMyImage *M = new CMyImage;
+					M->Serialize(ar);
+					m_figures.push_back(M);
 					break;
 				}
 			}

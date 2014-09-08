@@ -214,6 +214,19 @@ void CMyImage::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		ar << m_id;
+		ar << m_Path;
+		m_Model.Serialize(ar);
+		m_View.Serialize(ar);
+		m_Base.Serialize(ar);
+		m_Traslate.Serialize(ar);
+		m_Rotate.Serialize(ar);
+		m_Scale.Serialize(ar);
+		m_Center.Serialize(ar);
+		ar << m_iWidth;
+		ar << m_iHeight;
+		ar << m_iMin;
+		ar << m_iMax;
+		ar << m_iBytesPerLine;
 		ar << m_bgcolor;
 		ar << m_linecolor;
 		ar << m_filled;
@@ -224,6 +237,23 @@ void CMyImage::Serialize(CArchive& ar)
 	}
 	else
 	{
+
+		ar >> m_Path;
+
+		std::cout<< m_Path <<std::endl;
+		SetBitmap(m_Path);
+		m_Model.Serialize(ar);
+		m_View.Serialize(ar);
+		m_Base.Serialize(ar);
+		m_Traslate.Serialize(ar);
+		m_Rotate.Serialize(ar);
+		m_Scale.Serialize(ar);
+		m_Center.Serialize(ar);
+		ar >> m_iWidth;
+		ar >> m_iHeight;
+		ar >> m_iMin;
+		ar >> m_iMax;
+		ar >> m_iBytesPerLine;
 		ar >> m_bgcolor;
 		ar >> m_linecolor;
 		ar >> m_filled;
@@ -417,6 +447,8 @@ bool CMyImage::SetBitmap(CString strBitmap)
 						strBitmap, IMAGE_BITMAP, 0, 0, 
 						LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	
+	m_Path = strBitmap;
+
 	// Do we have a valid handle for the loaded image?
 	if (hBitmap)
 	{
@@ -584,8 +616,14 @@ void CMyImage::ApplyFilter(int type, int dim){
 			m_Filter.Sharpen(m_Original, m_ImageData, m_iWidth, m_iHeight);
 			break;			 
 		}
-	
+		default:
+		{
+			return;
+			break;
+		}
 	}	
+
+	memcpy(m_Original,m_ImageData, m_iWidth * m_iHeight * 3 * sizeof(float));
 }
 
 //Get histogram of the image
@@ -604,7 +642,7 @@ std::vector<float> CMyImage::getHistogram(){
 
 			offset = i * m_iWidth * 3 + j * 3;
 
-			grey = float(m_Original[offset]) * 0.299f + float(m_Original[offset+ 1]) * 0.587f + float(m_Original[offset + 2]) * 0.114f;
+			grey = float(m_ImageData[offset]) * 0.299f + float(m_ImageData[offset+ 1]) * 0.587f + float(m_ImageData[offset + 2]) * 0.114f;
 			vec[int(grey + 0.5f)] += 1.f;
 
 		}
@@ -621,7 +659,7 @@ void CMyImage::segmentImage(int threshold_min, int threshold_max){
 	int offset;
 
 	for(int i =0;i<m_iHeight;++i){
-		for(int j=0;j<m_iHeight;++j){
+		for(int j=0;j<m_iWidth;++j){
 
 			offset = i * m_iWidth * 3 + j * 3;
 
@@ -644,19 +682,44 @@ void CMyImage::changeBrightness(int alpha){
 
 	int offset;
 	for(int i =0;i<m_iHeight;++i){
-		for(int j=0;j<m_iHeight;++j){
+		for(int j=0;j<m_iWidth;++j){
 
 			offset = i * m_iWidth * 3 + j * 3;
 
-			m_ImageData[offset] = max(min(m_Original[offset] + alpha, 255), 0);
-			m_ImageData[offset + 1] = max(min(m_Original[offset + 1] + alpha, 255), 0);
-			m_ImageData[offset + 2] = max(min(m_Original[offset + 2] + alpha, 255), 0);
+			m_ImageData[offset] = max(min(m_ImageData[offset] + alpha, 255), 0);
+			m_ImageData[offset + 1] = max(min(m_ImageData[offset + 1] + alpha, 255), 0);
+			m_ImageData[offset + 2] = max(min(m_ImageData[offset + 2] + alpha, 255), 0);
 		}
 	}
 }
 
-void CMyImage::changeContrast(int){
+//Change contrast
+void CMyImage::changeContrast(float factor){
 
+	float half_factor = factor* 255.0f/2.0f;
+	float c = 255.0f/2.0f;
+
+
+	std::ofstream off("out.txt");
+    std::cout.rdbuf(off.rdbuf()); //redirect std::cout to out.txt!
+	std::cout<< factor << "    "<< 255 * factor - half_factor + c << "    "<< 125 * factor - half_factor + c << "    "<< 100 * factor - half_factor + c <<std::endl;
+
+	int offset;
+	for(int i =0;i<m_iHeight;++i){
+		for(int j=0;j<m_iWidth;++j){
+
+			offset = i * m_iWidth * 3 + j * 3;
+
+			m_ImageData[offset] = max(min(m_Original[offset] * factor - half_factor + c, 255), 0);
+			m_ImageData[offset + 1] = max(min(m_Original[offset + 1] * factor - half_factor + c, 255), 0);
+			m_ImageData[offset + 2] = max(min(m_Original[offset + 2] * factor - half_factor + c, 255), 0);
+		}
+	}
+}
+
+
+void CMyImage::saveImage(){
+	memcpy(m_Original,m_ImageData, m_iWidth * m_iHeight * 3 * sizeof(float));
 }
 
 int CMyImage::getWidth(){
