@@ -230,7 +230,8 @@ void CFilters::Gaussian(float *original, float *result, int w, int h, int dim){
 			minred = 0.0;
 			mingreen = 0.0;
 			minblue = 0.0; 
-         
+			div = 0; 
+
 			//multiply every value of the filter with corresponding image pixel 
 			for(int filterX = 0; filterX < dim; filterX++) 
 				for(int filterY = 0; filterY < dim; filterY++) 
@@ -238,9 +239,12 @@ void CFilters::Gaussian(float *original, float *result, int w, int h, int dim){
 					int imageX = (x + w - dim / 2 + filterX) % w; 
 					int imageY = (y + h - dim / 2 + filterY) % h; 
 
-					minred += original[imageY * 3* w + imageX * 3] * filter[filterY * dim + filterX]; 
-					mingreen += original[imageY * 3 * w + imageX * 3 + 1] * filter[filterY * dim + filterX]; 
-					minblue += original[imageY * 3* w + imageX * 3 + 2] * filter[filterY * dim + filterX]; 
+					if(0 <= imageX && imageX < w && 0 <= imageY && imageY < h){
+						minred += original[imageY * 3* w + imageX * 3] * filter[filterY * dim + filterX]; 
+						mingreen += original[imageY * 3 * w + imageX * 3 + 1] * filter[filterY * dim + filterX]; 
+						minblue += original[imageY * 3* w + imageX * 3 + 2] * filter[filterY * dim + filterX]; 
+						div += filter[filterY * dim + filterX];
+					}
 				} 
         
 			//truncate values smaller than zero and larger than 255 

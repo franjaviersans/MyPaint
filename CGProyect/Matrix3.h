@@ -16,6 +16,7 @@ public:
 	CMatrix3();
 	void PreMult(const CMatrix3 &);
 	void PostMult(const CMatrix3 &);
+	void Serialize(CArchive& ar);
 	
 	friend CMatrix3 Invert(const CMatrix3 &);
 	friend CMatrix3 Transpose(const CMatrix3 &);

@@ -2,15 +2,15 @@
 #include "BackBuffer.h"
 
 void CBackBuffer::SetPixel(int x, int y, int r, int g, int b){
-	m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
+	m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) b;
 	m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
-	m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
+	m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) r;
 }
 
 void CBackBuffer::SetPixel(int x, int y, float r, float g, float b){
-	m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
+	m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) b;
 	m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
-	m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
+	m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) r;
 }
 
 void CBackBuffer::SetPixel(int x, int y, CColor c){
@@ -55,17 +55,17 @@ void CBackBuffer::Rectangle(int x0, int y0, int x1, int y1, COLORREF c){
 
 void CBackBuffer::SetPixelSecured(int x, int y, int r, int g, int b){
 	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
-		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
+		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) b;
 		m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
-		m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
+		m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) r;
 	}
 }
 
 void CBackBuffer::SetPixelSecured(int x, int y, float r, float g, float b){
 	if(0 <= x && x < m_iWidth && 0 <= y && y < m_iHeight){
-		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) r;
+		m_bmpBackData[y*BytesPerLine + x*3] = (BYTE) b;
 		m_bmpBackData[y*BytesPerLine + x*3+1] = (BYTE) g;
-		m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) b;
+		m_bmpBackData[y*BytesPerLine + x*3+2] = (BYTE) r;
 	}
 }
 
