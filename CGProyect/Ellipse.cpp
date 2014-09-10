@@ -16,7 +16,12 @@ CEllipse::CEllipse()
 
 void CEllipse::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
+	if(m_filled) OnDraw(pDC,WindowsSize, true);
+	OnDraw(pDC,WindowsSize, false);
+}
 
+void CEllipse::OnDraw(CBackBuffer *pDC, POINT WindowsSize, bool filled)
+{
 	POINT p0, p1;
 	p0.x = (int)m_p1.x;
 	p0.y = (int)m_p1.y;
@@ -55,7 +60,7 @@ void CEllipse::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 		deltaincy	= aa << 3;
 
 		//Draw the 4 points of the ellipse
-		if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC, draw);
+		if(filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC, draw);
 		else			EllipsePoints(x,y,center, m_linecolor, pDC, draw);
 
 		while (((bb * (x + 1)) << 1) < aa * ((y << 1) - 1)) {
@@ -68,7 +73,7 @@ void CEllipse::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 			}
 			++x;
 			incx += deltaincx; 
-			if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC, draw);
+			if(filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC, draw);
 			else			EllipsePoints(x,y,center, m_linecolor, pDC, draw);
 		}
 
@@ -90,11 +95,13 @@ void CEllipse::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 			}
 			--y;
 			incy += deltaincy;
-			if(m_filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC, draw);
+			if(filled)	EllipsePointsFilled(x,y,center, m_linecolor, pDC, draw);
 			else			EllipsePoints(x,y,center, m_linecolor, pDC, draw);
 		}
 	}
+
 }
+
 
 void CEllipse::Serialize(CArchive& ar)
 {

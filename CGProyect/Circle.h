@@ -12,6 +12,7 @@ public:
 	CPOINT2F m_tangente;
 	CCircle();
 	virtual void OnDraw(CBackBuffer *, POINT);
+	void OnDraw(CBackBuffer *, POINT, bool);
 	virtual void Serialize(CArchive& ar);
 	virtual void DrawSelected(CBackBuffer *, POINT);
 	virtual bool Intersect(POINT);

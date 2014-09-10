@@ -16,6 +16,11 @@ CCircle::CCircle()
 
 void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
+	if(m_filled) OnDraw(pDC,WindowsSize, true);
+	OnDraw(pDC,WindowsSize, false);
+}
+
+void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize, bool filled){
 	// 0 Don't draw, 1 draw secured, 2 draw normal
 	int draw;
 	POINT center, tangent;
@@ -29,8 +34,7 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
 
 	//Check if the figure is inside the drawing area
-	if(center.x + r < 0 || center.x - r >= WindowsSize.x || center.y + r < 0 || center.y - r >= WindowsSize.y)
-		draw = 0;
+	if(center.x + r < 0 || center.x - r >= WindowsSize.x || center.y + r < 0 || center.y - r >= WindowsSize.y) draw = 0;
 	else if(center.x - r >= 0 && center.x + r < WindowsSize.x && center.y - r >= 0 && center.y + r < WindowsSize.y) draw = 2;
 	else draw = 1;
 
@@ -39,7 +43,7 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 		int dx = center.x - tangent.x;
 		int dy = center.y - tangent.y;
 		int incx, incy, delta;
-		int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
+		int r = (int)(0.5 + sqrt( double(dx * dx + dy * dy)));
 
 		int x,y,d;
 		x = 0;
@@ -48,9 +52,9 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 
 		incx		= 3;
 		delta		= 2;
-		incy		= -2 * r +5;
+		incy		= -2 * r + 5;
 
-		if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
+		if(filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
 		else		Draw8Points(x, y, center, m_linecolor, pDC, draw);
 
 		while (y > x){
@@ -63,7 +67,7 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 			}
 			++x;
 			incx += delta;
-			if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
+			if(filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
 			else		Draw8Points(x, y, center, m_linecolor, pDC, draw);
 		}
 	}

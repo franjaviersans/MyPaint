@@ -12,6 +12,7 @@ public:
 	CPOINT2F m_p2;
 	CEllipse();
 	virtual void OnDraw(CBackBuffer *, POINT);
+	void OnDraw(CBackBuffer *, POINT, bool);
 	virtual void Serialize(CArchive& );
 	virtual void DrawSelected(CBackBuffer *, POINT);
 	virtual bool Intersect(POINT);
