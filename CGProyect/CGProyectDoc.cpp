@@ -47,6 +47,7 @@ BOOL CCGProyectDoc::OnNewDocument()
 	m_current		= -1;
 	m_pressed		= m_bezier = false;
 	m_triangle		= 0;
+	m_bezierInsert	= 0;
 	m_selectedPoint = NULL;
 
 	m_pFrame = (CMainFrame*) AfxGetApp()->m_pMainWnd;

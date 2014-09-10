@@ -38,7 +38,7 @@ public:
 	bool m_pressed, m_bezier;
 	CPOINT2F* m_selectedPoint;
 	std::vector<CShape *>::iterator position;
-	int m_triangle;
+	int m_triangle, m_bezierInsert;
 	CToolBar* m_pToolBar;
 	CMainFrame* m_pFrame;
 
