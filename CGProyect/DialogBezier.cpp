@@ -72,7 +72,8 @@ BOOL CDialogBezier::OnInitDialog()
     m_k = (int)(0.5*PRECISION);
 	Slider->SetPos(int(m_k));
 	CString text;
-	text.Format("%.3f",(m_k/PRECISION));
+	m_k = (m_k/PRECISION);
+	text.Format("%.3f",m_k);
     m_kValue.SetWindowTextA(text);
     Invalidate();
 
