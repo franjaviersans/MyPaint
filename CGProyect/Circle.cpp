@@ -16,11 +16,6 @@ CCircle::CCircle()
 
 void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 {
-	if(m_filled) OnDraw(pDC,WindowsSize, true);
-	OnDraw(pDC,WindowsSize, false);
-}
-
-void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize, bool filled){
 	// 0 Don't draw, 1 draw secured, 2 draw normal
 	int draw;
 	POINT center, tangent;
@@ -45,7 +40,7 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize, bool filled){
 		int incx, incy, delta;
 		int r = (int)(0.5 + sqrt( double(dx * dx + dy * dy)));
 
-		int x,y,d;
+		int x,y,d,yant = -1, xant = -1;
 		x = 0;
 		y = r;
 		d = 1-r;
@@ -54,8 +49,11 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize, bool filled){
 		delta		= 2;
 		incy		= -2 * r + 5;
 
-		if(filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
-		else		Draw8Points(x, y, center, m_linecolor, pDC, draw);
+		if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw,xant,yant);
+		Draw8Points(x, y, center, m_linecolor, pDC, draw);
+
+		xant = x;
+		yant = y;
 
 		while (y > x){
 			if (d < 0) {
@@ -67,8 +65,11 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize, bool filled){
 			}
 			++x;
 			incx += delta;
-			if(filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
-			else		Draw8Points(x, y, center, m_linecolor, pDC, draw);
+			if(m_filled) Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw,xant,yant);
+			Draw8Points(x, y, center, m_linecolor, pDC, draw);
+
+			yant = y;
+			xant = x;
 		}
 	}
 }
@@ -120,33 +121,16 @@ void CCircle::Draw8Points(int x, int y, POINT center, COLORREF color, CBackBuffe
 	}
 }
 
-void CCircle::Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int draw){
-	if(draw ==  2){
-		pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
-		pDC->SetPixel(center.x + x,	center.y + y, color);
-		pDC->SetPixel(center.x - x,	center.y + y, color);
-		pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
-		pDC->SetPixel(center.x - x, center.y - y, color);
-		pDC->SetPixel(center.x + x, center.y - y, color);
-		pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
-		pDC->SetPixel(center.x + y, center.y + x, color);
-		pDC->SetPixel(center.x - y, center.y + x, color);
-		pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
-		pDC->SetPixel(center.x - y, center.y - x, color);
-		pDC->SetPixel(center.x + y, center.y - x, color);
-	}else{
-		pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
-		pDC->SetPixelSecured(center.x + x,	center.y + y, color);
-		pDC->SetPixelSecured(center.x - x,	center.y + y, color);
-		pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
-		pDC->SetPixelSecured(center.x - x, center.y - y, color);
-		pDC->SetPixelSecured(center.x + x, center.y - y, color);
-		pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
-		pDC->SetPixelSecured(center.x + y, center.y + x, color);
-		pDC->SetPixelSecured(center.x - y, center.y + x, color);
-		pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
-		pDC->SetPixelSecured(center.x - y, center.y - x, color);
-		pDC->SetPixelSecured(center.x + y, center.y - x, color);
+void CCircle::Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int draw,int lastx, int lasty){
+	if(draw !=  0){
+		if(y != lasty){
+			pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
+			pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
+		}
+		if(x != lastx){
+			pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
+			pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
+		}
 	}
 }
 

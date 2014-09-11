@@ -12,7 +12,6 @@ public:
 	CPOINT2F m_tangente;
 	CCircle();
 	virtual void OnDraw(CBackBuffer *, POINT);
-	void OnDraw(CBackBuffer *, POINT, bool);
 	virtual void Serialize(CArchive& ar);
 	virtual void DrawSelected(CBackBuffer *, POINT);
 	virtual bool Intersect(POINT);
@@ -24,7 +23,7 @@ public:
 
 private:
 	void Draw8Points(int, int, POINT, COLORREF, CBackBuffer *, int);
-	void Draw8PointsFilled(int, int, POINT, COLORREF, CBackBuffer *, int);
+	void Draw8PointsFilled(int, int, POINT, COLORREF, CBackBuffer *, int,int,int);
 };
 
 #endif
