@@ -23,7 +23,7 @@ public:
 
 private:
 	void Draw8Points(int, int, POINT, COLORREF, CBackBuffer *, int);
-	void Draw8PointsFilled(int, int, POINT, COLORREF, CBackBuffer *, int);
+	void Draw8PointsFilled(int, int, POINT, COLORREF, CBackBuffer *, int,int,int);
 };
 
 #endif

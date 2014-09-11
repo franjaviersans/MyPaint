@@ -35,7 +35,7 @@ BEGIN_MESSAGE_MAP(CCGProyectView, CView)
 	ON_COMMAND(ID_BUTTON_TRIANGLE, &CCGProyectView::OnButtonTriangle)
 	ON_WM_SIZE()
 	ON_WM_CONTEXTMENU()
-ON_WM_RBUTTONDOWN()
+//ON_WM_RBUTTONDOWN()
 ON_COMMAND(ID_CHANGE_CHANGEBORDERCOLOR, &CCGProyectView::OnChangeChangebordercolor)
 ON_COMMAND(ID_CHANGE_DELETEFIGURE, &CCGProyectView::OnChangeDeletefigure)
 ON_COMMAND(ID_CHANGE_FILLFIGURE, &CCGProyectView::OnChangeFillfigure)
@@ -225,40 +225,62 @@ void CCGProyectView::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 		case IM_BEZIER:  {
 			pDoc->m_transform = 0;
-			CBezier *B = new CBezier;
-			B->arr[0][0] = point;
-			B->arr[0][1] = point;
-			pDoc->m_figures.push_back(B);
-			pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+			if(pDoc->m_bezierInsert == 0){
+				CBezier *B = new CBezier;
+				B->arr[0][0] = point;
+				//B->arr[0][1] = point;
+				pDoc->m_figures.push_back(B);
+				pDoc->position = pDoc->m_figures.begin() + pDoc->m_figures.size() - 1;
+				pDoc->m_bezierInsert = 1;
+			}else{
+				std::vector<CShape *>::reverse_iterator i = pDoc->m_figures.rbegin();
+				((CBezier *)(*i))->addPoint(point.x, point.y);
+			}
 			break;
 		}
 		default:{
 			pDoc->m_transform = 0;
-			if ((nFlags & MK_CONTROL) && (nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE){
-				//Rotate
-				pDoc->m_transform = 3;
-				pDoc->m_initialPoint = point;
-			}else if ((nFlags & MK_CONTROL) && pDoc->position != pDoc->m_figures.end()){
-				//Translate
-				::SetCursor(::LoadCursor(0, IDC_HAND));
-				pDoc->m_transform = 1;
-				pDoc->m_initialPoint = point;
-			}else if ((nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end()){
-				//Scale
-				pDoc->m_transform = 2;
+
+			if(pDoc->position != pDoc->m_figures.end()){
 				//Select a control point of the selected figure
 				pDoc->m_selectedPoint = NULL;
 				pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(point);
-				if(pDoc->m_selectedPoint != NULL) ::SetCursor(::LoadCursor(0, IDC_SIZEALL));
+			
+				if ( pDoc->m_selectedPoint != NULL){
+					//Scale
+					pDoc->m_transform = 2;
+					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
+				}else{
+					//Intersect with Figure
+					pDoc->position = pDoc->m_figures.end();
+					for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
+						if((*i)->Intersect(point)){
+							pDoc->position = i;
+						}
+					}
+			
+			
+					if ((nFlags & MK_SHIFT) && pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE){
+						//Rotate
+						pDoc->m_transform = 3;
+						pDoc->m_initialPoint = point;
+					}else if (pDoc->position != pDoc->m_figures.end()){
+						//Translate
+						::SetCursor(::LoadCursor(0, IDC_HAND));
+						pDoc->m_transform = 1;
+						pDoc->m_initialPoint = point;
+					}
+				}
 			}else{
+				//Intersect with Figure
 				pDoc->position = pDoc->m_figures.end();
-
 				for (std::vector<CShape *>::iterator i = pDoc->m_figures.begin(); i!=pDoc->m_figures.end(); i++){
 					if((*i)->Intersect(point)){
 						pDoc->position = i;
 					}
 				}
 			}
+
 			break;
 		}
 	}
@@ -302,14 +324,21 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 				}
 				break;
 			}
-			case IM_BEZIER:  {
-				((CBezier *)(*i))->arr[0][1] = point;
-				pDoc->m_current = -1;
-
-				break;
-			}
-			default:{
-				if (pDoc->m_transform == 1 && pDoc->position != pDoc->m_figures.end()){
+			default:{	
+				if (pDoc->m_transform == 2 && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
+					//Scale
+					if((*pDoc->position)->GetID() == IM_IMAGE){
+						((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
+					}else{
+						pDoc->m_selectedPoint->x = (float)point.x ;
+						pDoc->m_selectedPoint->y = (float)point.y ;
+					}
+				}else if (pDoc->m_transform == 3 && (nFlags & MK_LBUTTON) && pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE){
+					//Rotate
+					pDoc->m_transform = 3;
+					((CMyImage*)*pDoc->position)->RotateFigure(point, pDoc->m_initialPoint);
+					pDoc->m_initialPoint = point;
+				}else if (pDoc->m_transform == 1 && (nFlags & MK_LBUTTON) && pDoc->position != pDoc->m_figures.end()){
 					//Translate
 					POINT p;
 					p.x = (point.x - pDoc->m_initialPoint.x) ;
@@ -318,19 +347,6 @@ void CCGProyectView::OnLButtonUp(UINT nFlags, CPoint point)
 					(*pDoc->position)->Translate(p);
 
 					pDoc->m_initialPoint = point;
-				}else if (pDoc->m_transform == 3 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE){
-					//Rotate
-					pDoc->m_transform = 3;
-					((CMyImage*)*pDoc->position)->RotateFigure(point, pDoc->m_initialPoint);
-					pDoc->m_initialPoint = point;
-				}else if (pDoc->m_transform == 2 && pDoc->m_selectedPoint != NULL){
-					//Scale
-					if((*pDoc->position)->GetID() == IM_IMAGE){
-						((CMyImage*)*pDoc->position)->ModifyPoint(point, pDoc->m_selectedPoint, (nFlags & MK_SHIFT)?true:false);
-					}else{
-						pDoc->m_selectedPoint->x = (float)point.x ;
-						pDoc->m_selectedPoint->y = (float)point.y ;
-					}
 				}
 				break;
 			}
@@ -376,32 +392,10 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 					((CTriangle *)(*i))->m_p1 = point;
 				}
 				break;
-			}
-			case IM_BEZIER:  {
-				((CBezier *)(*i))->arr[0][1] = point;
-				break;
-			}		 
+			}	 
 			default:{
 				
-				if (pDoc->m_transform == 1 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end()){
-					//Translate
-					::SetCursor(::LoadCursor(0, IDC_HAND));
-
-					POINT p;
-
-					p.x = (point.x - pDoc->m_initialPoint.x) ;
-					p.y = (point.y - pDoc->m_initialPoint.y) ;
-
-					(*pDoc->position)->Translate(p);
-
-					pDoc->m_initialPoint = point;
-
-				}else if (pDoc->m_transform == 3 && (nFlags & MK_LBUTTON)  && pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE){
-					//Rotate
-					pDoc->m_transform = 3;
-					((CMyImage*)*pDoc->position)->RotateFigure(point, pDoc->m_initialPoint);
-					pDoc->m_initialPoint = point;
-				}else if (pDoc->m_transform == 2 && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL ){
+				if (pDoc->m_transform == 2 && (nFlags & MK_LBUTTON) && pDoc->m_selectedPoint != NULL){
 					//Scale
 					::SetCursor(::LoadCursor(0, IDC_SIZEALL));
 
@@ -411,7 +405,24 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 						pDoc->m_selectedPoint->x = (float)point.x ;
 						pDoc->m_selectedPoint->y = (float)point.y ;
 					}
+				}else if (pDoc->m_transform == 3 && (nFlags & MK_LBUTTON) && pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE){
+					//Rotate
+					pDoc->m_transform = 3;
+					((CMyImage*)*pDoc->position)->RotateFigure(point, pDoc->m_initialPoint);
+					pDoc->m_initialPoint = point;
+				}else if (pDoc->m_transform == 1 && (nFlags & MK_LBUTTON) && pDoc->position != pDoc->m_figures.end()){
+					//Translate
+					::SetCursor(::LoadCursor(0, IDC_HAND));
+
+					POINT p;
+					p.x = (point.x - pDoc->m_initialPoint.x) ;
+					p.y = (point.y - pDoc->m_initialPoint.y) ;
+
+					(*pDoc->position)->Translate(p);
+
+					pDoc->m_initialPoint = point;
 				}
+
 				break;
 			}
 		}
@@ -426,6 +437,7 @@ void CCGProyectView::OnMouseMove(UINT nFlags, CPoint point)
 void CCGProyectView::OnButtonBezier()
 {
 	CCGProyectDoc* pDoc = GetDocument();
+	pDoc->m_bezierInsert = 0;
 	pDoc->m_current = IM_BEZIER;
 }
 
@@ -496,36 +508,37 @@ void CCGProyectView::OnContextMenu(CWnd * pWnd, CPoint point)
 {
 	CCGProyectDoc* pDoc = GetDocument();
 	
-	CMenu menu;
+	if(pDoc->m_current != IM_BEZIER){
+		CMenu menu;
 
-	if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_BEZIER)			menu.LoadMenu(IDR_MENU2);
-	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE)		menu.LoadMenu(IDR_MENU_IMAGE);
-	else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_TRIANGLE){ 
+		if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_BEZIER)			menu.LoadMenu(IDR_MENU2);
+		else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_IMAGE)		menu.LoadMenu(IDR_MENU_IMAGE);
+		else if(pDoc->position != pDoc->m_figures.end() && (*pDoc->position)->GetID() == IM_TRIANGLE){ 
 
-		CPoint q = point;
-		ScreenToClient(&q);
+			CPoint q = point;
+			ScreenToClient(&q);
 
-		pDoc->m_selectedPoint = NULL;
-		pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(q);
+			pDoc->m_selectedPoint = NULL;
+			pDoc->m_selectedPoint = (*pDoc->position)->IntersectControlPoint(q);
 		
-		if(pDoc->m_selectedPoint != NULL)															menu.LoadMenu(IDR_MENU4);	
-		else																						menu.LoadMenu(IDR_MENU2);
-	}else																							menu.LoadMenu(IDR_MENU1);
+			if(pDoc->m_selectedPoint != NULL)															menu.LoadMenu(IDR_MENU4);	
+			else																						menu.LoadMenu(IDR_MENU2);
+		}else																							menu.LoadMenu(IDR_MENU1);
 
-    CMenu *pSub = menu.GetSubMenu(0);
-    // Modify menu items here if necessary (e.g. gray out items)
-    int nCmd = pSub->TrackPopupMenuEx(
-        TPM_LEFTALIGN | TPM_LEFTBUTTON,
-        point.x, point.y, this, NULL);
+		CMenu *pSub = menu.GetSubMenu(0);
+		// Modify menu items here if necessary (e.g. gray out items)
+		int nCmd = pSub->TrackPopupMenuEx(
+			TPM_LEFTALIGN | TPM_LEFTBUTTON,
+			point.x, point.y, this, NULL);
+
+	}else{
+		pDoc->m_bezierInsert = 1;
+		pDoc->m_current = -1;
+	}
 
 	Invalidate();
 }
 
-
-void CCGProyectView::OnRButtonDown(UINT nFlags, CPoint point)
-{
-	CView::OnRButtonDown(nFlags, point);
-}
 
 //Change the border color
 void CCGProyectView::OnChangeChangebordercolor()
@@ -824,11 +837,14 @@ void CCGProyectView::OnDivideBezier()
 	CCGProyectDoc* pDoc = GetDocument();
 	if(pDoc->position != pDoc->m_figures.end()){
 		if((*pDoc->position)->GetID() == IM_BEZIER){
-			
+
 			CDialogBezier db;
 			if(db.DoModal() == IDOK){
 				std::vector< CPOINT2F > firsthalf, secondhalf;
 				((CBezier*)(*pDoc->position))->Divide(firsthalf, secondhalf, db.m_k);
+
+				//Erase original curve
+				pDoc->m_figures.erase(pDoc->position);
 
 				CColor c = CColor(float(rand()%255),float(rand()%255),float(rand()%255));
 
@@ -843,7 +859,7 @@ void CCGProyectView::OnDivideBezier()
 				B = new CBezier(secondhalf);
 				B ->ChangeLineColor(c.ToCOLORREF());
 				pDoc->m_figures.push_back(B);
-			
+				
 				//Clear auxiliar vectors
 				firsthalf.clear();
 				secondhalf.clear();	

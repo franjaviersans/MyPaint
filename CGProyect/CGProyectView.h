@@ -49,7 +49,7 @@ public:
 	afx_msg void OnButtonTriangle();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
-	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+//	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnChangeChangebordercolor();
 	afx_msg void OnChangeDeletefigure();
 	afx_msg void OnChangeDeselectfigure();

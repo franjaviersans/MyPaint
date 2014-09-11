@@ -29,8 +29,7 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 	int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
 
 	//Check if the figure is inside the drawing area
-	if(center.x + r < 0 || center.x - r >= WindowsSize.x || center.y + r < 0 || center.y - r >= WindowsSize.y)
-		draw = 0;
+	if(center.x + r < 0 || center.x - r >= WindowsSize.x || center.y + r < 0 || center.y - r >= WindowsSize.y) draw = 0;
 	else if(center.x - r >= 0 && center.x + r < WindowsSize.x && center.y - r >= 0 && center.y + r < WindowsSize.y) draw = 2;
 	else draw = 1;
 
@@ -39,19 +38,22 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 		int dx = center.x - tangent.x;
 		int dy = center.y - tangent.y;
 		int incx, incy, delta;
-		int r = (int)(0.5+sqrt( (double)dx * dx + dy * dy));
+		int r = (int)(0.5 + sqrt( double(dx * dx + dy * dy)));
 
-		int x,y,d;
+		int x,y,d,yant = -1, xant = -1;
 		x = 0;
 		y = r;
 		d = 1-r;
 
 		incx		= 3;
 		delta		= 2;
-		incy		= -2 * r +5;
+		incy		= -2 * r + 5;
 
-		if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
-		else		Draw8Points(x, y, center, m_linecolor, pDC, draw);
+		if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw,xant,yant);
+		Draw8Points(x, y, center, m_linecolor, pDC, draw);
+
+		xant = x;
+		yant = y;
 
 		while (y > x){
 			if (d < 0) {
@@ -63,8 +65,11 @@ void CCircle::OnDraw(CBackBuffer *pDC, POINT WindowsSize)
 			}
 			++x;
 			incx += delta;
-			if(m_filled)Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw);
-			else		Draw8Points(x, y, center, m_linecolor, pDC, draw);
+			if(m_filled) Draw8PointsFilled(x, y, center, m_linecolor, pDC, draw,xant,yant);
+			Draw8Points(x, y, center, m_linecolor, pDC, draw);
+
+			yant = y;
+			xant = x;
 		}
 	}
 }
@@ -116,33 +121,16 @@ void CCircle::Draw8Points(int x, int y, POINT center, COLORREF color, CBackBuffe
 	}
 }
 
-void CCircle::Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int draw){
-	if(draw ==  2){
-		pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
-		pDC->SetPixel(center.x + x,	center.y + y, color);
-		pDC->SetPixel(center.x - x,	center.y + y, color);
-		pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
-		pDC->SetPixel(center.x - x, center.y - y, color);
-		pDC->SetPixel(center.x + x, center.y - y, color);
-		pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
-		pDC->SetPixel(center.x + y, center.y + x, color);
-		pDC->SetPixel(center.x - y, center.y + x, color);
-		pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
-		pDC->SetPixel(center.x - y, center.y - x, color);
-		pDC->SetPixel(center.x + y, center.y - x, color);
-	}else{
-		pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
-		pDC->SetPixelSecured(center.x + x,	center.y + y, color);
-		pDC->SetPixelSecured(center.x - x,	center.y + y, color);
-		pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
-		pDC->SetPixelSecured(center.x - x, center.y - y, color);
-		pDC->SetPixelSecured(center.x + x, center.y - y, color);
-		pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
-		pDC->SetPixelSecured(center.x + y, center.y + x, color);
-		pDC->SetPixelSecured(center.x - y, center.y + x, color);
-		pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
-		pDC->SetPixelSecured(center.x - y, center.y - x, color);
-		pDC->SetPixelSecured(center.x + y, center.y - x, color);
+void CCircle::Draw8PointsFilled(int x, int y, POINT center, COLORREF color, CBackBuffer *pDC, int draw,int lastx, int lasty){
+	if(draw !=  0){
+		if(y != lasty){
+			pDC->FillLine(center.x + x, center.y + y, center.x - x, center.y + y, m_bgcolor);
+			pDC->FillLine(center.x + x, center.y - y, center.x - x, center.y - y, m_bgcolor);
+		}
+		if(x != lastx){
+			pDC->FillLine(center.x + y, center.y + x, center.x - y, center.y + x, m_bgcolor);
+			pDC->FillLine(center.x + y, center.y - x, center.x - y, center.y - x, m_bgcolor);
+		}
 	}
 }
 

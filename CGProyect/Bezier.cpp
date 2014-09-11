@@ -9,7 +9,7 @@ CBezier::CBezier()
 	std::vector< CPOINT2F > va;
 	arr.push_back(va);
 	addPoint(0,0);
-	addPoint(0,0);
+	//addPoint(0,0);
 	/*arr[0].resize(2);
 	arr[0].resize(1);
 	arr[0][0].x = 0;
@@ -27,7 +27,7 @@ CBezier::CBezier(std::vector< CPOINT2F > &copy){
 	std::vector< CPOINT2F > va;
 	arr.push_back(va);
 	addPoint(0,0);
-	addPoint(0,0);
+	//addPoint(0,0);
 
 	//Allocate the space
 	arr[0].resize(copy.size());
